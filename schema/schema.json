@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MatchJSONv3",
+  "description": "Standardized Cricket Match JSON v3.0 format for Cricket Data Lake",
+  "type": "object",
+  "required": [
+    "match_id",
+    "meta",
+    "outcome",
+    "toss",
+    "playing_xi",
+    "innings"
+  ],
+  "properties": {
+    "match_id": {
+      "type": "string",
+      "description": "Canonical ESPNcricinfo Match ID (string format)"
+    },
+    "meta": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "format",
+        "format_bucket",
+        "dates",
+        "venue",
+        "balls_per_over"
+      ],
+      "properties": {
+        "schema_version": { "type": "string", "const": "3.0.0" },
+        "format": { "type": "string" },
+        "format_bucket": {
+          "type": "string",
+          "enum": ["IPL", "T20I", "T20", "ODI", "Test"]
+        },
+        "competition": { "type": ["string", "null"] },
+        "season": { "type": ["string", "integer", "null"] },
+        "dates": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "venue": { "type": "string" },
+        "venue_country": { "type": ["string", "null"] },
+        "city": { "type": ["string", "null"] },
+        "gender": { "type": "string", "enum": ["male", "female"] },
+        "day_night": { "type": "string" },
+        "match_stage": { "type": ["string", "null"] },
+        "match_number": { "type": ["integer", "string", "null"] },
+        "match_group": { "type": ["string", "null"] },
+        "balls_per_over": { "type": "integer", "default": 6 },
+        "tactical_coverage": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "properties": {
+        "winner": { "type": ["string", "null"] },
+        "win_by_runs": { "type": ["integer", "null"] },
+        "win_by_wickets": { "type": ["integer", "null"] },
+        "win_by_innings": { "type": ["integer", "null"] },
+        "result": { "type": ["string", "null"] },
+        "eliminator": { "type": ["string", "null"] },
+        "method": { "type": ["string", "null"] }
+      }
+    },
+    "toss": {
+      "type": "object",
+      "properties": {
+        "winner": { "type": ["string", "null"] },
+        "decision": { "type": ["string", "null"], "enum": ["bat", "field", null] }
+      }
+    },
+    "playing_xi": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "innings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "innings_number",
+          "batting_team",
+          "overs"
+        ],
+        "properties": {
+          "innings_number": { "type": "integer", "minimum": 1 },
+          "batting_team": { "type": "string" },
+          "bowling_team": { "type": ["string", "null"] },
+          "target": { "type": ["integer", "null"] },
+          "declared": { "type": "boolean" },
+          "follow_on": { "type": "boolean" },
+          "super_over": { "type": "boolean" },
+          "overs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["over", "deliveries"],
+              "properties": {
+                "over": { "type": "integer", "minimum": 0 },
+                "deliveries": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "ball_number",
+                      "actual_delivery",
+                      "is_legal",
+                      "batter_id",
+                      "bowler_id",
+                      "runs",
+                      "extras",
+                      "wickets"
+                    ],
+                    "properties": {
+                      "ball_number": { "type": "integer", "minimum": 1 },
+                      "actual_delivery": { "type": "string" },
+                      "is_legal": { "type": "boolean" },
+                      "batter_id": { "type": "string" },
+                      "bowler_id": { "type": "string" },
+                      "non_striker_id": { "type": ["string", "null"] },
+                      "runs": {
+                        "type": "object",
+                        "required": ["batter", "extras", "total"],
+                        "properties": {
+                          "batter": { "type": "integer" },
+                          "extras": { "type": "integer" },
+                          "total": { "type": "integer" }
+                        }
+                      },
+                      "extras": {
+                        "type": "object",
+                        "properties": {
+                          "wides": { "type": "integer" },
+                          "noballs": { "type": "integer" },
+                          "byes": { "type": "integer" },
+                          "legbyes": { "type": "integer" },
+                          "penalty": { "type": "integer" }
+                        }
+                      },
+                      "wickets": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "required": ["player_out_id", "kind"],
+                          "properties": {
+                            "player_out_id": { "type": "string" },
+                            "player_out_name": { "type": ["string", "null"] },
+                            "kind": { "type": "string" },
+                            "fielders": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "name": { "type": "string" },
+                                  "player_id": { "type": ["string", "null"] },
+                                  "cricsheet_id": { "type": ["string", "null"] }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "total_inning_runs": { "type": ["integer", "null"] },
+                      "phase": { "type": "string" },
+                      "tactical": {
+                        "type": "object",
+                        "properties": {
+                          "wagon_coords": {
+                            "type": ["array", "null"],
+                            "items": { "type": "integer" }
+                          },
+                          "wagon_zone": { "type": ["integer", "null"] },
+                          "pitch_line": { "type": ["integer", "string", "null"] },
+                          "pitch_length": { "type": ["integer", "string", "null"] },
+                          "shot_type": { "type": ["integer", "string", "null"] },
+                          "shot_control": { "type": ["integer", "null"] }
+                        }
+                      },
+                      "review": {
+                        "type": ["object", "null"],
+                        "properties": {
+                          "by": { "type": ["string", "null"] },
+                          "batter": { "type": ["string", "null"] },
+                          "bowler": { "type": ["string", "null"] },
+                          "decision": { "type": "string" },
+                          "type": { "type": "string" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

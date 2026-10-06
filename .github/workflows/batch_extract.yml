@@ -1,0 +1,118 @@
+name: Resumable Batch Extractor
+
+on:
+  workflow_dispatch:
+    inputs:
+      batch_index:
+        description: 'Batch Index (0 to 11)'
+        required: true
+        default: '0'
+      batch_size:
+        description: 'Number of matches per batch'
+        required: true
+        default: '500'
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Pre-fetch Previous Batch Release
+        id: prefetch
+        run: |
+          set -euo pipefail
+          mkdir -p output_batch_${{ github.event.inputs.batch_index }}
+          mkdir -p raw_batch_${{ github.event.inputs.batch_index }}
+
+          # 1. Inspect existing assets safely
+          if ! LIST=$(gh release view data-v2-batches --json assets --jq '.assets[].name' 2>err.txt); then
+            if grep -qi "release not found" err.txt; then
+              LIST=""
+            else
+              cat err.txt
+              exit 1
+            fi
+          fi
+
+          # 2. Download parsed asset if present
+          if echo "$LIST" | grep -qx "matches_batch_${{ github.event.inputs.batch_index }}.tar.gz"; then
+            echo "Downloading existing parsed asset..."
+            gh release download data-v2-batches -p "matches_batch_${{ github.event.inputs.batch_index }}.tar.gz" --dir output_batch_${{ github.event.inputs.batch_index }}
+            tar -xzf output_batch_${{ github.event.inputs.batch_index }}/matches_batch_${{ github.event.inputs.batch_index }}.tar.gz -C output_batch_${{ github.event.inputs.batch_index }}
+            rm output_batch_${{ github.event.inputs.batch_index }}/matches_batch_${{ github.event.inputs.batch_index }}.tar.gz
+          fi
+
+          # 3. Download raw asset if present
+          if echo "$LIST" | grep -qx "raw_batch_${{ github.event.inputs.batch_index }}.tar.gz"; then
+            echo "Downloading existing raw asset..."
+            gh release download data-v2-batches -p "raw_batch_${{ github.event.inputs.batch_index }}.tar.gz" --dir raw_batch_${{ github.event.inputs.batch_index }}
+            tar -xzf raw_batch_${{ github.event.inputs.batch_index }}/raw_batch_${{ github.event.inputs.batch_index }}.tar.gz -C raw_batch_${{ github.event.inputs.batch_index }}
+            rm raw_batch_${{ github.event.inputs.batch_index }}/raw_batch_${{ github.event.inputs.batch_index }}.tar.gz
+          fi
+
+          PREV_COUNT=$(find output_batch_${{ github.event.inputs.batch_index }} -name "*.json" ! -name "failed_matches.json" | wc -l | tr -d ' ')
+          echo "prev_count=$PREV_COUNT" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run Extraction Batch
+        id: run_extractor
+        env:
+          AKAMAI_KEY: ${{ secrets.AKAMAI_KEY }}
+        run: |
+          python extract.py \
+            --batch-index ${{ github.event.inputs.batch_index }} \
+            --batch-size ${{ github.event.inputs.batch_size }} \
+            --delay 0.6 \
+            --skip-existing \
+            --raw-dir raw_batch_${{ github.event.inputs.batch_index }} \
+            --output-dir output_batch_${{ github.event.inputs.batch_index }}
+
+      - name: Compress Outputs
+        if: always() && steps.prefetch.outcome == 'success'
+        run: |
+          set -euo pipefail
+          if [ -d "output_batch_${{ github.event.inputs.batch_index }}" ]; then
+            tar -czf matches_batch_${{ github.event.inputs.batch_index }}.tar.gz -C output_batch_${{ github.event.inputs.batch_index }} .
+          fi
+          if [ -d "raw_batch_${{ github.event.inputs.batch_index }}" ]; then
+            tar -czf raw_batch_${{ github.event.inputs.batch_index }}.tar.gz -C raw_batch_${{ github.event.inputs.batch_index }} .
+          fi
+
+      - name: Safety Overwrite Gate
+        id: gate
+        if: always() && steps.prefetch.outcome == 'success'
+        run: |
+          set -euo pipefail
+          PREV_COUNT="${{ steps.prefetch.outputs.prev_count }}"
+          : "${PREV_COUNT:?missing PREV_COUNT}"
+          NEW_COUNT=$(find output_batch_${{ github.event.inputs.batch_index }} -name "*.json" ! -name "failed_matches.json" | wc -l | tr -d ' ')
+          echo "Comparing match counts: NEW=$NEW_COUNT vs PREV=$PREV_COUNT"
+          if [ "$NEW_COUNT" -lt "$PREV_COUNT" ]; then
+            echo "CRITICAL: Truncation detected ($NEW_COUNT < $PREV_COUNT)! Aborting upload to preserve data."
+            exit 1
+          fi
+
+      - name: Upload Release Assets
+        if: always() && steps.prefetch.outcome == 'success' && steps.gate.outcome == 'success'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: data-v2-batches
+          files: |
+            matches_batch_${{ github.event.inputs.batch_index }}.tar.gz
+            raw_batch_${{ github.event.inputs.batch_index }}.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
