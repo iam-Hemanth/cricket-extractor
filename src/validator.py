@@ -119,6 +119,8 @@ def validate_player_registry(match_data: dict) -> Tuple[bool, List[str]]:
     errors = []
     known_ids = set()
     for team, players in match_data.get("playing_xi", {}).items():
+        if team.startswith("_") or not isinstance(players, list):
+            continue
         for p in players:
             if isinstance(p, dict) and p.get("player_id"):
                 known_ids.add(p["player_id"])
