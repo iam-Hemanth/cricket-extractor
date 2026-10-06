@@ -11,6 +11,11 @@ on:
         description: 'Number of matches per batch'
         required: true
         default: '500'
+      delay:
+        description: 'Delay between requests (seconds)'
+        required: false
+        default: '0.2'
+
 
 permissions:
   contents: write
@@ -77,10 +82,18 @@ jobs:
           python extract.py \
             --batch-index ${{ github.event.inputs.batch_index }} \
             --batch-size ${{ github.event.inputs.batch_size }} \
-            --delay 0.6 \
+            --delay ${{ github.event.inputs.delay || '0.2' }} \
             --skip-existing \
             --raw-dir raw_batch_${{ github.event.inputs.batch_index }} \
             --output-dir output_batch_${{ github.event.inputs.batch_index }}
+
+      - name: Upload Failed Matches Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failed_matches_batch_${{ github.event.inputs.batch_index }}
+          path: output_batch_${{ github.event.inputs.batch_index }}/failed_matches.json
+          if-no-files-found: ignore
 
       - name: Compress Outputs
         if: always() && steps.prefetch.outcome == 'success'
@@ -117,3 +130,4 @@ jobs:
             raw_batch_${{ github.event.inputs.batch_index }}.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
