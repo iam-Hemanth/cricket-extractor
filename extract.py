@@ -216,10 +216,11 @@ def main():
             # 4. Multi-dimension validation
             validation_errors = []
             sc_inns = content.get("innings") or []
+            match_bpo = match_v3.get("meta", {}).get("balls_per_over", 6)
             for i_idx, v_inn in enumerate(match_v3.get("innings", [])):
                 sc_inn_data = sc_inns[i_idx] if i_idx < len(sc_inns) else None
                 is_last = (i_idx == len(match_v3.get("innings", [])) - 1)
-                is_ok, errs = validate_innings(v_inn, sc_inn_data, is_last_innings=is_last)
+                is_ok, errs = validate_innings(v_inn, sc_inn_data, is_last_innings=is_last, balls_per_over=match_bpo)
                 if not is_ok:
                     validation_errors.extend(errs)
 

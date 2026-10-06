@@ -44,6 +44,8 @@ def determine_format_bucket(raw_format: str, competition_name: Optional[str]) ->
 
     if comp == "Indian Premier League":
         return "T20", "IPL"
+    if comp == "The Hundred Men's Competition" or fmt_upper in ("HUNDRED_BALL", "HUNDRED"):
+        return "T20", "T20"
     if fmt_upper in ("IT20", "T20I"):
         return "T20I", "T20I"
     if fmt_upper in ("T20",):
@@ -442,6 +444,14 @@ def construct_match_v3(
 
     tactical_coverage = round(total_tracked_balls / total_balls_count, 3) if total_balls_count > 0 else 0.0
 
+    raw_bpo = match_info.get("ballsPerOver")
+    if raw_bpo and isinstance(raw_bpo, int) and raw_bpo > 0:
+        balls_per_over = raw_bpo
+    elif comp_name == "The Hundred Men's Competition":
+        balls_per_over = 5
+    else:
+        balls_per_over = 6
+
     match_v3 = {
         "match_id": str(mid),
         "meta": {
@@ -459,7 +469,7 @@ def construct_match_v3(
             "match_stage": (match_info.get("event") or {}).get("stage"),
             "match_number": (match_info.get("event") or {}).get("matchNumber"),
             "match_group": (match_info.get("event") or {}).get("group"),
-            "balls_per_over": 6,
+            "balls_per_over": balls_per_over,
             "tactical_coverage": tactical_coverage
         },
         "outcome": {

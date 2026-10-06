@@ -16,7 +16,8 @@ def parse_delivery_key(actual_str: str) -> Tuple[int, int]:
 def validate_innings(
     inn: dict,
     sc_inn: Optional[dict] = None,
-    is_last_innings: bool = False
+    is_last_innings: bool = False,
+    balls_per_over: int = 6
 ) -> Tuple[bool, List[str]]:
     """
     Validate innings delivery sequence, running totals, and scorecard totals.
@@ -27,7 +28,7 @@ def validate_innings(
     if not overs:
         return True, []
 
-    # 1. Monotonicity & 6-ball over check
+    # 1. Monotonicity & legal balls per over check
     prev_tuple = (-1, -1)
     tot_overs = len(overs)
 
@@ -50,10 +51,10 @@ def validate_innings(
             if d.get("is_legal"):
                 legal_count += 1
 
-        # Completed overs must have exactly 6 legal balls (unless final over of innings)
-        if not is_final_over and legal_count != 6:
+        # Completed overs must have exactly balls_per_over legal balls (unless final over of innings)
+        if not is_final_over and legal_count != balls_per_over:
             errors.append(
-                f"Inn {inn.get('innings_number')} Over {ov.get('over')} has {legal_count} legal balls (expected 6)"
+                f"Inn {inn.get('innings_number')} Over {ov.get('over')} has {legal_count} legal balls (expected {balls_per_over})"
             )
 
     # 2. Cumulative score integrity vs Cricinfo totalInningRuns
