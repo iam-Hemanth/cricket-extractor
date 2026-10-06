@@ -39,13 +39,14 @@ jobs:
 
           # 1. Inspect existing assets safely
           if ! LIST=$(gh release view data-v2-batches --json assets --jq '.assets[].name' 2>err.txt); then
-            if grep -qi "release not found" err.txt; then
+            if grep -E -qi "release not found|not found|404|no releases" err.txt; then
               LIST=""
             else
               cat err.txt
               exit 1
             fi
           fi
+
 
           # 2. Download parsed asset if present
           if echo "$LIST" | grep -qx "matches_batch_${{ github.event.inputs.batch_index }}.tar.gz"; then
