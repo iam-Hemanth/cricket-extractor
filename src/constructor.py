@@ -148,10 +148,11 @@ def construct_match_v3(
                         f_name = fp.get("name") or fp.get("longName")
                         f_obj = fp.get("objectId")
                         f_prof = player_profiles.get(f"espn_{f_obj}") or {}
+                        f_cid = f_prof.get("cricsheet_id") or (people_registry.get(str(f_obj)) if people_registry else None)
                         fielders.append({
                             "name": f_name,
                             "player_id": f"espn_{f_obj}" if f_obj else None,
-                            "cricsheet_id": f_prof.get("cricsheet_id")
+                            "cricsheet_id": f_cid
                         })
             if b_id and fielders:
                 dismissal_fielders_map[(inn_num, b_id)] = fielders
@@ -175,10 +176,11 @@ def construct_match_v3(
             if not obj_id or obj_id in seen_pids: continue
             seen_pids.add(obj_id)
             prof = player_profiles.get(f"espn_{obj_id}") or {}
+            c_id = prof.get("cricsheet_id") or (people_registry.get(str(obj_id)) if people_registry else None)
 
             team_players.append({
                 "player_id": f"espn_{obj_id}",
-                "cricsheet_id": prof.get("cricsheet_id"),
+                "cricsheet_id": c_id,
                 "espn_id": obj_id,
                 "name": prof.get("name") or pl.get("name"),
                 "batting_hand": prof.get("batting_hand"),
@@ -195,10 +197,11 @@ def construct_match_v3(
             if not obj_id or obj_id in seen_pids: continue
             seen_pids.add(obj_id)
             prof = player_profiles.get(f"espn_{obj_id}") or {}
+            c_id = prof.get("cricsheet_id") or (people_registry.get(str(obj_id)) if people_registry else None)
 
             team_players.append({
                 "player_id": f"espn_{obj_id}",
-                "cricsheet_id": prof.get("cricsheet_id"),
+                "cricsheet_id": c_id,
                 "espn_id": obj_id,
                 "name": prof.get("name") or pl.get("name"),
                 "batting_hand": prof.get("batting_hand"),

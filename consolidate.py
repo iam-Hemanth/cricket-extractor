@@ -68,7 +68,7 @@ def scan_and_consolidate(
     total_wickets = 0
     wagon_balls = 0
     pitch_balls = 0
-    pred_balls = 0
+    shot_balls = 0
     min_date = "9999-99-99"
     max_date = "0000-00-00"
     unique_players: Set[str] = set()
@@ -123,12 +123,13 @@ def scan_and_consolidate(
                     total_balls += 1
                     total_runs += d.get("runs", {}).get("total", 0)
                     total_wickets += len(d.get("wickets") or [])
-                    if d.get("tactical", {}).get("wagon_x") is not None:
+                    tact = d.get("tactical") or {}
+                    if tact.get("wagon_coords") is not None:
                         wagon_balls += 1
-                    if d.get("tactical", {}).get("pitch_line") is not None:
+                    if tact.get("pitch_line") is not None:
                         pitch_balls += 1
-                    if d.get("tactical", {}).get("win_probability") is not None:
-                        pred_balls += 1
+                    if tact.get("shot_type") is not None:
+                        shot_balls += 1
 
         # Copy/Symlink or ensure present in output_dir
         dest = output_dir / f"{mid}.json"
@@ -143,8 +144,9 @@ def scan_and_consolidate(
         failed_matches_all.pop(mid, None)
 
     total_matches = len(processed_mids)
-    tactical_pct = round((wagon_balls / total_balls * 100), 2) if total_balls > 0 else 0.0
+    wagon_pct = round((wagon_balls / total_balls * 100), 2) if total_balls > 0 else 0.0
     pitch_pct = round((pitch_balls / total_balls * 100), 2) if total_balls > 0 else 0.0
+    shot_pct = round((shot_balls / total_balls * 100), 2) if total_balls > 0 else 0.0
 
     manifest = {
         "dataset_name": "cricket-lake-v3",
@@ -161,9 +163,10 @@ def scan_and_consolidate(
             "wickets": total_wickets,
             "deliveries_with_wagon_wheel": wagon_balls,
             "deliveries_with_pitch_coordinates": pitch_balls,
-            "deliveries_with_win_probability": pred_balls,
-            "wagon_wheel_coverage_pct": tactical_pct,
-            "pitch_coordinates_coverage_pct": pitch_pct
+            "deliveries_with_shot_type": shot_balls,
+            "wagon_wheel_coverage_pct": wagon_pct,
+            "pitch_coordinates_coverage_pct": pitch_pct,
+            "shot_type_coverage_pct": shot_pct
         },
         "players": {
             "unique_players_count": len(unique_players),
