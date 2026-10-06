@@ -242,8 +242,14 @@ def construct_match_v3(
             deduped_balls.append(b)
         raw_balls = deduped_balls
 
-        # Sort ascending chronologically
-        raw_balls.sort(key=lambda b: (b.get("oversUnique") or b.get("oversActual") or 0))
+        # Sort ascending chronologically by oversUnique, ballNumber, or oversActual
+        raw_balls.sort(key=lambda b: (
+            b.get("oversUnique") if b.get("oversUnique") is not None else (
+                b.get("ballNumber") if b.get("ballNumber") is not None else (
+                    b.get("oversActual") or 0
+                )
+            )
+        ))
 
         overs_dict = {}
         for b in raw_balls:
@@ -254,6 +260,9 @@ def construct_match_v3(
 
 
         enriched_overs = []
+        seen_dismissed_batters = set()
+        prev_inning_cricinfo_total = 0
+
         for ov_num in sorted(overs_dict.keys()):
             ov_balls = overs_dict[ov_num]
 
@@ -291,6 +300,18 @@ def construct_match_v3(
                 extras_total = byes + legbyes + wides + noballs + penalties
                 tot_runs = ball.get("totalRuns") if ball.get("totalRuns") is not None else (bat_runs + extras_total)
 
+                # Detect unallocated +5 penalty runs (MCC Law 28.3, e.g. ball hit helmet)
+                c_tot = ball.get("totalInningRuns")
+                if c_tot is not None and prev_inning_cricinfo_total > 0:
+                    step = c_tot - prev_inning_cricinfo_total
+                    if step == (tot_runs + 5):
+                        penalties += 5
+                        extras_total += 5
+                        tot_runs += 5
+
+                if c_tot is not None:
+                    prev_inning_cricinfo_total = c_tot
+
                 is_legal = (wides == 0 and noballs == 0)
 
                 extras_dict = {}
@@ -304,25 +325,32 @@ def construct_match_v3(
                 wickets_list = []
                 if ball.get("isWicket"):
                     out_int_id = ball.get("outPlayerId") or b_int_id
-                    out_info = player_map.get(out_int_id) or {}
-                    out_obj_id = out_info.get("objectId")
-                    out_pid = f"espn_{out_obj_id}" if out_obj_id else f"espn_{out_int_id}"
-                    out_name = out_info.get("name") or b_info.get("name")
-
                     dtype = ball.get("dismissalType")
                     kind = DISMISSAL_KIND_MAP.get(dtype, "unknown")
-                    fielders = dismissal_fielders_map.get((inn_idx + 1, out_int_id), [])
 
-                    if kind == "caught" and fielders:
-                        if fielders[0].get("player_id") == bw_pid:
-                            kind = "caught and bowled"
+                    # Deduplicate accidental duplicate wicket entries for the same batter in an innings
+                    if out_int_id and out_int_id in seen_dismissed_batters and kind != "retired hurt":
+                        pass
+                    else:
+                        if out_int_id and kind != "retired hurt":
+                            seen_dismissed_batters.add(out_int_id)
+                        out_info = player_map.get(out_int_id) or {}
+                        out_obj_id = out_info.get("objectId")
+                        out_pid = f"espn_{out_obj_id}" if out_obj_id else f"espn_{out_int_id}"
+                        out_name = out_info.get("name") or b_info.get("name")
 
-                    wickets_list.append({
-                        "player_out_id": out_pid,
-                        "player_out_name": out_name,
-                        "kind": kind,
-                        "fielders": fielders
-                    })
+                        fielders = dismissal_fielders_map.get((inn_idx + 1, out_int_id), [])
+
+                        if kind == "caught" and fielders:
+                            if fielders[0].get("player_id") == bw_pid:
+                                kind = "caught and bowled"
+
+                        wickets_list.append({
+                            "player_out_id": out_pid,
+                            "player_out_name": out_name,
+                            "kind": kind,
+                            "fielders": fielders
+                        })
 
                 # Tactical traits (Clean sentinels: null over fake zeros)
                 wx = ball.get("wagonX")

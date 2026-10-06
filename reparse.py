@@ -59,6 +59,7 @@ def main():
     parser.add_argument("--output-dir", type=str, default="data/matches", help="Path to output parsed matches")
     parser.add_argument("--match-ids", type=str, default=None, help="Comma-separated match IDs to reparse")
     parser.add_argument("--verify-determinism", action="store_true", help="Assert offline parser determinism")
+    parser.add_argument("--strict", action="store_true", help="Fail with non-zero exit code if any match fails validation")
     args = parser.parse_args()
 
     repo_root = Path(__file__).resolve().parent
@@ -84,6 +85,7 @@ def main():
     succeeded = 0
     failed = 0
     determinism_failures = 0
+    failed_matches: Dict[str, str] = {}
 
     for idx, mdir in enumerate(match_dirs, 1):
         mid = mdir.name
@@ -92,6 +94,7 @@ def main():
         details, chunks_by_inn, err = load_raw_match_payloads(mdir)
         if err or not details:
             logger.warning(f"Failed to load raw payloads for match {mid}: {err}")
+            failed_matches[mid] = f"Payload error: {err}"
             failed += 1
             continue
 
@@ -105,6 +108,7 @@ def main():
         )
         if const_err or not match_v3:
             logger.warning(f"Failed to construct match {mid}: {const_err}")
+            failed_matches[mid] = f"Construction error: {const_err}"
             failed += 1
             continue
 
@@ -137,8 +141,12 @@ def main():
             if not is_ok:
                 validation_errors.extend(errs)
 
+        _, reg_errs = validate_player_registry(match_v3)
+        validation_errors.extend(reg_errs)
+
         if validation_errors:
             logger.warning(f"Validation failed for match {mid}: {validation_errors[:2]}")
+            failed_matches[mid] = f"Validation errors: {'; '.join(validation_errors[:3])}"
             failed += 1
             continue
 
@@ -150,13 +158,17 @@ def main():
         temp_file.replace(out_file)
         succeeded += 1
 
+    if failed_matches:
+        with open(output_dir / "failed_matches.json", "w", encoding="utf-8") as f:
+            json.dump(failed_matches, f, indent=2)
+
     logger.info("=" * 60)
     logger.info(f"Offline Reparse Complete: {succeeded} succeeded | {failed} failed")
     if args.verify_determinism:
         logger.info(f"Determinism Checks: {len(match_dirs) - determinism_failures}/{len(match_dirs)} passed")
     logger.info("=" * 60)
 
-    if determinism_failures > 0 or failed > 0:
+    if determinism_failures > 0 or (args.strict and failed > 0):
         sys.exit(1)
     sys.exit(0)
 

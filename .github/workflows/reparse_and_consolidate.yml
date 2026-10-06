@@ -1,0 +1,171 @@
+name: Reparse & Consolidate Master Data Lake
+
+on:
+  workflow_dispatch:
+    inputs:
+      batch_list:
+        description: 'Comma-separated batch indices to reparse (0 to 22)'
+        required: true
+        default: '0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22'
+      skip_reparse:
+        description: 'Skip reparse and run consolidation only'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: write
+
+jobs:
+  generate_matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      batches: ${{ steps.set_batches.outputs.batches }}
+      skip_reparse: ${{ steps.set_batches.outputs.skip_reparse }}
+    steps:
+      - id: set_batches
+        run: |
+          INPUT="${{ github.event.inputs.batch_list }}"
+          SKIP="${{ github.event.inputs.skip_reparse }}"
+          JSON_ARRAY=$(python3 -c "import json; print(json.dumps([int(x.strip()) for x in '$INPUT'.split(',') if x.strip().isdigit()]))")
+          echo "batches=$JSON_ARRAY" >> $GITHUB_OUTPUT
+          echo "skip_reparse=$SKIP" >> $GITHUB_OUTPUT
+
+  reparse_matrix:
+    needs: generate_matrix
+    if: needs.generate_matrix.outputs.skip_reparse != 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 23
+      matrix:
+        batch_index: ${{ fromJson(needs.generate_matrix.outputs.batches) }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Fetch Batch Raw & Match Assets
+        id: fetch_assets
+        run: |
+          set -euo pipefail
+          mkdir -p raw_batch_${{ matrix.batch_index }}
+          mkdir -p output_batch_${{ matrix.batch_index }}
+
+          echo "Downloading raw archive for batch ${{ matrix.batch_index }}..."
+          gh release download data-v2-batches -p "raw_batch_${{ matrix.batch_index }}.tar.gz" --dir raw_batch_${{ matrix.batch_index }}
+          tar -xzf raw_batch_${{ matrix.batch_index }}/raw_batch_${{ matrix.batch_index }}.tar.gz -C raw_batch_${{ matrix.batch_index }}
+          rm raw_batch_${{ matrix.batch_index }}/raw_batch_${{ matrix.batch_index }}.tar.gz
+
+          if gh release view data-v2-batches --json assets --jq '.assets[].name' | grep -qx "matches_batch_${{ matrix.batch_index }}.tar.gz"; then
+            echo "Downloading existing parsed matches..."
+            gh release download data-v2-batches -p "matches_batch_${{ matrix.batch_index }}.tar.gz" --dir output_batch_${{ matrix.batch_index }}
+            tar -xzf output_batch_${{ matrix.batch_index }}/matches_batch_${{ matrix.batch_index }}.tar.gz -C output_batch_${{ matrix.batch_index }}
+            rm output_batch_${{ matrix.batch_index }}/matches_batch_${{ matrix.batch_index }}.tar.gz
+          fi
+
+          PREV_COUNT=$(find output_batch_${{ matrix.batch_index }} -name "*.json" ! -name "failed_matches.json" | wc -l | tr -d ' ')
+          echo "prev_count=$PREV_COUNT" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run Offline Reparser
+        run: |
+          python reparse.py \
+            --raw-dir raw_batch_${{ matrix.batch_index }} \
+            --output-dir output_batch_${{ matrix.batch_index }}
+
+      - name: Upload Failed Matches Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failed_matches_batch_${{ matrix.batch_index }}
+          path: output_batch_${{ matrix.batch_index }}/failed_matches.json
+          if-no-files-found: ignore
+
+      - name: Verify Count & Compress
+        id: compress
+        run: |
+          set -euo pipefail
+          PREV_COUNT="${{ steps.fetch_assets.outputs.prev_count }}"
+          NEW_COUNT=$(find output_batch_${{ matrix.batch_index }} -name "*.json" ! -name "failed_matches.json" | wc -l | tr -d ' ')
+          echo "Batch ${{ matrix.batch_index }} Count: NEW=$NEW_COUNT vs PREV=$PREV_COUNT"
+          if [ "$NEW_COUNT" -lt "$PREV_COUNT" ]; then
+            echo "CRITICAL: Count decreased ($NEW_COUNT < $PREV_COUNT)! Aborting release upload."
+            exit 1
+          fi
+          tar -czf matches_batch_${{ matrix.batch_index }}.tar.gz -C output_batch_${{ matrix.batch_index }} .
+
+      - name: Upload Updated Matches Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: data-v2-batches
+          files: matches_batch_${{ matrix.batch_index }}.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  consolidate:
+    needs: [generate_matrix, reparse_matrix]
+    if: always() && (needs.reparse_matrix.result == 'success' || needs.reparse_matrix.result == 'skipped')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Download All Match Archives
+        run: |
+          set -euo pipefail
+          mkdir -p archives
+          mkdir -p all_matches
+          echo "Downloading all 23 batch archives from data-v2-batches..."
+          gh release download data-v2-batches -p "matches_batch_*.tar.gz" --dir archives
+
+          for arch in archives/matches_batch_*.tar.gz; do
+            echo "Unpacking $arch..."
+            tar -xzf "$arch" -C all_matches
+          done
+
+          TOTAL_FILES=$(find all_matches -name "*.json" ! -name "failed_matches.json" | wc -l | tr -d ' ')
+          echo "Unpacked $TOTAL_FILES matches into all_matches."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Consolidate Master Lake & Generate Manifest
+        run: |
+          python consolidate.py \
+            --input-dirs all_matches \
+            --output-dir master_lake/matches \
+            --manifest-path master_lake/lake_manifest.json \
+            --archive-path master_lake/cricket_lake_v3.tar.gz
+
+      - name: Display Lake Summary
+        run: |
+          cat master_lake/lake_manifest.json
+          echo "### 🏏 Master Cricket Data Lake v3.0 Summary" >> $GITHUB_STEP_SUMMARY
+          echo '```json' >> $GITHUB_STEP_SUMMARY
+          cat master_lake/lake_manifest.json >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload Master Lake Assets to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: data-v2-batches
+          files: |
+            master_lake/cricket_lake_v3.tar.gz
+            master_lake/lake_manifest.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
