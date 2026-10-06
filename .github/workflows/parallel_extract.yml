@@ -4,13 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       batch_list:
-        description: 'Comma-separated batch indices (e.g. 1,2,3,4,5,6,7,8,9,10,11 or 1,2,3)'
+        description: 'Comma-separated batch indices (0 to 22 for 250-sized batches)'
         required: true
-        default: '1,2,3,4,5,6,7,8,9,10,11'
+        default: '0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22'
       batch_size:
         description: 'Number of matches per batch'
         required: true
-        default: '500'
+        default: '250'
       delay:
         description: 'Delay between requests in seconds'
         required: false
@@ -36,10 +36,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      max-parallel: 4
+      max-parallel: 20
       matrix:
         batch_index: ${{ fromJson(needs.generate_matrix.outputs.batches) }}
     steps:
+
       - name: Checkout Code
         uses: actions/checkout@v4
 
