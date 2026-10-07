@@ -20,7 +20,7 @@ from src.client import CircuitBreakerTripped, CricinfoClient
 from src.commentary import fetch_innings_commentary, fetch_match_details
 from src.constructor import construct_match_v3
 from src.cricsheet_audit import CricsheetAuditor
-from src.validator import validate_innings, validate_player_registry
+from src.validator import validate_match_data
 
 logging.basicConfig(
     level=logging.INFO,
@@ -219,19 +219,8 @@ def main():
                 failed_matches[mid] = f"Construction error: {const_err}"
                 continue
 
-            # 4. Multi-dimension validation
-            validation_errors = []
-            sc_inns = content.get("innings") or []
-            match_bpo = match_v3.get("meta", {}).get("balls_per_over", 6)
-            for i_idx, v_inn in enumerate(match_v3.get("innings", [])):
-                sc_inn_data = sc_inns[i_idx] if i_idx < len(sc_inns) else None
-                is_last = (i_idx == len(match_v3.get("innings", [])) - 1)
-                is_ok, errs = validate_innings(v_inn, sc_inn_data, is_last_innings=is_last, balls_per_over=match_bpo)
-                if not is_ok:
-                    validation_errors.extend(errs)
-
-            _, reg_errs = validate_player_registry(match_v3)
-            validation_errors.extend(reg_errs)
+            # Shared schema, scoring, and participant gate.
+            validation_errors = validate_match_data(match_v3, content.get("innings") or [])
 
             if validation_errors:
                 logger.warning(f"Validation failed for match {mid} ({len(validation_errors)} errors): {validation_errors[:2]}")

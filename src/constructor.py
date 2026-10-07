@@ -6,6 +6,8 @@ import re
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 
+from src.participants import build_participant_registry, extract_participation_events, confirmed_lineups, _id
+
 LEAGUE_COMPETITIONS = {
     "Indian Premier League",
     "SA20",
@@ -28,6 +30,45 @@ DISMISSAL_KIND_MAP = {
     11: "retired out",
     13: "retired hurt"
 }
+
+
+def normalize_delivery_runs(ball: dict, match_meta: dict) -> Tuple[dict, dict, Optional[dict]]:
+    """Keep source totals and correct only an evidenced seasonal component rule."""
+    def quantity(key):
+        value = ball.get(key)
+        value = 0 if value is None else value
+        if type(value) is not int or value < 0:
+            raise ValueError(f"Invalid run component {key}: {value!r}")
+        return value
+
+    batter = quantity("batsmanRuns")
+    extras = {name: quantity(source) for name, source in (
+        ("wides", "wides"), ("noballs", "noballs"), ("byes", "byes"),
+        ("legbyes", "legbyes"), ("penalty", "penalties"),
+    )}
+    component_total = batter + sum(extras.values())
+    total = ball.get("totalRuns")
+    if total is None:
+        total = component_total
+    if type(total) is not int or total < 0:
+        raise ValueError(f"Invalid total run component: {total!r}")
+    note = None
+    dates = match_meta.get("dates") or []
+    year = str(dates[0])[:4] if dates else ""
+    other_extras = sum(value for name, value in extras.items() if name != "noballs")
+    if (total != component_total and extras["noballs"] == 1
+            and match_meta.get("competition") == "The Hundred Men's Competition"
+            and year in {"2021", "2023"} and total - batter - other_extras == 2):
+        extras["noballs"] = 2
+        component_total += 1
+        note = {"source_ball_id": ball.get("id"), "field": "extras.noballs",
+                "source_value": 1, "normalized_value": 2,
+                "rule_id": "hundred_no_ball_2021_2023"}
+    if total != component_total:
+        raise ValueError(f"Run component mismatch at {ball.get('oversActual')}: "
+                         f"source total {total} != components {component_total}")
+    extras = {name: value for name, value in extras.items() if value}
+    return {"batter": batter, "extras": sum(extras.values()), "total": total}, extras, note
 
 def determine_format_bucket(raw_format: str, competition_name: Optional[str]) -> Tuple[str, str]:
     """
@@ -95,43 +136,19 @@ def construct_match_v3(
     venue_country = venue_map.get(venue_name) or (match_info.get("country") or {}).get("name")
     city = ground.get("town", {}).get("name") if isinstance(ground.get("town"), dict) else ground.get("town")
 
-    # Build internal player map
-    player_map = {}
-    team_name_by_id = {}
-    for t in (match_info.get("teams") or []):
-        tm = t.get("team") or {}
-        if tm.get("id"):
-            team_name_by_id[tm["id"]] = tm.get("name")
-
-    for inn in (content.get("innings") or []):
-        for b in (inn.get("inningBatsmen") or []):
-            pl = b.get("player") or {}
-            if pl.get("id"):
-                player_map[pl["id"]] = {
-                    "objectId": pl.get("objectId"),
-                    "name": pl.get("name"),
-                    "longName": pl.get("longName"),
-                    "teamId": (inn.get("team") or {}).get("id")
-                }
-        for bw in (inn.get("inningBowlers") or []):
-            pl = bw.get("player") or {}
-            if pl.get("id"):
-                player_map[pl["id"]] = {
-                    "objectId": pl.get("objectId"),
-                    "name": pl.get("name"),
-                    "longName": pl.get("longName"),
-                    "teamId": (inn.get("team") or {}).get("id")
-                }
-
-    for tp in ((content.get("matchPlayers") or {}).get("teamPlayers") or []):
-        for p in (tp.get("players") or []):
-            pl = p.get("player") or {}
-            if pl.get("id"):
-                player_map[pl["id"]] = {
-                    "objectId": pl.get("objectId"),
-                    "name": pl.get("name"),
-                    "longName": pl.get("longName")
-                }
+    id_map, players, identity_issues = build_participant_registry(
+        raw_details, commentary_chunks_by_inn, player_profiles, people_registry
+    )
+    player_map = {internal: {"objectId": record["espn_id"], "name": record["name"]}
+                  for internal, pid in id_map.items() for record in [players[pid]]}
+    team_name_by_id = {(t.get("team") or {}).get("id"): (t.get("team") or {}).get("name")
+                       for t in (match_info.get("teams") or []) if (t.get("team") or {}).get("id")}
+    try:
+        participation_events = extract_participation_events(raw_details, commentary_chunks_by_inn, id_map, players)
+    except ValueError as exc:
+        return None, f"Match {mid}: {exc}"
+    playing_xi, playing_xi_status = confirmed_lineups(raw_details, players, participation_events)
+    missing_non_striker_deliveries = 0
 
     # Dismissal fielders map
     dismissal_fielders_map = {}
@@ -146,78 +163,30 @@ def construct_match_v3(
                     fp = f.get("player")
                     if fp and isinstance(fp, dict):
                         f_name = fp.get("name") or fp.get("longName")
-                        f_obj = fp.get("objectId")
-                        f_prof = player_profiles.get(f"espn_{f_obj}") or {}
-                        f_cid = f_prof.get("cricsheet_id") or (people_registry.get(str(f_obj)) if people_registry else None)
+                        f_obj, f_internal = _id(fp.get("objectId")), _id(fp.get("id"))
+                        f_pid = id_map.get(f_internal) if f_internal is not None else None
+                        if f_pid is None and f_obj is not None and f"espn_{f_obj}" in players:
+                            f_pid = f"espn_{f_obj}"
+                        if f_pid is None and (f_internal is not None or f_obj is not None):
+                            identity_issues.append({"reason": "missing_object_id", "field": "fielder",
+                                                    "source_internal_id": f_internal,
+                                                    "source_object_id": f_obj, "innings_number": inn_num})
+                        f_cid = (players.get(f_pid) or {}).get("cricsheet_id")
                         fielders.append({
                             "name": f_name,
-                            "player_id": f"espn_{f_obj}" if f_obj else None,
+                            "player_id": f_pid,
                             "cricsheet_id": f_cid
                         })
             if b_id and fielders:
                 dismissal_fielders_map[(inn_num, b_id)] = fielders
 
-    # Playing XI with canonical espn_<id> primary keys
     teams = [(t.get("team") or {}).get("name") for t in (match_info.get("teams") or []) if t.get("team")]
-    playing_xi = {}
-
-    for inn in (content.get("innings") or []):
-        t_name = (inn.get("team") or {}).get("name")
-        if not t_name or t_name in playing_xi:
-            continue
-
-        team_players = []
-        seen_pids = set()
-
-        # True batting order
-        for b in (inn.get("inningBatsmen") or []):
-            pl = b.get("player") or {}
-            obj_id = pl.get("objectId")
-            if not obj_id or obj_id in seen_pids: continue
-            seen_pids.add(obj_id)
-            prof = player_profiles.get(f"espn_{obj_id}") or {}
-            c_id = prof.get("cricsheet_id") or (people_registry.get(str(obj_id)) if people_registry else None)
-
-            team_players.append({
-                "player_id": f"espn_{obj_id}",
-                "cricsheet_id": c_id,
-                "espn_id": obj_id,
-                "name": prof.get("name") or pl.get("name"),
-                "batting_hand": prof.get("batting_hand"),
-                "bowling_arm": prof.get("bowling_arm"),
-                "bowling_style": prof.get("bowling_style"),
-                "bowling_type": prof.get("bowling_type"),
-                "role": prof.get("role"),
-                "batting_position": len(team_players) + 1
-            })
-
-        for p in (inn.get("inningDidNotBats") or []):
-            pl = p.get("player") or {}
-            obj_id = pl.get("objectId")
-            if not obj_id or obj_id in seen_pids: continue
-            seen_pids.add(obj_id)
-            prof = player_profiles.get(f"espn_{obj_id}") or {}
-            c_id = prof.get("cricsheet_id") or (people_registry.get(str(obj_id)) if people_registry else None)
-
-            team_players.append({
-                "player_id": f"espn_{obj_id}",
-                "cricsheet_id": c_id,
-                "espn_id": obj_id,
-                "name": prof.get("name") or pl.get("name"),
-                "batting_hand": prof.get("batting_hand"),
-                "bowling_arm": prof.get("bowling_arm"),
-                "bowling_style": prof.get("bowling_style"),
-                "bowling_type": prof.get("bowling_type"),
-                "role": prof.get("role"),
-                "batting_position": len(team_players) + 1
-            })
-
-        playing_xi[t_name] = team_players[:11]
 
     # Process Innings & Deliveries
     enriched_innings = []
     total_balls_count = 0
     total_tracked_balls = 0
+    normalization_notes = []
 
     super_over_counter = 3
 
@@ -279,29 +248,32 @@ def construct_match_v3(
             enriched_deliveries = []
             for b_idx, ball in enumerate(ov_balls, 1):
                 total_balls_count += 1
-                b_int_id = ball.get("batsmanPlayerId")
-                b_info = player_map.get(b_int_id) or {}
-                b_obj_id = b_info.get("objectId")
-                b_pid = f"espn_{b_obj_id}" if b_obj_id else f"espn_{b_int_id}"
+                b_int_id, bw_int_id = _id(ball.get("batsmanPlayerId")), _id(ball.get("bowlerPlayerId"))
+                b_info, bw_info = player_map.get(b_int_id) or {}, player_map.get(bw_int_id) or {}
+                b_pid, bw_pid = id_map.get(b_int_id), id_map.get(bw_int_id)
+                if b_pid is None or bw_pid is None:
+                    return None, f"Match {mid}: unresolved mandatory actor at ball {ball.get('id')}: {b_int_id}/{bw_int_id}"
+                source_ns_id = ball.get("nonStrikerPlayerId")
+                ns_int_id = _id(source_ns_id)
+                ns_pid = id_map.get(ns_int_id) if ns_int_id else None
+                if ns_pid is None:
+                    missing_non_striker_deliveries += 1
+                    if source_ns_id is not None:
+                        identity_issues.append({"reason": "missing_object_id", "field": "non_striker_id",
+                                                "source_internal_id": source_ns_id, "source_ball_id": ball.get("id"),
+                                                "innings_number": inn_num})
 
-                bw_int_id = ball.get("bowlerPlayerId")
-                bw_info = player_map.get(bw_int_id) or {}
-                bw_obj_id = bw_info.get("objectId")
-                bw_pid = f"espn_{bw_obj_id}" if bw_obj_id else f"espn_{bw_int_id}"
-
-                ns_int_id = ball.get("nonStrikerPlayerId")
-                ns_info = player_map.get(ns_int_id) or {}
-                ns_obj_id = ns_info.get("objectId")
-                ns_pid = f"espn_{ns_obj_id}" if ns_obj_id else (f"espn_{ns_int_id}" if ns_int_id else None)
-
-                bat_runs = ball.get("batsmanRuns") or 0
-                byes = ball.get("byes") or 0
-                legbyes = ball.get("legbyes") or 0
-                wides = ball.get("wides") or 0
-                noballs = ball.get("noballs") or 0
-                penalties = ball.get("penalties") or 0
-                extras_total = byes + legbyes + wides + noballs + penalties
-                tot_runs = ball.get("totalRuns") if ball.get("totalRuns") is not None else (bat_runs + extras_total)
+                try:
+                    runs, extras_dict, note = normalize_delivery_runs(
+                        ball, {"competition": comp_name, "dates": dates}
+                    )
+                except ValueError as exc:
+                    return None, f"Match {mid}: {exc}"
+                if note:
+                    normalization_notes.append(note)
+                bat_runs, extras_total, tot_runs = runs["batter"], runs["extras"], runs["total"]
+                wides, noballs = extras_dict.get("wides", 0), extras_dict.get("noballs", 0)
+                penalties = extras_dict.get("penalty", 0)
 
                 # Detect unallocated +5 penalty runs (MCC Law 28.3, e.g. ball hit helmet)
                 c_tot = ball.get("totalInningRuns")
@@ -311,23 +283,19 @@ def construct_match_v3(
                         penalties += 5
                         extras_total += 5
                         tot_runs += 5
+                        extras_dict["penalty"] = penalties
 
                 if c_tot is not None:
                     prev_inning_cricinfo_total = c_tot
 
                 is_legal = (wides == 0 and noballs == 0)
 
-                extras_dict = {}
-                if wides: extras_dict["wides"] = wides
-                if noballs: extras_dict["noballs"] = noballs
-                if byes: extras_dict["byes"] = byes
-                if legbyes: extras_dict["legbyes"] = legbyes
-                if penalties: extras_dict["penalty"] = penalties
-
                 # Wickets
                 wickets_list = []
                 if ball.get("isWicket"):
-                    out_int_id = ball.get("outPlayerId") or b_int_id
+                    if ball.get("outPlayerId") is not None and _id(ball.get("outPlayerId")) is None:
+                        return None, f"Match {mid}: invalid source dismissal actor {ball.get('outPlayerId')!r}"
+                    out_int_id = _id(ball.get("outPlayerId")) or b_int_id
                     dtype = ball.get("dismissalType")
                     kind = DISMISSAL_KIND_MAP.get(dtype, "unknown")
 
@@ -339,7 +307,9 @@ def construct_match_v3(
                             seen_dismissed_batters.add(out_int_id)
                         out_info = player_map.get(out_int_id) or {}
                         out_obj_id = out_info.get("objectId")
-                        out_pid = f"espn_{out_obj_id}" if out_obj_id else f"espn_{out_int_id}"
+                        out_pid = id_map.get(out_int_id)
+                        if out_pid is None:
+                            return None, f"Match {mid}: unresolved dismissal actor {out_int_id}"
                         out_name = out_info.get("name") or b_info.get("name")
 
                         fielders = dismissal_fielders_map.get((inn_idx + 1, out_int_id), [])
@@ -486,7 +456,7 @@ def construct_match_v3(
     match_v3 = {
         "match_id": str(mid),
         "meta": {
-            "schema_version": "3.0.0",
+            "schema_version": "3.1.0",
             "format": meta_fmt,
             "format_bucket": db_fmt_bucket,
             "competition": comp_name,
@@ -501,7 +471,11 @@ def construct_match_v3(
             "match_number": (match_info.get("event") or {}).get("matchNumber"),
             "match_group": (match_info.get("event") or {}).get("group"),
             "balls_per_over": balls_per_over,
-            "tactical_coverage": tactical_coverage
+            "tactical_coverage": tactical_coverage,
+            "normalization_notes": normalization_notes,
+            "identity_issues": identity_issues,
+            "playing_xi_status": playing_xi_status,
+            "missing_non_striker_deliveries": missing_non_striker_deliveries
         },
         "outcome": {
             "winner": winner_name,
@@ -517,6 +491,8 @@ def construct_match_v3(
             "decision": toss_decision
         },
         "playing_xi": db_playing_xi,
+        "players": players,
+        "participation_events": participation_events,
         "innings": enriched_innings
     }
 

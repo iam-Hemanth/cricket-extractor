@@ -3,6 +3,57 @@ src/validator.py
 Hardened Multi-Dimension Validator for Cricket Match JSON.
 """
 from typing import Dict, List, Optional, Tuple
+from functools import lru_cache
+from pathlib import Path
+import json
+
+NON_DISMISSAL_KINDS = {"retired hurt", "retired not out"}
+DISMISSAL_KINDS = {
+    "caught", "caught and bowled", "bowled", "lbw", "run out", "stumped",
+    "hit wicket", "handled the ball", "obstructing the field",
+    "hit the ball twice", "timed out", "retired out",
+}
+
+
+def count_team_wickets(deliveries: List[dict]) -> int:
+    """Count dismissals independently of retirement/other recorded events."""
+    count = 0
+    for delivery in deliveries:
+        for event in delivery.get("wickets") or []:
+            kind = str(event.get("kind") or "").strip().lower()
+            if kind in NON_DISMISSAL_KINDS:
+                continue
+            if kind not in DISMISSAL_KINDS:
+                raise ValueError(f"Unrecognized dismissal kind: {kind!r}")
+            count += 1
+    return count
+
+
+@lru_cache(maxsize=1)
+def _schema_validator():
+    from jsonschema import Draft202012Validator
+    schema = json.loads((Path(__file__).parents[1] / "schema/schema.json").read_text())
+    Draft202012Validator.check_schema(schema)
+    return Draft202012Validator(schema)
+
+
+def validate_match_data(match: dict, scorecard_innings: Optional[List[dict]] = None) -> List[str]:
+    """Apply the same schema, identity, and scoring gate in every candidate writer."""
+    errors = [f"Schema {list(error.absolute_path)}: {error.message}"
+              for error in _schema_validator().iter_errors(match)]
+    if errors:
+        return errors
+    _, identity_errors = validate_player_registry(match)
+    errors.extend(identity_errors)
+    innings = match.get("innings") or []
+    if scorecard_innings is not None and len(innings) != len(scorecard_innings):
+        errors.append(f"Incomplete innings: candidate {len(innings)} != source {len(scorecard_innings)}")
+    for index, inn in enumerate(innings):
+        source = scorecard_innings[index] if scorecard_innings is not None and index < len(scorecard_innings) else None
+        _, innings_errors = validate_innings(inn, source, is_last_innings=index == len(innings)-1,
+                                             balls_per_over=match["meta"]["balls_per_over"])
+        errors.extend(innings_errors)
+    return errors
 
 def parse_delivery_key(actual_str: str) -> Tuple[int, int]:
     """Parse delivery string (e.g. '2.6') into integer tuple (2, 6)."""
@@ -26,7 +77,32 @@ def validate_innings(
     errors = []
     overs = inn.get("overs") or []
     if not overs:
+        if sc_inn and ((sc_inn.get("runs") or 0) > 0 or (sc_inn.get("wickets") or 0) > 0):
+            return False, ["Incomplete deliveries for a nonzero scorecard innings"]
         return True, []
+
+    for ov in overs:
+        for d in ov.get("deliveries") or []:
+            runs, extras = d.get("runs") or {}, d.get("extras") or {}
+            components = [runs.get(name) for name in ("batter", "extras", "total")]
+            if any(type(value) is not int or value < 0 for value in components):
+                errors.append(f"Invalid run components at {d.get('actual_delivery')}")
+                continue
+            if any(type(value) is not int or value < 0 for value in extras.values()):
+                errors.append(f"Invalid extras components at {d.get('actual_delivery')}")
+                continue
+            if runs["total"] != runs["batter"] + runs["extras"]:
+                errors.append(f"Run component mismatch at {d.get('actual_delivery')}")
+            if runs["extras"] != sum(extras.values()):
+                errors.append(f"Extras component mismatch at {d.get('actual_delivery')}")
+            if d.get("is_legal") != (not bool(extras.get("wides") or extras.get("noballs"))):
+                errors.append(f"Legal-ball component mismatch at {d.get('actual_delivery')}")
+    if errors:
+        return False, errors
+    try:
+        count_team_wickets([d for ov in overs for d in ov.get("deliveries") or []])
+    except ValueError as exc:
+        return False, [str(exc)]
 
     # 1. Monotonicity & legal balls per over check
     prev_tuple = (-1, -1)
@@ -81,7 +157,13 @@ def validate_innings(
         sc_runs = sc_inn.get("runs")
         sc_wkts = sc_inn.get("wickets")
         got_runs = sum(d.get("runs", {}).get("total", 0) for ov in overs for d in ov.get("deliveries", []))
-        got_wkts = sum(len(d.get("wickets", [])) for ov in overs for d in ov.get("deliveries", []))
+        try:
+            got_wkts = count_team_wickets([
+                d for ov in overs for d in ov.get("deliveries", [])
+            ])
+        except ValueError as exc:
+            errors.append(str(exc))
+            return False, errors
 
         # Check for non-delivery dismissals like 'timed out' (e.g. Angelo Mathews 2023 WC)
         timed_out_count = 0
@@ -131,6 +213,34 @@ def validate_innings(
 def validate_player_registry(match_data: dict) -> Tuple[bool, List[str]]:
     """Verify that every player ID referenced in deliveries exists in playing_xi or substitutes."""
     errors = []
+    if (match_data.get("meta") or {}).get("schema_version") == "3.1.0":
+        registry = match_data.get("players") or {}
+        for pid, player in registry.items():
+            if player.get("player_id") != pid or pid != f"espn_{player.get('espn_id')}":
+                errors.append(f"Invalid canonical participant identity {pid}")
+        for issue in (match_data.get("meta") or {}).get("identity_issues") or []:
+            errors.append(f"Participant identity issue: {issue}")
+        for inn in match_data.get("innings") or []:
+            for ov in inn.get("overs") or []:
+                for d in ov.get("deliveries") or []:
+                    for role in ("batter_id", "bowler_id", "non_striker_id"):
+                        pid = d.get(role)
+                        if (pid is None and role != "non_striker_id") or (pid is not None and pid not in registry):
+                            errors.append(f"Unresolved {role}: {pid}")
+                    for wicket in d.get("wickets") or []:
+                        pid = wicket.get("player_out_id")
+                        if pid not in registry:
+                            errors.append(f"Unresolved dismissed participant: {pid}")
+                        for fielder in wicket.get("fielders") or []:
+                            pid = fielder.get("player_id")
+                            if pid is not None and pid not in registry:
+                                errors.append(f"Unresolved fielder: {pid}")
+        for event in match_data.get("participation_events") or []:
+            for role in ("incoming_player_id", "outgoing_player_id"):
+                pid = event.get(role)
+                if pid is not None and pid not in registry:
+                    errors.append(f"Unresolved replacement {role}: {pid}")
+        return not errors, errors
     known_ids = set()
     for team, players in match_data.get("playing_xi", {}).items():
         if team.startswith("_") or not isinstance(players, list):

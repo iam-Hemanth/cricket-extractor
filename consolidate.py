@@ -18,6 +18,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
+from src.validator import validate_match_data, count_team_wickets
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -66,6 +68,8 @@ def scan_and_consolidate(
     total_balls = 0
     total_runs = 0
     total_wickets = 0
+    total_wicket_events = 0
+    schema_versions: Counter = Counter()
     wagon_balls = 0
     pitch_balls = 0
     shot_balls = 0
@@ -73,6 +77,8 @@ def scan_and_consolidate(
     max_date = "0000-00-00"
     unique_players: Set[str] = set()
     mapped_players: Set[str] = set()
+    zero_delivery_matches = 0
+    missing_non_striker_deliveries = 0
 
     processed_mids: List[str] = []
 
@@ -86,6 +92,20 @@ def scan_and_consolidate(
             continue
 
         meta = data.get("meta") or {}
+        if meta.get("schema_version") == "3.1.0":
+            validation_errors = validate_match_data(data)
+            if validation_errors:
+                failed_matches_all[mid] = "; ".join(validation_errors[:5])
+                logger.warning("Rejected candidate %s: %s", mid, failed_matches_all[mid])
+                continue
+        try:
+            match_wicket_count = count_team_wickets([
+                d for inn in data.get("innings") or [] for ov in inn.get("overs") or []
+                for d in ov.get("deliveries") or []
+            ])
+        except ValueError as exc:
+            failed_matches_all[mid] = str(exc)
+            continue
         fmt = meta.get("format") or "Unknown"
         bucket = meta.get("format_bucket") or fmt
         season = str(meta.get("season") or "Unknown")
@@ -93,6 +113,7 @@ def scan_and_consolidate(
         format_counts[fmt] += 1
         bucket_counts[bucket] += 1
         season_counts[season] += 1
+        schema_versions[meta.get("schema_version") or "unknown"] += 1
 
         dates = meta.get("dates") or []
         for dt in dates:
@@ -102,9 +123,10 @@ def scan_and_consolidate(
                 max_date = dt
 
         # Player counts
-        xi = data.get("playing_xi") or {}
+        xi = ({"participants": list(data["players"].values())}
+              if meta.get("schema_version") == "3.1.0" else (data.get("playing_xi") or {}))
         for team, players in xi.items():
-            if not isinstance(players, list):
+            if team.startswith("_") or not isinstance(players, list):
                 continue
             for pl in players:
                 if isinstance(pl, dict):
@@ -116,13 +138,17 @@ def scan_and_consolidate(
                 elif isinstance(pl, str):
                     unique_players.add(pl)
 
-        # Innings metrics
+        # Field presence is coverage, not an accuracy or tracking provenance claim.
+        match_ball_count = 0
+        total_wickets += match_wicket_count
+        missing_non_striker_deliveries += meta.get("missing_non_striker_deliveries", 0)
         for inn in data.get("innings") or []:
             for ov in inn.get("overs") or []:
                 for d in ov.get("deliveries") or []:
                     total_balls += 1
+                    match_ball_count += 1
                     total_runs += d.get("runs", {}).get("total", 0)
-                    total_wickets += len(d.get("wickets") or [])
+                    total_wicket_events += len(d.get("wickets") or [])
                     tact = d.get("tactical") or {}
                     if tact.get("wagon_coords") is not None:
                         wagon_balls += 1
@@ -130,6 +156,8 @@ def scan_and_consolidate(
                         pitch_balls += 1
                     if tact.get("shot_type") is not None:
                         shot_balls += 1
+        if match_ball_count == 0:
+            zero_delivery_matches += 1
 
         # Copy/Symlink or ensure present in output_dir
         dest = output_dir / f"{mid}.json"
@@ -151,7 +179,8 @@ def scan_and_consolidate(
     manifest = {
         "dataset_name": "cricket-lake-v3",
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "schema_version": "3.0.0",
+        "schema_version": next(iter(schema_versions)) if len(schema_versions) == 1 else "mixed",
+        "schema_versions": dict(schema_versions),
         "total_matches": total_matches,
         "date_range": {
             "earliest": min_date if min_date != "9999-99-99" else None,
@@ -161,17 +190,22 @@ def scan_and_consolidate(
             "deliveries": total_balls,
             "runs": total_runs,
             "wickets": total_wickets,
+            "wicket_events": total_wicket_events,
             "deliveries_with_wagon_wheel": wagon_balls,
-            "deliveries_with_pitch_coordinates": pitch_balls,
             "deliveries_with_shot_type": shot_balls,
             "wagon_wheel_coverage_pct": wagon_pct,
-            "pitch_coordinates_coverage_pct": pitch_pct,
+            "deliveries_with_pitch_line": pitch_balls,
+            "pitch_line_coverage_pct": pitch_pct,
             "shot_type_coverage_pct": shot_pct
         },
         "players": {
             "unique_players_count": len(unique_players),
             "players_with_cricsheet_mapping": len(mapped_players),
             "mapping_rate_pct": round(len(mapped_players) / len(unique_players) * 100, 2) if unique_players else 0.0
+        },
+        "coverage": {
+            "zero_delivery_matches": zero_delivery_matches,
+            "missing_non_striker_deliveries": missing_non_striker_deliveries,
         },
         "formats_breakdown": dict(format_counts.most_common()),
         "format_buckets_breakdown": dict(bucket_counts.most_common()),

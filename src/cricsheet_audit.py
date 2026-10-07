@@ -10,6 +10,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from src.validator import NON_DISMISSAL_KINDS, count_team_wickets
+
 logger = logging.getLogger(__name__)
 
 
@@ -83,7 +85,7 @@ class CricsheetAuditor:
 
         if len(v3_inns) != len(cs_inns):
             # Soft warning or hard error? If match was truncated or rain/super-over difference:
-            result.soft_warnings.append(
+            result.hard_errors.append(
                 f"Innings count mismatch: v3 has {len(v3_inns)} vs Cricsheet {len(cs_inns)}"
             )
 
@@ -123,8 +125,12 @@ class CricsheetAuditor:
         v_total_runs = sum(d.get("runs", {}).get("total", 0) for d in v_deliveries)
         c_total_runs = sum(d.get("runs", {}).get("total", 0) for d in c_deliveries)
 
-        v_total_wkts = sum(len(d.get("wickets", [])) for d in v_deliveries)
-        c_total_wkts = sum(len(d.get("wickets", [])) for d in c_deliveries)
+        try:
+            v_total_wkts = count_team_wickets(v_deliveries)
+            c_total_wkts = count_team_wickets(c_deliveries)
+        except ValueError as exc:
+            result.hard_errors.append(f"Inn {inn_num}: {exc}")
+            return
 
         v_legal_balls = sum(1 for d in v_deliveries if d.get("is_legal"))
         c_legal_balls = sum(
@@ -189,6 +195,12 @@ class CricsheetAuditor:
             # Wickets check
             v_wkts = vd.get("wickets") or []
             c_wkts = cd.get("wickets") or []
+            v_non_dismissals = [w for w in v_wkts if str(w.get("kind", "")).lower() in NON_DISMISSAL_KINDS]
+            c_non_dismissals = [w for w in c_wkts if str(w.get("kind", "")).lower() in NON_DISMISSAL_KINDS]
+            if v_non_dismissals != c_non_dismissals:
+                result.soft_warnings.append(f"{b_label} non-dismissal event difference")
+            v_wkts = [w for w in v_wkts if w not in v_non_dismissals]
+            c_wkts = [w for w in c_wkts if w not in c_non_dismissals]
             if len(v_wkts) != len(c_wkts):
                 result.hard_errors.append(
                     f"{b_label} wicket event mismatch: v3={len(v_wkts)} vs cs={len(c_wkts)}"

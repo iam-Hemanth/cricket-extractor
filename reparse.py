@@ -16,7 +16,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from src.commentary import load_raw_match_payloads
 from src.constructor import construct_match_v3
-from src.validator import validate_innings, validate_player_registry
+from src.validator import validate_match_data
 
 logging.basicConfig(
     level=logging.INFO,
@@ -86,6 +86,11 @@ def main():
     failed = 0
     determinism_failures = 0
     failed_matches: Dict[str, str] = {}
+    if args.match_ids:
+        for requested in target_mids:
+            if not (raw_dir / requested).is_dir():
+                failed_matches[requested] = "Requested raw match directory is missing"
+                failed += 1
 
     for idx, mdir in enumerate(match_dirs, 1):
         mid = mdir.name
@@ -130,19 +135,8 @@ def main():
             else:
                 logger.info(f"Determinism verified for match {mid} ✓")
 
-        # Multi-dimension validation
-        validation_errors = []
-        sc_inns = (details.get("content") or {}).get("innings") or []
-        match_bpo = match_v3.get("meta", {}).get("balls_per_over", 6)
-        for i_idx, v_inn in enumerate(match_v3.get("innings", [])):
-            sc_inn_data = sc_inns[i_idx] if i_idx < len(sc_inns) else None
-            is_last = (i_idx == len(match_v3.get("innings", [])) - 1)
-            is_ok, errs = validate_innings(v_inn, sc_inn_data, is_last_innings=is_last, balls_per_over=match_bpo)
-            if not is_ok:
-                validation_errors.extend(errs)
-
-        _, reg_errs = validate_player_registry(match_v3)
-        validation_errors.extend(reg_errs)
+        # Shared schema, scoring, and participant gate.
+        validation_errors = validate_match_data(match_v3, (details.get("content") or {}).get("innings") or [])
 
         if validation_errors:
             logger.warning(f"Validation failed for match {mid}: {validation_errors[:2]}")

@@ -1,5 +1,11 @@
 # Cricket Extractor (Curated Lake) — Project Context for Copilot & AI Agents
 
+> **Local repair update — 7 October 2026:** read [DATA_INTEGRITY_REPAIR.md](DATA_INTEGRITY_REPAIR.md)
+> before the historical context below. The repaired constructor emits schema 3.1
+> candidates with a separate participant registry and replacement history. Published
+> releases remain unchanged; the historical coverage/quality wording below is not
+> a new production-readiness claim.
+
 > Feed this file at the start of any session working on `cricket-extractor`:
 > In Chat type: `#file:CRICKET_EXTRACTOR_CONTEXT.md` then your prompt.
 

@@ -1,0 +1,97 @@
+{
+  "match_id": "247475",
+  "source_sha256": "ffd1225ef081f1051300943aca24ff59ad0e8f2670f34ca431b1ac16f712e455",
+  "deliveries": [
+    {
+      "wickets": [
+        {
+          "kind": "caught and bowled",
+          "player_out": "JM Davison"
+        }
+      ]
+    },
+    {
+      "wickets": [
+        {
+          "kind": "caught",
+          "player_out": "GEF Barnett",
+          "fielders": [
+            {
+              "name": "BB McCullum"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "wickets": [
+        {
+          "kind": "bowled",
+          "player_out": "A Bagai"
+        }
+      ]
+    },
+    {
+      "wickets": [
+        {
+          "kind": "bowled",
+          "player_out": "IS Billcliff"
+        }
+      ]
+    },
+    {
+      "wickets": [
+        {
+          "kind": "lbw",
+          "player_out": "AA Mulla"
+        }
+      ]
+    },
+    {
+      "wickets": [
+        {
+          "kind": "run out",
+          "player_out": "AM Samad",
+          "fielders": [
+            {
+              "name": "L Vincent"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "wickets": [
+        {
+          "kind": "retired hurt",
+          "player_out": "S Dhaniram"
+        }
+      ]
+    },
+    {
+      "wickets": [
+        {
+          "kind": "bowled",
+          "player_out": "U Bhatti"
+        }
+      ]
+    },
+    {
+      "wickets": [
+        {
+          "kind": "bowled",
+          "player_out": "KT Sandher"
+        }
+      ]
+    },
+    {
+      "wickets": [
+        {
+          "kind": "bowled",
+          "player_out": "H Osinde"
+        }
+      ]
+    }
+  ],
+  "expected_team_wickets": 9
+}
