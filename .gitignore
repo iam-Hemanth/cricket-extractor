@@ -18,6 +18,8 @@ raw_batch_*/
 err.txt
 data/raw/
 data/matches/
+data/batch_*/
+data/manifest_*_delta.json
 *.tar.gz
 
 # macOS
