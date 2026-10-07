@@ -13,7 +13,7 @@ import zipfile
 from pathlib import Path
 
 
-def generate_catalog(matches_dir: Path, output_dir: Path):
+def generate_catalog(matches_dir: Path, output_dir: Path, archive_prefix: str = "cricket_lake_v3"):
     output_dir.mkdir(parents=True, exist_ok=True)
     json_files = sorted(
         [p for p in matches_dir.glob("*.json") if p.name not in ("lake_manifest.json", "manifest.json", "failed_matches.json")],
@@ -180,8 +180,8 @@ def generate_catalog(matches_dir: Path, output_dir: Path):
 
     print(f"Generated README.txt catalog at: {txt_path}")
 
-    # 3. Create cricket_lake_v3.zip
-    zip_path = output_dir / "cricket_lake_v3.zip"
+    # 3. Create zip archive
+    zip_path = output_dir / f"{archive_prefix}.zip"
     print(f"Packaging {zip_path} (this may take ~15-20s)...")
     with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
         zf.write(txt_path, arcname="README.txt")
@@ -193,8 +193,8 @@ def generate_catalog(matches_dir: Path, output_dir: Path):
             zf.write(p, arcname=p.name)
     print(f"Created {zip_path} ({zip_path.stat().st_size / (1024*1024):.2f} MB)")
 
-    # 4. Create updated cricket_lake_v3.tar.gz
-    tar_path = output_dir / "cricket_lake_v3.tar.gz"
+    # 4. Create tar.gz archive
+    tar_path = output_dir / f"{archive_prefix}.tar.gz"
     print(f"Packaging {tar_path}...")
     with tarfile.open(tar_path, "w:gz") as tf:
         tf.add(txt_path, arcname="README.txt")
@@ -207,7 +207,18 @@ def generate_catalog(matches_dir: Path, output_dir: Path):
     print(f"Created {tar_path} ({tar_path.stat().st_size / (1024*1024):.2f} MB)")
 
 
+def main():
+    import argparse
+    parser = argparse.ArgumentParser(description="Build match catalog and distribution archives")
+    parser.add_argument("--matches-dir", type=str, default="data/master_lake_matches", help="Directory of JSON matches")
+    parser.add_argument("--output-dir", type=str, default="data/master_lake_dist", help="Directory to output catalog & archives")
+    parser.add_argument("--archive-prefix", type=str, default="cricket_lake_v3", help="Prefix for .zip and .tar.gz archives")
+    args = parser.parse_args()
+
+    matches_dir = Path(args.matches_dir)
+    output_dir = Path(args.output_dir)
+    generate_catalog(matches_dir, output_dir, archive_prefix=args.archive_prefix)
+
+
 if __name__ == "__main__":
-    matches_dir = Path("data/master_lake_matches")
-    output_dir = Path("data/master_lake_dist")
-    generate_catalog(matches_dir, output_dir)
+    main()
