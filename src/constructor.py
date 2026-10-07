@@ -123,7 +123,7 @@ def construct_match_v3(
                     "teamId": (inn.get("team") or {}).get("id")
                 }
 
-    for tp in (content.get("matchPlayers", {}).get("teamPlayers") or []):
+    for tp in ((content.get("matchPlayers") or {}).get("teamPlayers") or []):
         for p in (tp.get("players") or []):
             pl = p.get("player") or {}
             if pl.get("id"):
@@ -465,9 +465,9 @@ def construct_match_v3(
         winner_name = None
 
     # Officials in DB format
-    umpires = [u.get("player", {}).get("name") for u in (match_info.get("umpires") or []) if u and u.get("player", {}).get("name")]
-    tv_umpire = next((u.get("player", {}).get("name") for u in (match_info.get("tvUmpires") or []) if u and u.get("player", {}).get("name")), None)
-    match_referee = next((u.get("player", {}).get("name") for u in (match_info.get("matchReferees") or []) if u and u.get("player", {}).get("name")), None)
+    umpires = [u.get("player", {}).get("name") for u in (match_info.get("umpires") or []) if u and isinstance(u.get("player"), dict) and u.get("player", {}).get("name")]
+    tv_umpire = next((u.get("player", {}).get("name") for u in (match_info.get("tvUmpires") or []) if u and isinstance(u.get("player"), dict) and u.get("player", {}).get("name")), None)
+    match_referee = next((u.get("player", {}).get("name") for u in (match_info.get("matchReferees") or []) if u and isinstance(u.get("player"), dict) and u.get("player", {}).get("name")), None)
 
     db_playing_xi = dict(playing_xi)
     db_playing_xi["_umpires"] = umpires

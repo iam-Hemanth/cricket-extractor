@@ -149,8 +149,14 @@ jobs:
           python consolidate.py \
             --input-dirs all_matches \
             --output-dir master_lake/matches \
-            --manifest-path master_lake/lake_manifest.json \
-            --archive-path master_lake/cricket_lake_v3.tar.gz
+            --manifest-path master_lake/lake_manifest.json
+
+      - name: Build Index Catalog & Distribution Archives
+        run: |
+          python scripts/build_lake_catalog.py \
+            --matches-dir master_lake/matches \
+            --output-dir master_lake/dist \
+            --archive-prefix cricket_lake_v3
 
       - name: Display Lake Summary
         run: |
@@ -165,7 +171,10 @@ jobs:
         with:
           tag_name: data-v2-batches
           files: |
-            master_lake/cricket_lake_v3.tar.gz
+            master_lake/dist/cricket_lake_v3.zip
+            master_lake/dist/cricket_lake_v3.tar.gz
+            master_lake/dist/matches_index.csv
+            master_lake/dist/README.txt
             master_lake/lake_manifest.json
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

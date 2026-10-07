@@ -200,14 +200,20 @@ def main():
                 continue
 
             # 3. Construct Match v3.0
-            match_v3, const_err = construct_match_v3(
-                mid=mid,
-                raw_details=details,
-                commentary_chunks_by_inn=commentary_chunks_by_inn,
-                player_profiles=player_profiles,
-                people_registry=people_registry,
-                venue_map=venue_map
-            )
+            try:
+                match_v3, const_err = construct_match_v3(
+                    mid=mid,
+                    raw_details=details,
+                    commentary_chunks_by_inn=commentary_chunks_by_inn,
+                    player_profiles=player_profiles,
+                    people_registry=people_registry,
+                    venue_map=venue_map
+                )
+            except Exception as e:
+                logger.warning(f"Exception constructing match {mid}: {e}")
+                failed_matches[mid] = f"Construction exception: {e}"
+                continue
+
             if const_err or not match_v3:
                 logger.warning(f"Failed to construct match {mid}: {const_err}")
                 failed_matches[mid] = f"Construction error: {const_err}"
