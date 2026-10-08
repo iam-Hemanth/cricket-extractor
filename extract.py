@@ -21,6 +21,7 @@ from src.commentary import fetch_innings_commentary, fetch_match_details
 from src.constructor import construct_match_v3
 from src.cricsheet_audit import CricsheetAuditor
 from src.validator import validate_match_data
+from src.match_filter import source_scope_decision
 
 logging.basicConfig(
     level=logging.INFO,
@@ -139,6 +140,7 @@ def main():
     succeeded = 0
     failed_matches: Dict[str, str] = {}
     skipped = 0
+    scope_decisions = {}
 
     failed_log_path = output_dir / "failed_matches.json"
 
@@ -165,6 +167,13 @@ def main():
                 failed_matches[mid] = f"Details fetch failed: {err}"
                 continue
 
+            decision=source_scope_decision(details,mid)
+            scope_decisions[mid]=decision
+            if decision['status']!='selected':
+                if decision['status']=='held':failed_matches[mid]='Scope review: '+decision['reason']
+                else:skipped+=1
+                logger.info('Source admission %s: %s',mid,decision['reason'])
+                continue
             match_info = details.get("match") or {}
             content = details.get("content") or {}
             series_id = str(
@@ -263,6 +272,7 @@ def main():
         logger.info("Extraction interrupted by user.")
 
     finally:
+        atomic_write_json(output_dir/'scope_decisions.json',scope_decisions)
         # Save failed matches log
         if failed_matches:
             with open(failed_log_path, "w", encoding="utf-8") as f:

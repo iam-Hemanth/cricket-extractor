@@ -103,6 +103,7 @@ def discover_matches(since_date: str = "2026-09-18") -> dict:
                             }
                         elif series:
                             discovered[mid]["competition"] = series
+                            discovered[mid]['trophy_id']=(match.get('series') or {}).get('trophyId')
     except Exception as e:
         logger.warning(f"Error scraping live results: {e}")
 
@@ -113,7 +114,7 @@ def main():
     parser = argparse.ArgumentParser(description="Discover recent Cricinfo matches")
     parser.add_argument("--since", type=str, default="2026-09-18", help="Earliest match date (YYYY-MM-DD)")
     parser.add_argument("--output-curated", type=str, default="data/manifest_curated_delta.json")
-    parser.add_argument("--output-unfiltered", type=str, default="data/manifest_unfiltered_delta.json")
+    parser.add_argument("--output-unfiltered", type=str, default=None)
     args = parser.parse_args()
 
     # Load existing manifests
@@ -145,9 +146,9 @@ def main():
                 "match_type": info["format"],
                 "teams": info["teams"],
                 "dates": [info["date"]],
-                "event": {"name": info.get("competition")}
+                "event": {"name": info.get("competition"),"trophy_id":info.get('trophy_id')}
             }
-            keep, _ = should_ingest_match(meta)
+            keep, _ = should_ingest_match(meta,mid)
             if keep:
                 curated_delta.append(info)
 
@@ -160,13 +161,13 @@ def main():
     with open(out_curated_path, "w", encoding="utf-8") as f:
         json.dump(curated_delta, f, indent=2)
 
-    out_unfiltered_path = REPO_ROOT / args.output_unfiltered
-    out_unfiltered_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(out_unfiltered_path, "w", encoding="utf-8") as f:
-        json.dump(unfiltered_delta, f, indent=2)
-
+    if args.output_unfiltered:
+        out_unfiltered_path = REPO_ROOT / args.output_unfiltered
+        out_unfiltered_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(out_unfiltered_path, "w", encoding="utf-8") as f:
+            json.dump(unfiltered_delta, f, indent=2)
+        logger.info(f"Saved {len(unfiltered_delta)} matches to {out_unfiltered_path}")
     logger.info(f"Saved {len(curated_delta)} matches to {out_curated_path}")
-    logger.info(f"Saved {len(unfiltered_delta)} matches to {out_unfiltered_path}")
 
 if __name__ == "__main__":
     main()
