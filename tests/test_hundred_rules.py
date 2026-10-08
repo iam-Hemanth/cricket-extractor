@@ -31,6 +31,11 @@ def sequence(count, illegal_before=None):
         delivery.update(id=index+1,overNumber=index//5+1,
             oversActual=float(f'{index//5}.{index%5+1}'),oversUnique=index+0.2,totalInningRuns=None)
         records.append(delivery)
+    legal=0
+    for position,record in enumerate(records,1):
+        record['ballsUnique']=position
+        record['ballsActual']=legal+1
+        legal+=int(not(record.get('wides') or record.get('noballs')))
     return records
 
 
@@ -285,6 +290,60 @@ class HundredFailureRegressionTests(unittest.TestCase):
 
     def test_native_group_must_match_retained_source_over_number(self):
         m=build();deliveries(m)[0]['source_over_number']=2
+        self.assertTrue(validator.validate_match_data(m))
+
+    def test_source_scorecard_detects_omitted_final_set_without_external_scorecard(self):
+        raw=hundred();raw['content']['innings'][0]['balls']=40
+        m=build(raw,sequence(35))
+        self.assertTrue(validator.validate_match_data(m))
+
+    def test_real_missing_completed_set_cannot_hide_behind_recomputed_clocks(self):
+        data=json.loads((Path(__file__).parent/'fixtures/hundred/1252678.json').read_text())
+        chunks={int(k):v for k,v in data['commentary'].items()}
+        chunks[1]=[b for b in chunks[1] if b['overNumber']!=2]
+        m,error=constructor.construct_match_v3('1252678',data['details'],chunks,{},{},{})
+        self.assertIsNone(error)
+        self.assertTrue(validator.validate_match_data(m,data['details']['content']['innings']))
+
+    def test_missing_illegal_delivery_is_detected_by_source_unique_counter(self):
+        bs=sequence(30,illegal_before=24);bs.pop(24)
+        self.assertTrue(validator.validate_match_data(build(balls=bs)))
+
+    def test_corrupt_source_legal_position_is_not_treated_as_authoritative(self):
+        m=build();deliveries(m)[25]['source_legal_ball_marker']=25
+        self.assertTrue(validator.validate_match_data(m))
+
+    def test_wide_after_allocation_completed_is_rejected(self):
+        bs=sequence(100)
+        extra=ball();extra.update(id=999,overNumber=21,oversActual=20.1,oversUnique=101,
+                                  wides=1,totalRuns=1,totalInningRuns=None)
+        bs.append(extra)
+        self.assertTrue(validator.validate_match_data(build(balls=bs)))
+
+    def test_rain_or_missing_quota_does_not_remove_absolute_20_ball_ceiling(self):
+        for quota in (50,None):
+            with self.subTest(quota=quota):
+                bs=sequence(45)
+                for index,b in enumerate(bs):
+                    b['bowlerPlayerId']=12 if index<10 or 20<=index<30 or index>=40 else 13
+                self.assertTrue(validator.validate_match_data(build(hundred(quota=quota),bs)))
+
+    def test_partial_set_appearances_count_toward_absolute_four_set_limit(self):
+        bs=sequence(25)
+        for index,b in enumerate(bs):
+            b['bowlerPlayerId']=12 if index%5==0 else 13+index//5
+        self.assertTrue(validator.validate_match_data(build(balls=bs)))
+
+    def test_partial_parts_of_three_consecutive_sets_require_review(self):
+        bs=sequence(15)
+        for index,b in enumerate(bs):
+            b['bowlerPlayerId']=12 if index in (4,5,6,7,8,9,10) else 13+index//5
+        self.assertTrue(validator.validate_match_data(build(balls=bs)))
+
+    def test_super_five_stops_immediately_after_second_dismissal(self):
+        m=build(hundred(quota=5,special=True),sequence(3))
+        for index,d in enumerate(deliveries(m)[:2]):
+            d['wickets']=[{'kind':'bowled','player_out_id':f'espn_{1001+index}'}]
         self.assertTrue(validator.validate_match_data(m))
 
     def test_zero_balls_rate_basis_remains_explicit(self):

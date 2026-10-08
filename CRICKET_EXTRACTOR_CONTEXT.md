@@ -1,5 +1,11 @@
 # Cricket Extractor (Curated Lake) — Project Context for Copilot & AI Agents
 
+> **Hundred repair update — 8 October 2026:** read [HUNDRED_RULES_REPAIR.md](HUNDRED_RULES_REPAIR.md)
+> first. Hundred candidates emit schema 3.2 with five-ball rules, dated core packs,
+> source-backed clock coverage and separate nominal/unknown phases. Other formats
+> retain 3.1. Published releases and website consumers have not been migrated.
+
+
 > **Local repair update — 7 October 2026:** read [DATA_INTEGRITY_REPAIR.md](DATA_INTEGRITY_REPAIR.md)
 > before the historical context below. The repaired constructor emits schema 3.1
 > candidates with a separate participant registry and replacement history. Published

@@ -580,7 +580,7 @@
                           "integer",
                           "null"
                         ],
-                        "minimum": 0
+                        "minimum": 1
                       },
                       "nominal_phase": {
                         "enum": [
@@ -590,6 +590,13 @@
                           "neutral",
                           "unknown"
                         ]
+                      },
+                      "source_delivery_sequence": {
+                        "type": [
+                          "integer",
+                          "null"
+                        ],
+                        "minimum": 1
                       }
                     }
                   }
@@ -669,6 +676,30 @@
           "delivered_balls": {
             "type": "integer",
             "minimum": 0
+          },
+          "source_legal_balls": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "source_counter_coverage": {
+            "type": "object",
+            "required": [
+              "delivery_sequence",
+              "legal_position"
+            ],
+            "properties": {
+              "delivery_sequence": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "legal_position": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
           }
         }
       }
@@ -877,7 +908,9 @@
                 "rule_review_issues",
                 "legal_balls",
                 "delivered_balls",
-                "super_over"
+                "super_over",
+                "source_legal_balls",
+                "source_counter_coverage"
               ],
               "properties": {
                 "overs": {
@@ -892,7 +925,8 @@
                             "source_over_number",
                             "source_legal_ball_marker",
                             "phase",
-                            "nominal_phase"
+                            "nominal_phase",
+                            "source_delivery_sequence"
                           ]
                         }
                       }

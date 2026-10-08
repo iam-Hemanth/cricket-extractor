@@ -6,7 +6,7 @@ from typing import Dict, List, Optional, Tuple
 from functools import lru_cache
 from pathlib import Path
 import json
-from collections import Counter
+from collections import Counter, defaultdict
 
 from src import hundred
 
@@ -56,6 +56,10 @@ def validate_match_data(match: dict, scorecard_innings: Optional[List[dict]] = N
         _, innings_errors = validate_innings(inn, source, is_last_innings=index == len(innings)-1,
                                              balls_per_over=match["meta"]["balls_per_over"])
         errors.extend(innings_errors)
+        if match['meta']['schema_version']=='3.2.0' and source and source.get('balls') is not None:
+            actual=sum(d['is_legal'] for ov in inn['overs'] for d in ov['deliveries'])
+            if actual!=source['balls']:
+                errors.append('Hundred source scorecard legal-ball total mismatch')
     if match["meta"]["schema_version"] == "3.2.0":
         errors.extend(validate_hundred_contract(match))
     return errors
@@ -285,20 +289,39 @@ def validate_hundred_contract(match: dict) -> List[str]:
     for inn in match['innings']:
         special=inn['super_over']
         allocations=inn['source_allocations']
-        expected_inn=hundred.innings_metadata({'totalBalls':allocations.get('scorecard_total_balls')},
+        expected_inn=hundred.innings_metadata({'totalBalls':allocations.get('scorecard_total_balls'),'balls':inn['source_legal_balls']},
             [{'over':{'ballLimit':v}} for v in allocations.get('commentary_ball_limits',[])],pack,special)
         for key,value in expected_inn.items():
             if inn.get(key)!=value:
                 errors.append(f'Hundred innings metadata mismatch: {key}')
         balls=[d for ov in inn['overs'] for d in ov['deliveries']]
+        bowler_sets=defaultdict(set)
         for ov in inn['overs']:
             for d in ov['deliveries']:
+                bowler_sets[d['bowler_id']].add(ov['over'])
                 if d['source_over_number'] is not None and d['source_over_number']!=ov['over']+1:
                     errors.append('Hundred native group conflicts with source over number')
         legal=0;bowler_balls=Counter()
-        consecutive=0;previous_bowler=None
+        consecutive=0;previous_bowler=None;special_wickets=0
+        quota=expected_inn['allocated_legal_balls']
+        maximum=5 if special else 100
         for sequence,d in enumerate(balls,1):
+            if legal>=maximum or (quota is not None and legal>=quota):
+                errors.append('Hundred delivery after innings ball limit reached')
+            if special and special_wickets>=2:
+                errors.append('Super Five delivery after second dismissal')
+            if special:
+                try:
+                    special_wickets+=count_team_wickets([d])
+                except ValueError as exc:
+                    errors.append(str(exc))
             after=legal+int(d['is_legal'])
+            if d['source_delivery_sequence'] is not None and d['source_delivery_sequence']!=sequence:
+                errors.append(f'Hundred source delivery sequence gap at {sequence}')
+            # Provider ballsActual points to the legal position being attempted,
+            # including on wides/no-balls, rather than completed legal balls.
+            if d['source_legal_ball_marker'] is not None and d['source_legal_ball_marker']!=legal+1:
+                errors.append(f'Hundred source legal position mismatch at {sequence}')
             if (d['delivery_sequence'],d['legal_balls_before'],d['legal_balls_after'])!=(sequence,legal,after):
                 errors.append(f'Hundred ball clock mismatch at delivery {sequence}')
             if d['phase']!=hundred.delivery_phase(legal,expected_inn) or d['nominal_phase']!=hundred.nominal_phase(legal,expected_inn):
@@ -312,7 +335,13 @@ def validate_hundred_contract(match: dict) -> List[str]:
             legal=after
         if inn['legal_balls']!=legal or inn['delivered_balls']!=len(balls):
             errors.append('Hundred innings clock totals mismatch')
-        maximum=5 if special else 100
+        if inn['source_legal_balls'] is not None and legal!=inn['source_legal_balls']:
+            errors.append('Hundred stored scorecard legal-ball total mismatch')
+        counter_coverage={
+            'delivery_sequence':sum(d['source_delivery_sequence'] is not None for d in balls),
+            'legal_position':sum(d['source_legal_ball_marker'] is not None for d in balls)}
+        if inn['source_counter_coverage']!=counter_coverage:
+            errors.append('Hundred source counter coverage mismatch')
         if legal>maximum:
             errors.append(f'Hundred innings exceeds {maximum} legal balls')
         if special:
@@ -324,6 +353,13 @@ def validate_hundred_contract(match: dict) -> List[str]:
         quota=expected_inn['allocated_legal_balls']
         if quota and legal>quota:
             errors.append('Hundred innings exceeds reported allocation; requires source review')
-        if pack and quota==100 and any(v>20 for v in bowler_balls.values()):
-            errors.append('Hundred bowler exceeds 20 legal balls; requires source review')
+        if pack and not special:
+            if any(v>pack['full_bowler_limit'] for v in bowler_balls.values()):
+                errors.append('Hundred bowler exceeds 20 legal balls; requires source review')
+            for sets in bowler_sets.values():
+                if len(sets)>4:
+                    errors.append('Hundred bowler participates in more than four sets; requires source review')
+                ordered=sorted(sets)
+                if any(b==a+1 and c==b+1 for a,b,c in zip(ordered,ordered[1:],ordered[2:])):
+                    errors.append('Hundred bowler participates in three consecutive sets; requires source review')
     return errors

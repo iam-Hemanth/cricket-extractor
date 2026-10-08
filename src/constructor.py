@@ -399,6 +399,7 @@ def construct_match_v3(
                                      legal_balls_after=legal_balls + int(is_legal),
                                      source_over_number=ball.get("overNumber"),
                                      source_legal_ball_marker=ball.get("ballsActual"),
+                                     source_delivery_sequence=ball.get("ballsUnique"),
                                      phase=hundred.delivery_phase(legal_balls, hundred_innings),
                                      nominal_phase=hundred.nominal_phase(legal_balls, hundred_innings))
                     legal_balls += int(is_legal)
@@ -418,7 +419,10 @@ def construct_match_v3(
             "follow_on": bool(inn.get("isFollowOn")),
             "super_over": is_so,
             "overs": enriched_overs,
-            **(dict(hundred_innings, legal_balls=legal_balls, delivered_balls=delivery_sequence) if is_hundred else {})
+            **(dict(hundred_innings, legal_balls=legal_balls, delivered_balls=delivery_sequence,
+                    source_counter_coverage={
+                        "delivery_sequence":sum(type(b.get("ballsUnique")) is int for b in raw_balls),
+                        "legal_position":sum(type(b.get("ballsActual")) is int for b in raw_balls)}) if is_hundred else {})
         })
 
     # Toss & Outcome

@@ -66,7 +66,7 @@ def innings_metadata(source, balls, pack, special):
         issues.append('unsupported_main_allocation')
     nominal_death=(quota-(quota+3)//4+1 if nominal_pp is not None else None)
     return {'innings_kind':kind,'include_in_standard_stats':not special,
-            'allocated_legal_balls':quota,'allocation_source':'scorecard.totalBalls' if quota else 'unknown',
+            'allocated_legal_balls':quota,'source_legal_balls':source.get('balls'),'allocation_source':'scorecard.totalBalls' if quota else 'unknown',
             'source_allocations':{'scorecard_total_balls':reported,'commentary_ball_limits':source_limits},
             'nominal_powerplay_balls':nominal_pp,'nominal_death_start_ball':nominal_death,
             'phase_basis':'nominal_conditions' if not issues and not special else (
