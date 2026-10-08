@@ -5,7 +5,7 @@ import unittest
 
 from consolidate import scan_and_consolidate
 from src.constructor import construct_match_v3
-from helpers import details,ball
+from helpers import details,ball,legacy_match
 
 
 class MetricsTests(unittest.TestCase):
@@ -31,14 +31,12 @@ class MetricsTests(unittest.TestCase):
         self.assertNotIn('pitch_coordinates_coverage_pct',result['totals'])
 
     def test_legacy_input_does_not_advertise_new_match_contract(self):
-        match,_=construct_match_v3('100',details(),{1:[ball()]},{},{},{})
-        match['meta']['schema_version']='3.0.0'
+        match=legacy_match()
         result=self.consolidate(match)
         self.assertEqual(result['schema_version'],'3.0.0')
 
     def test_unknown_legacy_dismissal_is_reported_without_aborting_scan(self):
-        match,_=construct_match_v3('100',details(),{1:[ball()]},{},{},{})
-        match['meta']['schema_version']='3.0.0'
+        match=legacy_match()
         match['innings'][0]['overs'][0]['deliveries'][0]['wickets']=[{'kind':'unknown','player_out_id':'espn_1001'}]
         result=self.consolidate(match)
         self.assertEqual(result['total_matches'],0)

@@ -33,9 +33,9 @@ releases stay unchanged. Prior3.1/3.2 inputs remain supported as their own contr
   Ambiguous not-out flags, scorecard-only dismissals, unreliable running counters,
   missing actors and other contradictions remain source-review records.
 
-## Verification before the final independent review
+## Verification after independent review fixes
 
-166 tests pass in the curated working branch; the full producer gets the same suite.
+178 tests pass in the curated working branch; the full producer gets the same suite.
 Frozen curated replay5527 sources currently yields5412 candidates and115 review
 records. Nine previous rejects recover: six innings penalties, two ball labels and
 one explicit retirement. Stronger gates expose previously tolerated contradictions;
@@ -63,3 +63,17 @@ Optional non-striker gaps remain unavailable partnership coverage.
 
 Current lifecycle/report/evidence: CricStats docs/revamp/CLASSIFICATION_REPAIR_SPEC.md,
 CLASSIFICATION_REPAIR_PLAN.md and the forthcoming completion report.
+
+## Independent review disposition
+
+Three Important findings were fixed: Hundred competition/class contradictions,
+prior-version gate laundering and stored snapshots overriding external scorecard
+facts. The omitted timed-out team wicket total was regraded from Minor to Important
+because a published total must include accepted source dismissals. Nine new test
+methods (including source-family subcases) reproduce/fix the four categories. The
+whole178-test suite is green; no deferred Minor findings and no repeated reviewer.
+Genuine3.0 inventory is readable through an explicit unverified path; modern-shaped
+older-version records and unsupported versions fail closed. Source-only timed-out
+counts affect team totals without synthetic balls, duplicate events or bowler credit.
+
+Final cohort comparison also exposed sponsorship names: source series.trophyId117 identifies IPL after T20 membership is established; exact-name fallback applies only without a known trophy ID. This keeps historic sponsored IPL matches out of international records and in IPL. The stable identifier is retained in metadata and covered by source/synthetic regressions.

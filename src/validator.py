@@ -54,6 +54,15 @@ def validate_match_data(match: dict, scorecard_innings: Optional[List[dict]] = N
         errors.append(f"Incomplete innings: candidate {len(innings)} != source {len(scorecard_innings)}")
     for index, inn in enumerate(innings):
         source = scorecard_innings[index] if scorecard_innings is not None and index < len(scorecard_innings) else None
+        if match['meta']['schema_version']=='3.3.0' and source is not None:
+            if inn['source_scorecard']!=source_facts.scorecard_snapshot(source):
+                errors.append('Stored scorecard snapshot conflicts with supplied source')
+            actual=sum(d['is_legal'] for ov in inn['overs'] for d in ov['deliveries'])
+            runs=sum(d['runs']['total'] for ov in inn['overs'] for d in ov['deliveries'])+inn['innings_penalty_runs']
+            if source.get('balls') is not None and actual!=source['balls']:
+                errors.append('Supplied source exact legal-ball total mismatch')
+            if source.get('runs') is not None and runs!=source['runs']:
+                errors.append('Supplied source exact runs mismatch')
         _, innings_errors = validate_innings(inn, source, is_last_innings=index == len(innings)-1,
                                              balls_per_over=match["meta"]["balls_per_over"])
         errors.extend(innings_errors)
@@ -218,7 +227,10 @@ def validate_innings(
             elif isinstance(d_text, str) and "timed out" in d_text.lower():
                 timed_out_count += 1
 
-        expected_wkts = (sc_wkts - timed_out_count) if sc_wkts is not None else None
+        recorded_timed_out=sum(str(w.get('kind') or '').strip().lower()=='timed out'
+            for ov in overs for d in ov['deliveries'] for w in d.get('wickets') or [])
+        missing_timed_out=max(0,timed_out_count-recorded_timed_out)
+        expected_wkts = (sc_wkts - missing_timed_out) if sc_wkts is not None else None
 
         # Allow minor ≤ 2 run historical scorer graphic discrepancy on multi-day/century games
         if sc_runs is not None and abs(got_runs - sc_runs) > 2:
@@ -396,3 +408,45 @@ def validate_hundred_contract(match: dict) -> List[str]:
                 if any(b==a+1 and c==b+1 for a,b,c in zip(ordered,ordered[1:],ordered[2:])):
                     errors.append('Hundred bowler participates in three consecutive sets; requires source review')
     return errors
+
+
+V3_3_META_FIELDS={'source_competition_trophy_id','source_classification_presence','record_class','statistical_family',
+    'international_status','classification_status','classification_issues','record_stats_eligible',
+    'gender_source','gender_issues','gender_evidence'}
+V3_3_INN_FIELDS={'source_scorecard','innings_penalty_runs','penalty_adjustment_source','penalty_adjustment_status'}
+V3_3_DELIVERY_FIELDS={'source_actual_delivery','source_ball_number','source_unique_marker'}
+
+
+def validate_inventory_candidate(match: dict) -> List[str]:
+    """Genuine v3.0 is explicitly unverified; modern-shaped downgrades fail closed."""
+    if not isinstance(match,dict) or not isinstance(match.get('meta'),dict):
+        return ['Malformed candidate object/metadata']
+    version=match['meta'].get('schema_version')
+    if not isinstance(version,str):
+        return ['Unsupported candidate contract type']
+    if version in {'3.1.0','3.2.0','3.3.0'}:
+        return validate_match_data(match)
+    if version!='3.0.0':
+        return [f'Unsupported candidate contract: {version!r}']
+    modern_meta=V3_3_META_FIELDS|{'source_classification','playing_format','ruleset_id',
+        'identity_issues','playing_xi_status','missing_non_striker_deliveries','normalization_notes'}
+    modern_inn=V3_3_INN_FIELDS|{'source_legal_balls','innings_kind','include_in_standard_stats'}
+    modern_delivery=V3_3_DELIVERY_FIELDS|{'delivery_sequence','legal_balls_before','source_over_number'}
+    try:
+        if not all(isinstance(match.get(k),t) for k,t in [('match_id',str),('innings',list),('playing_xi',dict),('outcome',dict),('toss',dict)]):
+            return ['Malformed legacy match structure']
+        if 'players' in match or 'participation_events' in match or modern_meta & match['meta'].keys():
+            return ['Legacy version retains modern contract fields']
+        errors=[]
+        for inn in match['innings']:
+            if modern_inn & inn.keys():
+                return ['Legacy version retains modern innings fields']
+            for ov in inn.get('overs') or []:
+                for d in ov.get('deliveries') or []:
+                    if modern_delivery & d.keys():
+                        return ['Legacy version retains modern delivery fields']
+            _,errs=validate_innings(inn,balls_per_over=match['meta'].get('balls_per_over',6))
+            errors.extend(errs)
+        return errors
+    except (KeyError,TypeError,AttributeError,ValueError) as exc:
+        return [f'Malformed legacy candidate: {type(exc).__name__}']

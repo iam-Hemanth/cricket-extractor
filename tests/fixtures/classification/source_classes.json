@@ -89,5 +89,23 @@
     ],
     "expected_bucket": "T20I",
     "expected_gender": "female"
+  },
+  {
+    "match_id": "335982",
+    "compressed_scorecard_sha256": "3f42c4e201ca5d4e3f9085357e913c89662a4025f456a48c0e5a49b50f7660e4",
+    "match_fields": {
+      "format": "T20",
+      "generalClassId": 6,
+      "internationalClassId": null,
+      "series": {
+        "name": "Indian Premier League",
+        "trophyId": 117
+      }
+    },
+    "roster_gender_values": [
+      "M"
+    ],
+    "expected_bucket": "IPL",
+    "expected_gender": "male"
   }
 ]

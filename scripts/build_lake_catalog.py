@@ -13,7 +13,8 @@ import zipfile
 from pathlib import Path
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from src.validator import count_team_wickets, validate_match_data
+from src.validator import count_team_wickets, validate_match_data, validate_inventory_candidate
+from src.source_facts import source_only_timed_out
 
 CATALOG_FIELDS=['filename', 'match_id', 'date', 'format', 'format_bucket', 'schema_version', 'record_class', 'playing_format', 'international_status', 'classification_status', 'record_stats_eligible', 'gender', 'competition', 'season', 'team1', 'team2', 'winner', 'result', 'toss_winner', 'toss_decision', 'venue', 'city', 'venue_country', 'total_balls', 'total_runs', 'total_wickets', 'wagon_wheel_balls', 'pitch_line_balls', 'shot_type_balls']
 
@@ -37,11 +38,10 @@ def generate_catalog(matches_dir: Path, output_dir: Path, archive_prefix: str = 
             print(f"Error loading {p.name}: {e}")
             continue
 
-        if (d.get('meta') or {}).get('schema_version') in {'3.1.0','3.2.0','3.3.0'}:
-            errors=validate_match_data(d)
-            if errors:
-                print(f'Rejected catalog candidate {p.stem}: {errors[0]}')
-                continue
+        errors=validate_inventory_candidate(d)
+        if errors:
+            print(f'Rejected catalog candidate {p.stem}: {errors[0]}')
+            continue
         mid = str(d.get("match_id") or p.stem)
         meta = d.get("meta") or {}
         dates = meta.get("dates") or []
@@ -95,7 +95,8 @@ def generate_catalog(matches_dir: Path, output_dir: Path, archive_prefix: str = 
 
         for inn in inns:
             total_runs += inn.get('innings_penalty_runs',0)
-            total_wkts += count_team_wickets([b for ov in inn.get('overs') or [] for b in ov.get('deliveries') or []])
+            deliveries=[b for ov in inn.get('overs') or [] for b in ov.get('deliveries') or []]
+            total_wkts += count_team_wickets(deliveries)+source_only_timed_out(deliveries,inn.get('source_scorecard') or {})
             for ov in (inn.get("overs") or []):
                 for b in (ov.get("deliveries") or []):
                     total_balls += 1

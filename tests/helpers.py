@@ -22,3 +22,13 @@ def ball(batter=1, bowler=12, non_striker=2):
     return {'id':100,'inningNumber':1,'overNumber':1,'oversActual':0.1,'oversUnique':0.1,
             'batsmanPlayerId':batter,'bowlerPlayerId':bowler,'nonStrikerPlayerId':non_striker,
             'batsmanRuns':0,'totalRuns':0,'totalInningRuns':0}
+
+
+def legacy_match():
+    return {'match_id':'100','meta':{'schema_version':'3.0.0','format':'T20','format_bucket':'IPL',
+        'dates':['2023-04-01'],'venue':'Ground','balls_per_over':6},'outcome':{},'toss':{},
+        'playing_xi':{'A':[{'player_id':'espn_1001'}],'B':[{'player_id':'espn_1012'}]},
+        'innings':[{'innings_number':1,'batting_team':'A','overs':[{'over':0,'deliveries':[
+            {'ball_number':1,'actual_delivery':'0.1','is_legal':True,'batter_id':'espn_1001',
+             'bowler_id':'espn_1012','runs':{'batter':0,'extras':0,'total':0},'extras':{},
+             'wickets':[],'total_inning_runs':0,'tactical':{}}]}]}]}

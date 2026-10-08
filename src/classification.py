@@ -56,12 +56,16 @@ def classify(match_info, roster_values):
     else:issues.append('unknown_general_class')
     if raw_play and playing!='unknown' and raw_play.replace('hundred_ball','t20')!=playing.replace('hundred_ball','t20'):
         issues.append('format_class_family_conflict')
+    if competition in COMPETITIONS and (record!='t20' or international_status!='non_international'):
+        issues.append('hundred_competition_class_conflict')
     if issues:
         record,family,bucket='unknown','unknown','Unknown';status='needs_review'
         international_status='unknown'
     if is_hundred(raw_format,competition):
         playing='hundred_ball'
-    if bucket=='T20' and competition=='Indian Premier League':bucket='IPL'
+    trophy=(match_info.get('series') or {}).get('trophyId')
+    if bucket=='T20' and ((type(trophy) is int and trophy==117) or (trophy is None and competition=='Indian Premier League')):
+        bucket='IPL'
 
     explicit=gender_value(match_info.get('gender'))
     class_gender=i[5] if i else ('female' if general==17 else None)
@@ -80,7 +84,7 @@ def classify(match_info, roster_values):
     else:
         gender='unknown';gender_source='unknown'
         if roster_values:gender_issues.append('incomplete_or_conflicting_roster_gender')
-    return {'source_classification':source,'source_classification_presence':presence,
+    return {'source_classification':source,'source_competition_trophy_id':trophy,'source_classification_presence':presence,
             'record_class':record,'statistical_family':family,'international_status':international_status,
             'playing_format':playing,'format':bucket if bucket!='IPL' else 'T20','format_bucket':bucket,
             'classification_status':status,'classification_issues':issues,
@@ -91,7 +95,7 @@ def classify(match_info, roster_values):
 
 def source_from_metadata(meta):
     source=meta['source_classification'];presence=meta['source_classification_presence']
-    result={'series':{'name':meta.get('competition')},'gender':meta['gender_evidence']['match_gender']}
+    result={'series':{'name':meta.get('competition'),'trophyId':meta['source_competition_trophy_id']},'gender':meta['gender_evidence']['match_gender']}
     for field,key in [('format','format'),('generalClassId','general_class_id'),('internationalClassId','international_class_id')]:
         if presence[key]:result[field]=source[key]
     return result

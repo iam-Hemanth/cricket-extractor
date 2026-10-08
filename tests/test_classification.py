@@ -143,6 +143,19 @@ class SourceClassificationTests(unittest.TestCase):
         m=build(make_match());m['meta'].pop('classification_status',None)
         self.assertTrue(validator.validate_match_data(m))
 
+    def test_sponsored_ipl_names_use_stable_source_trophy_identity(self):
+        for name in ('Pepsi Indian Premier League','DLF Indian Premier League','Indian Premier League'):
+            raw=make_match(6,None,'T20',name);raw['match']['series']['trophyId']=117
+            self.assertEqual(build(raw)['meta']['format_bucket'],'IPL')
+
+    def test_other_trophy_does_not_get_ipl_from_a_misleading_name(self):
+        raw=make_match(6,None,'T20','Indian Premier League');raw['match']['series']['trophyId']=999
+        self.assertEqual(build(raw)['meta']['format_bucket'],'T20')
+
+    def test_trophy_does_not_override_non_t20_record_class(self):
+        raw=make_match(4,None,'TEST','Pepsi Indian Premier League');raw['match']['series']['trophyId']=117
+        self.assertEqual(build(raw)['meta']['format_bucket'],'FC')
+
 
 class ArchivedClassRegressionTests(unittest.TestCase):
     def test_actual_domestic_tour_and_womens_source_classes(self):

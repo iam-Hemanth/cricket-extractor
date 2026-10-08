@@ -336,6 +336,12 @@
               }
             }
           }
+        },
+        "source_competition_trophy_id": {
+          "type": [
+            "integer",
+            "null"
+          ]
         }
       }
     },
@@ -1195,7 +1201,8 @@
               "gender_evidence",
               "source_classification",
               "playing_format",
-              "gender"
+              "gender",
+              "source_competition_trophy_id"
             ]
           },
           "innings": {
@@ -1323,16 +1330,217 @@
         "properties": {
           "meta": {
             "not": {
-              "required": [
-                "source_classification_presence"
+              "anyOf": [
+                {
+                  "required": [
+                    "source_classification_presence"
+                  ]
+                },
+                {
+                  "required": [
+                    "record_class"
+                  ]
+                },
+                {
+                  "required": [
+                    "statistical_family"
+                  ]
+                },
+                {
+                  "required": [
+                    "international_status"
+                  ]
+                },
+                {
+                  "required": [
+                    "classification_status"
+                  ]
+                },
+                {
+                  "required": [
+                    "classification_issues"
+                  ]
+                },
+                {
+                  "required": [
+                    "record_stats_eligible"
+                  ]
+                },
+                {
+                  "required": [
+                    "gender_source"
+                  ]
+                },
+                {
+                  "required": [
+                    "gender_issues"
+                  ]
+                },
+                {
+                  "required": [
+                    "gender_evidence"
+                  ]
+                },
+                {
+                  "required": [
+                    "source_competition_trophy_id"
+                  ]
+                }
               ]
             }
           },
           "innings": {
             "items": {
               "not": {
-                "required": [
-                  "innings_penalty_runs"
+                "anyOf": [
+                  {
+                    "required": [
+                      "source_scorecard"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "innings_penalty_runs"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "penalty_adjustment_status"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "penalty_adjustment_source"
+                    ]
+                  }
+                ]
+              },
+              "properties": {
+                "overs": {
+                  "items": {
+                    "properties": {
+                      "deliveries": {
+                        "items": {
+                          "not": {
+                            "anyOf": [
+                              {
+                                "required": [
+                                  "source_actual_delivery"
+                                ]
+                              },
+                              {
+                                "required": [
+                                  "source_ball_number"
+                                ]
+                              },
+                              {
+                                "required": [
+                                  "source_unique_marker"
+                                ]
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "meta": {
+            "properties": {
+              "schema_version": {
+                "const": "3.1.0"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "meta": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "playing_format"
+                  ]
+                },
+                {
+                  "required": [
+                    "source_classification"
+                  ]
+                },
+                {
+                  "required": [
+                    "ruleset_id"
+                  ]
+                },
+                {
+                  "required": [
+                    "ruleset_status"
+                  ]
+                },
+                {
+                  "required": [
+                    "ruleset"
+                  ]
+                },
+                {
+                  "required": [
+                    "display_unit"
+                  ]
+                },
+                {
+                  "required": [
+                    "economy_basis_balls"
+                  ]
+                },
+                {
+                  "required": [
+                    "phase_policy_id"
+                  ]
+                }
+              ]
+            },
+            "properties": {
+              "format_bucket": {
+                "enum": [
+                  "IPL",
+                  "T20I",
+                  "T20",
+                  "ODI",
+                  "Test"
+                ]
+              }
+            }
+          },
+          "innings": {
+            "items": {
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "source_legal_balls"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "innings_kind"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "include_in_standard_stats"
+                    ]
+                  }
                 ]
               }
             }

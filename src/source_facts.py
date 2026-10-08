@@ -46,3 +46,10 @@ def canonical_marker(source_actual, over_number, ball_number, unique_marker):
     except (InvalidOperation,ValueError,TypeError):
         pass
     return source_actual
+
+
+def source_only_timed_out(deliveries,scorecard):
+    reported=scorecard.get('timed_out') or 0
+    recorded=sum(str(w.get('kind') or '').strip().lower()=='timed out'
+                 for d in deliveries for w in d.get('wickets') or [])
+    return max(0,reported-recorded)

@@ -18,7 +18,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
-from src.validator import validate_match_data, count_team_wickets
+from src.validator import validate_match_data, count_team_wickets, validate_inventory_candidate
+from src.source_facts import source_only_timed_out
 
 logging.basicConfig(
     level=logging.INFO,
@@ -79,6 +80,8 @@ def scan_and_consolidate(
     mapped_players: Set[str] = set()
     zero_delivery_matches = 0
     missing_non_striker_deliveries = 0
+    legacy_unverified_matches = 0
+    source_only_timed_out_wickets = 0
 
     processed_mids: List[str] = []
 
@@ -91,13 +94,13 @@ def scan_and_consolidate(
             failed_matches_all[mid] = f"Corrupt JSON: {e}"
             continue
 
-        meta = data.get("meta") or {}
-        if meta.get("schema_version") in {"3.1.0", "3.2.0", "3.3.0"}:
-            validation_errors = validate_match_data(data)
-            if validation_errors:
-                failed_matches_all[mid] = "; ".join(validation_errors[:5])
-                logger.warning("Rejected candidate %s: %s", mid, failed_matches_all[mid])
-                continue
+        validation_errors = validate_inventory_candidate(data)
+        if validation_errors:
+            failed_matches_all[mid] = "; ".join(validation_errors[:5])
+            logger.warning("Rejected candidate %s: %s",mid,failed_matches_all[mid])
+            continue
+        meta=data['meta']
+        if meta.get('schema_version')=='3.0.0':legacy_unverified_matches+=1
         try:
             match_wicket_count = count_team_wickets([
                 d for inn in data.get("innings") or [] for ov in inn.get("overs") or []
@@ -141,7 +144,10 @@ def scan_and_consolidate(
 
         # Field presence is coverage, not an accuracy or tracking provenance claim.
         match_ball_count = 0
-        total_wickets += match_wicket_count
+        non_delivery=sum(source_only_timed_out([d for ov in inn.get('overs') or [] for d in ov['deliveries']],
+                         inn.get('source_scorecard') or {}) for inn in data.get('innings') or [])
+        source_only_timed_out_wickets+=non_delivery
+        total_wickets += match_wicket_count+non_delivery
         missing_non_striker_deliveries += meta.get("missing_non_striker_deliveries", 0)
         for inn in data.get("innings") or []:
             for ov in inn.get("overs") or []:
@@ -192,6 +198,7 @@ def scan_and_consolidate(
             "runs": total_runs,
             "wickets": total_wickets,
             "wicket_events": total_wicket_events,
+            "source_only_timed_out_wickets":source_only_timed_out_wickets,
             "deliveries_with_wagon_wheel": wagon_balls,
             "deliveries_with_shot_type": shot_balls,
             "wagon_wheel_coverage_pct": wagon_pct,
@@ -206,6 +213,7 @@ def scan_and_consolidate(
         },
         "coverage": {
             "zero_delivery_matches": zero_delivery_matches,
+            "legacy_unverified_matches":legacy_unverified_matches,
             "missing_non_striker_deliveries": missing_non_striker_deliveries,
         },
         "formats_breakdown": dict(format_counts.most_common()),

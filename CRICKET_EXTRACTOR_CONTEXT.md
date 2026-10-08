@@ -1,5 +1,12 @@
 # Cricket Extractor (Curated Lake) — Project Context for Copilot & AI Agents
 
+> **Classification/coverage repair —8 October2026:** read
+> [CLASSIFICATION_COVERAGE_REPAIR.md](CLASSIFICATION_COVERAGE_REPAIR.md) first.
+> New candidates use3.3 source class/presence, gender evidence, stable IPL trophy
+> identity and source score coverage. Both producer codebases share the gate;
+> published datasets/app consumers have not migrated. Rebuild/review before release.
+
+
 > **Hundred repair update — 8 October 2026:** read [HUNDRED_RULES_REPAIR.md](HUNDRED_RULES_REPAIR.md)
 > first. Hundred candidates emit schema 3.2 with five-ball rules, dated core packs,
 > source-backed clock coverage and separate nominal/unknown phases. Other formats
