@@ -128,7 +128,7 @@ class HundredConstructionTests(unittest.TestCase):
         self.assertEqual(meta.get('source_classification'),{'format':'HUNDRED_BALL','general_class_id':6,'international_class_id':None})
         self.assertEqual(meta.get('economy_basis_balls'),6)
         self.assertEqual(meta.get('display_unit'),'balls')
-        self.assertEqual(meta['schema_version'],'3.2.0')
+        self.assertEqual(meta['schema_version'],'3.3.0')
 
     def test_raw_format_detects_hundred_without_named_mens_competition(self):
         raw=hundred();raw['match'].pop('ballsPerOver');raw['match']['series']['name']="The Hundred Women's Competition"

@@ -85,6 +85,7 @@ def main():
     succeeded = 0
     failed = 0
     determinism_failures = 0
+    determinism_checks = 0
     failed_matches: Dict[str, str] = {}
     if args.match_ids:
         for requested in target_mids:
@@ -119,6 +120,7 @@ def main():
 
         # Determinism check
         if args.verify_determinism:
+            determinism_checks += 1
             match_v3_second, _ = construct_match_v3(
                 mid=mid,
                 raw_details=details,
@@ -159,7 +161,7 @@ def main():
     logger.info("=" * 60)
     logger.info(f"Offline Reparse Complete: {succeeded} succeeded | {failed} failed")
     if args.verify_determinism:
-        logger.info(f"Determinism Checks: {len(match_dirs) - determinism_failures}/{len(match_dirs)} passed")
+        logger.info(f"Determinism Checks: {determinism_checks - determinism_failures}/{determinism_checks} passed")
     logger.info("=" * 60)
 
     if determinism_failures > 0 or (args.strict and failed > 0):

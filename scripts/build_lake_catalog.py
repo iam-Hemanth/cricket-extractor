@@ -12,6 +12,12 @@ import tarfile
 import zipfile
 from pathlib import Path
 
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+from src.validator import count_team_wickets, validate_match_data
+
+CATALOG_FIELDS=['filename', 'match_id', 'date', 'format', 'format_bucket', 'schema_version', 'record_class', 'playing_format', 'international_status', 'classification_status', 'record_stats_eligible', 'gender', 'competition', 'season', 'team1', 'team2', 'winner', 'result', 'toss_winner', 'toss_decision', 'venue', 'city', 'venue_country', 'total_balls', 'total_runs', 'total_wickets', 'wagon_wheel_balls', 'pitch_line_balls', 'shot_type_balls']
+
+
 
 def generate_catalog(matches_dir: Path, output_dir: Path, archive_prefix: str = "cricket_lake_v3"):
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -22,6 +28,7 @@ def generate_catalog(matches_dir: Path, output_dir: Path, archive_prefix: str = 
     print(f"Found {len(json_files)} match JSON files to index.")
 
     rows = []
+    accepted_files = []
     for idx, p in enumerate(json_files, 1):
         try:
             with open(p, "r", encoding="utf-8") as f:
@@ -30,6 +37,11 @@ def generate_catalog(matches_dir: Path, output_dir: Path, archive_prefix: str = 
             print(f"Error loading {p.name}: {e}")
             continue
 
+        if (d.get('meta') or {}).get('schema_version') in {'3.1.0','3.2.0','3.3.0'}:
+            errors=validate_match_data(d)
+            if errors:
+                print(f'Rejected catalog candidate {p.stem}: {errors[0]}')
+                continue
         mid = str(d.get("match_id") or p.stem)
         meta = d.get("meta") or {}
         dates = meta.get("dates") or []
@@ -82,11 +94,12 @@ def generate_catalog(matches_dir: Path, output_dir: Path, archive_prefix: str = 
         shot_balls = 0
 
         for inn in inns:
+            total_runs += inn.get('innings_penalty_runs',0)
+            total_wkts += count_team_wickets([b for ov in inn.get('overs') or [] for b in ov.get('deliveries') or []])
             for ov in (inn.get("overs") or []):
                 for b in (ov.get("deliveries") or []):
                     total_balls += 1
                     total_runs += (b.get("runs") or {}).get("total", 0)
-                    total_wkts += len(b.get("wickets") or [])
                     tact = b.get("tactical") or {}
                     if tact.get("wagon_coords") is not None:
                         wagon_balls += 1
@@ -95,12 +108,20 @@ def generate_catalog(matches_dir: Path, output_dir: Path, archive_prefix: str = 
                     if tact.get("shot_type") is not None:
                         shot_balls += 1
 
+        accepted_files.append(p)
         rows.append({
             "filename": f"{mid}.json",
             "match_id": mid,
             "date": m_date,
             "format": fmt,
             "format_bucket": bucket,
+            "schema_version":meta.get('schema_version') or 'unknown',
+            "record_class":meta.get('record_class') or 'unknown',
+            "playing_format":meta.get('playing_format') or 'unknown',
+            "international_status":meta.get('international_status') or 'unknown',
+            "classification_status":meta.get('classification_status') or 'legacy_unverified',
+            "record_stats_eligible":meta.get('record_stats_eligible'),
+            "gender":meta.get('gender') or 'unknown',
             "competition": comp,
             "season": season,
             "team1": team1,
@@ -116,7 +137,7 @@ def generate_catalog(matches_dir: Path, output_dir: Path, archive_prefix: str = 
             "total_runs": total_runs,
             "total_wickets": total_wkts,
             "wagon_wheel_balls": wagon_balls,
-            "pitch_map_balls": pitch_balls,
+            "pitch_line_balls": pitch_balls,
             "shot_type_balls": shot_balls
         })
 
@@ -125,7 +146,7 @@ def generate_catalog(matches_dir: Path, output_dir: Path, archive_prefix: str = 
 
     # 1. Write matches_index.csv
     csv_path = output_dir / "matches_index.csv"
-    fieldnames = list(rows[0].keys())
+    fieldnames = CATALOG_FIELDS
     with open(csv_path, "w", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
@@ -136,22 +157,23 @@ def generate_catalog(matches_dir: Path, output_dir: Path, archive_prefix: str = 
     txt_path = output_dir / "README.txt"
     with open(txt_path, "w", encoding="utf-8") as f:
         f.write("=" * 120 + "\n")
-        f.write("🏏 ESPNcricinfo Master Cricket Data Lake v3.0 — Match Catalog & Dataset Guide\n")
+        f.write("🏏 ESPNcricinfo Master Cricket Data Lake versioned — Match Catalog & Dataset Guide\n")
         f.write("=" * 120 + "\n\n")
         f.write(f"Total Matches     : {len(rows):,} matches\n")
         total_balls_all = sum(r["total_balls"] for r in rows)
         total_runs_all = sum(r["total_runs"] for r in rows)
         total_wkts_all = sum(r["total_wickets"] for r in rows)
         wagon_balls_all = sum(r["wagon_wheel_balls"] for r in rows)
-        pitch_balls_all = sum(r["pitch_map_balls"] for r in rows)
+        pitch_balls_all = sum(r["pitch_line_balls"] for r in rows)
         shot_balls_all = sum(r["shot_type_balls"] for r in rows)
         f.write(f"Total Deliveries  : {total_balls_all:,} deliveries\n")
         f.write(f"Total Runs        : {total_runs_all:,} runs\n")
         f.write(f"Total Wickets     : {total_wkts_all:,} wickets\n")
-        f.write(f"Date Range        : {rows[0]['date']} to {rows[-1]['date']}\n")
-        f.write(f"Tactical Telemetry: Wagon Wheel ({wagon_balls_all:,} balls, {wagon_balls_all/total_balls_all*100:.1f}%), ")
-        f.write(f"Pitch Map ({pitch_balls_all:,} balls, {pitch_balls_all/total_balls_all*100:.1f}%), ")
-        f.write(f"Shot Types ({shot_balls_all:,} balls, {shot_balls_all/total_balls_all*100:.1f}%)\n\n")
+        date_range=f"{rows[0]['date']} to {rows[-1]['date']}" if rows else 'No accepted matches'
+        f.write(f"Date Range        : {date_range}\n")
+        f.write(f"Tactical Telemetry: Wagon Wheel ({wagon_balls_all:,} balls, {wagon_balls_all/(total_balls_all or 1)*100:.1f}%), ")
+        f.write(f"Pitch Line ({pitch_balls_all:,} balls, {pitch_balls_all/(total_balls_all or 1)*100:.1f}%), ")
+        f.write(f"Shot Types ({shot_balls_all:,} balls, {shot_balls_all/(total_balls_all or 1)*100:.1f}%)\n\n")
 
         f.write("DATASET STRUCTURE & HOW TO USE:\n")
         f.write("-" * 120 + "\n")
@@ -162,10 +184,10 @@ def generate_catalog(matches_dir: Path, output_dir: Path, archive_prefix: str = 
         f.write("   - meta       : Competition, format, season, dates, venue, balls_per_over, tactical_coverage\n")
         f.write("   - outcome    : Winner, margin (win_by_runs / win_by_wickets), eliminator\n")
         f.write("   - toss       : Toss winner and decision ('bat' or 'field')\n")
-        f.write("   - playing_xi : Team -> list of 11 players with batting/bowling style and canonical Cricsheet IDs\n")
-        f.write("   - innings    : Ball-by-ball delivery log with wagon wheel coordinates, Hawk-Eye pitch line/length\n\n")
+        f.write("   - playing_xi : Source-confirmed original lineups; see playing_xi_status and players registry\n")
+        f.write("   - innings    : Ball-by-ball delivery log with wagon wheel coordinates, categorical pitch line/length\n\n")
 
-        f.write("MATCH CATALOG (5,483 MATCHES CHRONOLOGICAL):\n")
+        f.write("MATCH CATALOG (ACCEPTED MATCHES, CHRONOLOGICAL):\n")
         f.write("-" * 120 + "\n")
         f.write(f"{'Filename':<14} {'Date':<12} {'Format':<8} {'Teams':<36} {'Competition / Series':<32} {'Result'}\n")
         f.write("-" * 120 + "\n")
@@ -189,7 +211,7 @@ def generate_catalog(matches_dir: Path, output_dir: Path, archive_prefix: str = 
         manifest_p = matches_dir / "lake_manifest.json"
         if manifest_p.exists():
             zf.write(manifest_p, arcname="lake_manifest.json")
-        for p in json_files:
+        for p in accepted_files:
             zf.write(p, arcname=p.name)
     print(f"Created {zip_path} ({zip_path.stat().st_size / (1024*1024):.2f} MB)")
 
@@ -202,7 +224,7 @@ def generate_catalog(matches_dir: Path, output_dir: Path, archive_prefix: str = 
         manifest_p = matches_dir / "lake_manifest.json"
         if manifest_p.exists():
             tf.add(manifest_p, arcname="lake_manifest.json")
-        for p in json_files:
+        for p in accepted_files:
             tf.add(p, arcname=p.name)
     print(f"Created {tar_path} ({tar_path.stat().st_size / (1024*1024):.2f} MB)")
 

@@ -8,7 +8,8 @@ from pathlib import Path
 import json
 from collections import Counter, defaultdict
 
-from src import hundred
+from src import hundred, classification, source_facts
+import re
 
 NON_DISMISSAL_KINDS = {"retired hurt", "retired not out"}
 DISMISSAL_KINDS = {
@@ -60,7 +61,37 @@ def validate_match_data(match: dict, scorecard_innings: Optional[List[dict]] = N
             actual=sum(d['is_legal'] for ov in inn['overs'] for d in ov['deliveries'])
             if actual!=source['balls']:
                 errors.append('Hundred source scorecard legal-ball total mismatch')
-    if match["meta"]["schema_version"] == "3.2.0":
+    version=match['meta']['schema_version']
+    if version=='3.3.0':
+        for inn in innings:
+            deliveries=[d for ov in inn['overs'] for d in ov['deliveries']]
+            snap=inn['source_scorecard']
+            _,source_errors=validate_innings(inn,snap,balls_per_over=match['meta']['balls_per_over'])
+            errors.extend(source_errors)
+            legal=sum(d['is_legal'] for d in deliveries)
+            if inn['source_legal_balls']!=snap['balls'] or (snap['balls'] is not None and legal!=snap['balls']):
+                errors.append('Source scorecard legal-ball coverage mismatch')
+            penalty=source_facts.innings_penalty(deliveries,snap)
+            if penalty['penalty_adjustment_status']=='needs_review':
+                errors.append('Source penalty component requires review')
+            if any(inn.get(k)!=v for k,v in penalty.items()):
+                errors.append('Source innings penalty adjustment mismatch')
+            runs=sum(d['runs']['total'] for d in deliveries)+inn['innings_penalty_runs']
+            if snap['runs'] is not None and runs!=snap['runs']:
+                errors.append('Source scorecard exact runs mismatch')
+            for d in deliveries:
+                marker=source_facts.canonical_marker(d['source_actual_delivery'],d['source_over_number'],
+                                                    d['source_ball_number'],d['source_unique_marker'])
+                if d['actual_delivery']!=marker:
+                    errors.append('Canonical delivery marker contradicts source evidence')
+                if not re.fullmatch(r'[0-9]+\.[0-9]+',d['actual_delivery']):
+                    errors.append('Uncorroborated delivery marker requires review')
+        expected=classification.classify(classification.source_from_metadata(match['meta']),
+                                        match['meta']['gender_evidence']['playing_roster_values'])
+        for key,value in expected.items():
+            if match['meta'].get(key)!=value:
+                errors.append(f'Source classification mismatch: {key}')
+    if version=='3.2.0' or (version=='3.3.0' and match['meta']['playing_format']=='hundred_ball'):
         errors.extend(validate_hundred_contract(match))
     return errors
 
@@ -169,7 +200,7 @@ def validate_innings(
     if sc_inn:
         sc_runs = sc_inn.get("runs")
         sc_wkts = sc_inn.get("wickets")
-        got_runs = sum(d.get("runs", {}).get("total", 0) for ov in overs for d in ov.get("deliveries", []))
+        got_runs = sum(d.get("runs", {}).get("total", 0) for ov in overs for d in ov.get("deliveries", [])) + inn.get('innings_penalty_runs',0)
         try:
             got_wkts = count_team_wickets([
                 d for ov in overs for d in ov.get("deliveries", [])
@@ -179,7 +210,7 @@ def validate_innings(
             return False, errors
 
         # Check for non-delivery dismissals like 'timed out' (e.g. Angelo Mathews 2023 WC)
-        timed_out_count = 0
+        timed_out_count = sc_inn.get('timed_out') or 0
         for b in (sc_inn.get("inningBatsmen") or []):
             d_text = b.get("dismissalText") or {}
             if isinstance(d_text, dict) and d_text.get("short") == "timed out":
@@ -226,7 +257,7 @@ def validate_innings(
 def validate_player_registry(match_data: dict) -> Tuple[bool, List[str]]:
     """Verify that every player ID referenced in deliveries exists in playing_xi or substitutes."""
     errors = []
-    if (match_data.get("meta") or {}).get("schema_version") in {"3.1.0", "3.2.0"}:
+    if (match_data.get("meta") or {}).get("schema_version") in {"3.1.0", "3.2.0", "3.3.0"}:
         registry = match_data.get("players") or {}
         for pid, player in registry.items():
             if player.get("player_id") != pid or pid != f"espn_{player.get('espn_id')}":
@@ -283,6 +314,8 @@ def validate_hundred_contract(match: dict) -> List[str]:
         'format':source.get('format'),'generalClassId':source.get('general_class_id'),
         'internationalClassId':source.get('international_class_id')},meta.get('competition'),meta.get('dates') or [])
     for key,value in expected.items():
+        if key=='gender' and meta['schema_version']=='3.3.0':
+            continue
         if meta.get(key)!=value:
             errors.append(f'Hundred metadata mismatch: {key}')
     pack=expected['ruleset']

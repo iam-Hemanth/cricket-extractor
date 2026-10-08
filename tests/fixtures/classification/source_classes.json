@@ -1,0 +1,93 @@
+[
+  {
+    "match_id": "524915",
+    "compressed_scorecard_sha256": "956cab2d4efa2f1477e68ee5a6344095edbf51e6d580b30f0dd3b1be23d99e4d",
+    "match_fields": {
+      "format": "T20",
+      "generalClassId": 6,
+      "internationalClassId": null,
+      "gender": null,
+      "series": {
+        "name": "Big Bash League"
+      }
+    },
+    "roster_gender_values": [
+      "M"
+    ],
+    "expected_bucket": "T20",
+    "expected_gender": "male"
+  },
+  {
+    "match_id": "692723",
+    "compressed_scorecard_sha256": "66015ef14ca6db47353f9e1b7bc020b525995c374104e14060266c27c2fd5f21",
+    "match_fields": {
+      "format": "TEST",
+      "generalClassId": 4,
+      "internationalClassId": null,
+      "gender": null,
+      "series": {
+        "name": "LV= County Championship Division One"
+      }
+    },
+    "roster_gender_values": [
+      "M"
+    ],
+    "expected_bucket": "FC",
+    "expected_gender": "male"
+  },
+  {
+    "match_id": "693275",
+    "compressed_scorecard_sha256": "d54e48b15025993c3370709325464bf95ff6e9d93ebbf1626079496169e60810",
+    "match_fields": {
+      "format": "ODI",
+      "generalClassId": 5,
+      "internationalClassId": null,
+      "gender": null,
+      "series": {
+        "name": "Royal London One-Day Cup"
+      }
+    },
+    "roster_gender_values": [
+      "M"
+    ],
+    "expected_bucket": "ListA",
+    "expected_gender": "male"
+  },
+  {
+    "match_id": "1525658",
+    "compressed_scorecard_sha256": "82154a93ae4d9d9127177ba639fb264a50a2e0550c5c3470b375c5185a78b1e2",
+    "match_fields": {
+      "format": "TEST",
+      "generalClassId": 11,
+      "internationalClassId": null,
+      "gender": null,
+      "series": {
+        "name": "Australia in South Africa"
+      }
+    },
+    "roster_gender_values": [
+      "M"
+    ],
+    "expected_bucket": "OtherMDM",
+    "expected_gender": "male"
+  },
+  {
+    "match_id": "1550480",
+    "compressed_scorecard_sha256": "c2780075957642698e8bd4a0da4390eaf51cda2594d161d785549455b05ec87c",
+    "match_fields": {
+      "format": "T20",
+      "generalClassId": 17,
+      "internationalClassId": 10,
+      "gender": null,
+      "series": {
+        "name": "Asian Games Women's Cricket Competition"
+      }
+    },
+    "roster_gender_values": [
+      "F",
+      "M"
+    ],
+    "expected_bucket": "T20I",
+    "expected_gender": "female"
+  }
+]

@@ -6,17 +6,9 @@ import re
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 
-from src import hundred
+from src import hundred, classification, source_facts
 
 from src.participants import build_participant_registry, extract_participation_events, confirmed_lineups, _id
-
-LEAGUE_COMPETITIONS = {
-    "Indian Premier League",
-    "SA20",
-    "The Hundred Men's Competition",
-    "International League T20",
-    "Major League Cricket"
-}
 
 DISMISSAL_KIND_MAP = {
     1: "caught",
@@ -72,36 +64,6 @@ def normalize_delivery_runs(ball: dict, match_meta: dict) -> Tuple[dict, dict, O
     extras = {name: value for name, value in extras.items() if value}
     return {"batter": batter, "extras": sum(extras.values()), "total": total}, extras, note
 
-def determine_format_bucket(raw_format: str, competition_name: Optional[str]) -> Tuple[str, str]:
-    """
-    Returns (meta_format, db_format_bucket) strictly adhering to GET_FORMAT_BUCKET_SQL:
-    - IPL: competition == 'Indian Premier League'
-    - T20I: IT20 or (T20 and not a domestic league)
-    - T20: domestic T20 leagues
-    - ODI: ODI
-    - Test: Test
-    """
-    comp = competition_name or ""
-    fmt = (raw_format or "").strip()
-    fmt_upper = fmt.upper()
-
-    if comp == "Indian Premier League":
-        return "T20", "IPL"
-    if comp == "The Hundred Men's Competition" or fmt_upper in ("HUNDRED_BALL", "HUNDRED"):
-        return "T20", "T20"
-    if fmt_upper in ("IT20", "T20I"):
-        return "T20I", "T20I"
-    if fmt_upper in ("T20",):
-        if comp in LEAGUE_COMPETITIONS:
-            return "T20", "T20"
-        return "T20I", "T20I"
-    if fmt_upper in ("ODI", "ODM"):
-        return "ODI", "ODI"
-    if fmt_upper in ("TEST", "MDM"):
-        return "Test", "Test"
-
-    return fmt, fmt
-
 def construct_match_v3(
     mid: str,
     raw_details: dict,
@@ -113,14 +75,18 @@ def construct_match_v3(
     """Assemble complete Match JSON v3.0."""
     match_info = raw_details.get("match") or {}
     content = raw_details.get("content") or {}
+    if 'content' not in raw_details or 'innings' not in content:
+        return None, f"Match {mid}: missing source scorecard innings"
+    if match_info.get('state') is not None and match_info['state']!='POST':
+        return None, f"Match {mid}: uncompleted source match state {match_info['state']}"
     series = match_info.get("series") or {}
 
     comp_name = series.get("name") or (match_info.get("event") or {}).get("name")
     raw_fmt = match_info.get("format")
-    meta_fmt, db_fmt_bucket = determine_format_bucket(raw_fmt, comp_name)
+    class_meta = classification.classify(match_info, classification.roster_gender_values(raw_details))
+    meta_fmt, db_fmt_bucket = class_meta["format"], class_meta["format_bucket"]
     is_hundred = hundred.is_hundred(raw_fmt, comp_name)
     if is_hundred:
-        meta_fmt, db_fmt_bucket = "T20", "T20"
         if match_info.get("ballsPerOver") not in (None, 5):
             return None, f"Match {mid}: conflicting Hundred ballsPerOver"
 
@@ -128,7 +94,7 @@ def construct_match_v3(
     start_str = (match_info.get("startDate") or "").split("T")[0]
     dates = []
     if start_str:
-        if meta_fmt == "Test":
+        if class_meta["playing_format"] == "multi_day":
             actual_days = match_info.get("actualDays") or match_info.get("scheduledDays") or 5
             try:
                 base_dt = datetime.strptime(start_str, "%Y-%m-%d")
@@ -161,10 +127,15 @@ def construct_match_v3(
 
     # Dismissal fielders map
     dismissal_fielders_map = {}
+    retirement_kinds = {}
+    retirement_refs = {}
     for inn_idx, inn in enumerate(content.get("innings") or []):
         inn_num = inn.get("inningNumber") or (inn_idx + 1)
-        for b in (inn.get("inningBatsmen") or []):
-            b_id = (b.get("player") or {}).get("id")
+        for batter_index,b in enumerate(inn.get("inningBatsmen") or []):
+            b_id = _id((b.get("player") or {}).get("id"))
+            if source_facts.dismissal_text(b)=='retired not out':
+                retirement_kinds[(inn_num,b_id)]='retired not out'
+                retirement_refs[(inn_num,b_id)]=f'/content/innings/{inn_idx}/inningBatsmen/{batter_index}/dismissalText'
             fielders = []
             if b.get("dismissalFielders"):
                 for f in (b.get("dismissalFielders") or []):
@@ -265,6 +236,13 @@ def construct_match_v3(
 
             enriched_deliveries = []
             for b_idx, ball in enumerate(ov_balls, 1):
+                source_actual=str(ball.get('oversActual'))
+                actual=source_actual
+                actual=source_facts.canonical_marker(source_actual,ball.get('overNumber'),
+                                                      ball.get('ballNumber'),ball.get('oversUnique'))
+                if actual!=source_actual:
+                    normalization_notes.append({'source_ball_id':ball.get('id'),'field':'actual_delivery',
+                        'source_value':source_actual,'normalized_value':actual,'rule_id':'corroborated_first_ball_marker'})
                 total_balls_count += 1
                 b_int_id, bw_int_id = _id(ball.get("batsmanPlayerId")), _id(ball.get("bowlerPlayerId"))
                 b_info, bw_info = player_map.get(b_int_id) or {}, player_map.get(bw_int_id) or {}
@@ -316,12 +294,17 @@ def construct_match_v3(
                     out_int_id = _id(ball.get("outPlayerId")) or b_int_id
                     dtype = ball.get("dismissalType")
                     kind = DISMISSAL_KIND_MAP.get(dtype, "unknown")
+                    if dtype==11 and (inn_num,out_int_id) in retirement_kinds:
+                        kind=retirement_kinds[(inn_num,out_int_id)]
+                        normalization_notes.append({'source_ball_id':ball.get('id'),'field':'wickets.kind',
+                            'source_value':dtype,'normalized_value':kind,'rule_id':'explicit_retired_not_out',
+                            'source_ref':retirement_refs[(inn_num,out_int_id)]})
 
                     # Deduplicate accidental duplicate wicket entries for the same batter in an innings
-                    if out_int_id and out_int_id in seen_dismissed_batters and kind != "retired hurt":
+                    if out_int_id and out_int_id in seen_dismissed_batters and kind not in {"retired hurt", "retired not out"}:
                         pass
                     else:
-                        if out_int_id and kind != "retired hurt":
+                        if out_int_id and kind not in {"retired hurt", "retired not out"}:
                             seen_dismissed_batters.add(out_int_id)
                         out_info = player_map.get(out_int_id) or {}
                         out_obj_id = out_info.get("objectId")
@@ -376,7 +359,11 @@ def construct_match_v3(
 
                 deliv_obj = {
                     "ball_number": b_idx,
-                    "actual_delivery": str(ball.get("oversActual")),
+                    "actual_delivery": actual,
+                    "source_actual_delivery": source_actual,
+                    "source_over_number":ball.get('overNumber'),
+                    "source_ball_number":ball.get('ballNumber'),
+                    "source_unique_marker":str(ball['oversUnique']) if ball.get('oversUnique') is not None else None,
                     "is_legal": is_legal,
                     "batter_id": b_pid,
                     "bowler_id": bw_pid,
@@ -410,6 +397,9 @@ def construct_match_v3(
                 "deliveries": enriched_deliveries
             })
 
+        all_deliveries=[d for ov in enriched_overs for d in ov['deliveries']]
+        source_snapshot=source_facts.scorecard_snapshot(inn)
+        source_penalty=source_facts.innings_penalty(all_deliveries,source_snapshot)
         enriched_innings.append({
             "innings_number": inn_num,
             "batting_team": batting_team,
@@ -419,6 +409,9 @@ def construct_match_v3(
             "follow_on": bool(inn.get("isFollowOn")),
             "super_over": is_so,
             "overs": enriched_overs,
+            'source_scorecard':source_snapshot,'source_legal_balls':inn.get('balls'),
+            'penalty_adjustment_source':f'/content/innings/{inn_idx}/penalties',
+            **source_penalty,
             **(dict(hundred_innings, legal_balls=legal_balls, delivered_balls=delivery_sequence,
                     source_counter_coverage={
                         "delivery_sequence":sum(type(b.get("ballsUnique")) is int for b in raw_balls),
@@ -488,7 +481,7 @@ def construct_match_v3(
     match_v3 = {
         "match_id": str(mid),
         "meta": {
-            "schema_version": "3.2.0" if is_hundred else "3.1.0",
+            "schema_version": "3.3.0",
             "format": meta_fmt,
             "format_bucket": db_fmt_bucket,
             "competition": comp_name,
@@ -508,7 +501,8 @@ def construct_match_v3(
             "identity_issues": identity_issues,
             "playing_xi_status": playing_xi_status,
             "missing_non_striker_deliveries": missing_non_striker_deliveries,
-            **hundred_meta
+            **hundred_meta,
+            **class_meta
         },
         "outcome": {
             "winner": winner_name,

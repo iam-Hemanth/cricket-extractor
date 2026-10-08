@@ -6,7 +6,7 @@ def player(internal_id, object_id=None, name=None):
 def details():
     a = [{'player': player(i)} for i in range(1, 12)]
     b = [{'player': player(i)} for i in range(12, 23)]
-    return {'match': {'format':'T20','series':{'name':'Indian Premier League'},
+    return {'match': {'generalClassId':6,'internationalClassId':None,'format':'T20','series':{'name':'Indian Premier League'},
                       'startDate':'2023-04-01','teams':[{'team':{'id':10,'name':'A'}},{'team':{'id':20,'name':'B'}}],
                       'ground':{'name':'Ground'},'season':'2023'},
             'content': {'matchPlayers':{'teamPlayers':[

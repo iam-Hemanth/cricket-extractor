@@ -92,7 +92,7 @@ def scan_and_consolidate(
             continue
 
         meta = data.get("meta") or {}
-        if meta.get("schema_version") in {"3.1.0", "3.2.0"}:
+        if meta.get("schema_version") in {"3.1.0", "3.2.0", "3.3.0"}:
             validation_errors = validate_match_data(data)
             if validation_errors:
                 failed_matches_all[mid] = "; ".join(validation_errors[:5])
@@ -115,6 +115,7 @@ def scan_and_consolidate(
         season_counts[season] += 1
         schema_versions[meta.get("schema_version") or "unknown"] += 1
 
+        total_runs += sum(inn.get('innings_penalty_runs',0) for inn in data.get('innings') or [])
         dates = meta.get("dates") or []
         for dt in dates:
             if dt < min_date:
@@ -124,7 +125,7 @@ def scan_and_consolidate(
 
         # Player counts
         xi = ({"participants": list(data["players"].values())}
-              if meta.get("schema_version") in {"3.1.0", "3.2.0"} else (data.get("playing_xi") or {}))
+              if meta.get("schema_version") in {"3.1.0", "3.2.0", "3.3.0"} else (data.get("playing_xi") or {}))
         for team, players in xi.items():
             if team.startswith("_") or not isinstance(players, list):
                 continue
