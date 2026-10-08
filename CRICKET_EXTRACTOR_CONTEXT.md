@@ -1,5 +1,12 @@
 # Cricket Extractor (Curated Lake) — Project Context for Copilot & AI Agents
 
+> **Curated launch admission — 8 October 2026:** read
+> [CURATED_LAUNCH_ADMISSION.md](CURATED_LAUNCH_ADMISSION.md) first. One policy now
+> serves discovery, source-verified extraction and the dedicated offline builder.
+> ILT20 is excluded; Afghanistan follows existing non-priority rules. Frozen corpus:
+> 5,233 selected,132 held,162 excluded;211 tests. The full producer is parked.
+> Source data stays archived; the staged subset is not a published/production swap.
+
 > **Classification/coverage repair —8 October2026:** read
 > [CLASSIFICATION_COVERAGE_REPAIR.md](CLASSIFICATION_COVERAGE_REPAIR.md) first.
 > New candidates use3.3 source class/presence, gender evidence, stable IPL trophy

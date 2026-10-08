@@ -1,4 +1,5 @@
 """Curated product admission; priority is not ICC membership or record class."""
+from datetime import date
 from src.classification import classify, roster_gender_values
 
 POLICY_ID='curated_launch_20261008_v1'
@@ -19,7 +20,9 @@ def scope_decision(info,match_id='',verified=False):
         return {'status':status,'reason':reason,'policy_id':POLICY_ID}
     if str(match_id) in _BLOCKED_MATCH_IDS:
         return answer('excluded','blocked_match')
-    competition=info.get('competition') or '';lower=competition.lower()
+    competition=info.get('competition') or ''
+    if not isinstance(competition,str):return answer('held','malformed_source_metadata')
+    lower=competition.lower()
     trophy=info.get('trophy_id');trophy=trophy if type(trophy) is int else None
     if trophy in _EXCLUDED_TROPHIES or 'international league t20' in lower or 'ilt20' in lower:
         return answer('excluded','ilt20_removed')
@@ -51,10 +54,14 @@ def scope_decision(info,match_id='',verified=False):
     if fmt in {'TEST','ODI'}:
         if not dates or not isinstance(dates[0],str) or len(dates[0])<10:
             return answer('held','cutoff_date_unknown')
+        try:date.fromisoformat(dates[0][:10])
+        except ValueError:return answer('held','cutoff_date_unknown')
         cutoff='2011-01-01' if fmt=='TEST' else '2007-01-01'
         if dates[0][:10]<cutoff:
             return answer('excluded','before_format_cutoff')
     allowed_league=trophy in _LEAGUE_TROPHIES or competition in _LEAGUES
+    if verified and allowed_league and record!='t20':
+        return answer('held','source_league_record_class_conflict')
     if verified and record=='t20':
         return answer('selected','allowed_league') if allowed_league else answer('excluded','domestic_league_not_whitelisted')
     # Provisional discovery labels can overlap; actual source admission runs again.
@@ -70,14 +77,30 @@ def scope_decision(info,match_id='',verified=False):
 
 
 def source_scope_facts(details):
-    info=details.get('match') or {};meta=classify(info,roster_gender_values(details))
-    return dict(meta,teams=[(t.get('team') or {}).get('name') for t in info.get('teams') or []],
+    if not isinstance(details,dict) or not isinstance(details.get('match'),dict):
+        raise ValueError('Malformed source metadata')
+    info=details['match'];series=info.get('series') or {};event=info.get('event') or {}
+    if not isinstance(series,dict) or not isinstance(event,dict):raise ValueError('Malformed source competition')
+    competition=series.get('name') or event.get('name')
+    if competition is not None and not isinstance(competition,str):raise ValueError('Malformed source competition')
+    team_entries=info.get('teams') or []
+    if not isinstance(team_entries,list) or any(not isinstance(t,dict) or not isinstance(t.get('team'),dict) for t in team_entries):
+        raise ValueError('Malformed source team metadata')
+    meta=classify(info,roster_gender_values(details))
+    return dict(meta,teams=[t['team'].get('name') for t in team_entries],
         dates=[str(info.get('startDate') or '').split('T')[0]] if info.get('startDate') else [],
-        trophy_id=meta['source_competition_trophy_id'],competition=(info.get('series') or {}).get('name') or (info.get('event') or {}).get('name'),state=info.get('state'))
+        trophy_id=meta['source_competition_trophy_id'],competition=competition,state=info.get('state'))
 
 
 def source_scope_decision(details,match_id=''):
-    return scope_decision(source_scope_facts(details),match_id,verified=True)
+    try:
+        facts=source_scope_facts(details)
+        public=details['match'].get('objectId')
+        if public is None or str(public)!=str(match_id):
+            return {'status':'held','reason':'source_match_identity_unknown_or_conflicting','policy_id':POLICY_ID}
+        return scope_decision(facts,match_id,verified=True)
+    except (TypeError,ValueError,AttributeError):
+        return {'status':'held','reason':'malformed_source_metadata','policy_id':POLICY_ID}
 
 
 def should_ingest_match(info,match_id=''):

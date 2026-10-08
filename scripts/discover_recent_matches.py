@@ -99,7 +99,8 @@ def discover_matches(since_date: str = "2026-09-18") -> dict:
                                 "date": start,
                                 "winner": None,
                                 "result": status,
-                                "competition": series
+                                "competition": series,
+                                "trophy_id":(match.get('series') or {}).get('trophyId')
                             }
                         elif series:
                             discovered[mid]["competition"] = series

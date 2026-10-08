@@ -22,16 +22,23 @@ def build_source_index(archives):
                 if not member.isfile() or Path(member.name).name!='scorecard.json.gz':continue
                 mid=next((p for p in Path(member.name).parts if p.isdigit() and len(p)>=3),None)
                 if mid is None:continue
-                body=archive.extractfile(member).read();details=json.loads(gzip.decompress(body))
-                facts=source_scope_facts(details)
-                public=(details.get('match') or {}).get('objectId')
-                mismatch=public is not None and str(public)!=mid
+                body=archive.extractfile(member).read()
                 evidence={'archive':path.name,'member':member.name,'compressed_sha256':hashlib.sha256(body).hexdigest()}
+                try:
+                    details=json.loads(gzip.decompress(body));facts=source_scope_facts(details)
+                    public=(details.get('match') or {}).get('objectId')
+                    mismatch=public is None or str(public)!=mid
+                    error=None
+                except (ValueError,TypeError,AttributeError,OSError) as exc:
+                    facts=None;mismatch=True;error=type(exc).__name__
                 old=index.get(mid)
                 if old:
                     old['source_conflict']|=old['facts']!=facts or mismatch
                     old['evidence'].append(evidence)
-                else:index[mid]={'facts':facts,'source_conflict':mismatch,'evidence':[evidence]}
+                    if error:old.setdefault('source_errors',[]).append(error)
+                else:
+                    index[mid]={'facts':facts,'source_conflict':mismatch,'evidence':[evidence]}
+                    if error:index[mid]['source_errors']=[error]
     return index
 
 
@@ -42,13 +49,14 @@ def prepare_launch(input_dir,source_index,output_dir):
     rows={};held={};scope_counts=Counter()
     candidate_ids={p.stem for p in source.glob('*.json') if p.stem.isdigit()}
     errors_file=source/'failed_matches.json';previous_errors=json.loads(errors_file.read_text()) if errors_file.exists() else {}
-    for mid in sorted(set(source_index)|candidate_ids):
+    for mid in sorted(set(source_index)|candidate_ids|set(previous_errors)):
         record=source_index.get(mid)
         if record is None or record['source_conflict']:
             decision={'status':'held','reason':'source_metadata_unavailable_or_conflicting','policy_id':POLICY_ID}
         else:decision=scope_decision(record['facts'],mid,verified=True)
         row=dict(decision);row['source_evidence']=record['evidence'] if record else []
-        if record:row['teams']=record['facts']['teams'];row['competition']=record['facts']['competition']
+        if record and record.get('facts'):
+            row['teams']=record['facts']['teams'];row['competition']=record['facts']['competition']
         rows[mid]=row
         if decision['status']=='excluded':continue
         if decision['status']=='held':held[mid]=decision['reason'];continue
@@ -60,7 +68,14 @@ def prepare_launch(input_dir,source_index,output_dir):
             m=json.loads(path.read_text());meta=m.get('meta') or {};facts=record['facts']
             keys=('source_classification','source_classification_presence','source_competition_trophy_id',
                   'record_class','format_bucket','gender','classification_status','record_stats_eligible')
-            if m.get('match_id')!=mid or any(meta.get(k)!=facts.get(k) for k in keys):
+            candidate_teams={t for t in (m.get('playing_xi') or {}) if not t.startswith('_')}
+            candidate_teams.update(t for i in m.get('innings') or [] for t in (i.get('batting_team'),i.get('bowling_team')) if t)
+            first_date=(meta.get('dates') or [None])[0]
+            source_date=(facts.get('dates') or [None])[0]
+            identity_conflict=(m.get('match_id')!=mid or any(meta.get(k)!=facts.get(k) for k in keys)
+                or meta.get('competition')!=facts.get('competition') or first_date!=source_date
+                or candidate_teams!=set(facts['teams']))
+            if identity_conflict:
                 row.update(status='held',reason='candidate_source_identity_conflict');held[mid]=row['reason'];continue
         except (ValueError,AttributeError,TypeError):
             row.update(status='held',reason='unreadable_candidate');held[mid]=row['reason'];continue
