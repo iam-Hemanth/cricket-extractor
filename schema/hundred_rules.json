@@ -1,0 +1,131 @@
+{
+  "scope": "Verified core Hundred rules only; season revisions may differ in other clauses.",
+  "rulesets": {
+    "2021": {
+      "id": "hundred-2021-core-v1",
+      "season": "2021",
+      "document_url": "https://resources.ecb.co.uk/ecb/document/2021/05/18/562e9a6f-4608-4e79-a751-f2d706ea0de2/Playing-Conditions-Hundred-180521.pdf",
+      "document_sha256": "f4b6e6416b00fb50fe3e8af80b97bbfd7f2aa889e191309326a8b0624034104a",
+      "verification_status": "verified_core_rules",
+      "legal_balls_per_set": 5,
+      "main_innings_limit": 100,
+      "no_ball_penalty_runs": 2,
+      "points": {
+        "win": 2,
+        "tie_or_no_result": 1,
+        "loss": 0
+      },
+      "full_bowler_limit": 20,
+      "super_five_limit": 5,
+      "super_five_wicket_limit": 2
+    },
+    "2022": {
+      "id": "hundred-2022-core-v1",
+      "season": "2022",
+      "document_url": "https://resources.ecb.co.uk/ecb/document/2022/03/10/12a85f8f-e3c3-4796-8e79-a95cd0b0140e/7.The-Hundred.pdf",
+      "document_sha256": "487ccda85aafabd87dce47f114bccc0784020b0432bc47bda775c38330e8b80f",
+      "verification_status": "verified_core_rules",
+      "legal_balls_per_set": 5,
+      "main_innings_limit": 100,
+      "no_ball_penalty_runs": 2,
+      "points": {
+        "win": 2,
+        "tie_or_no_result": 1,
+        "loss": 0
+      },
+      "full_bowler_limit": 20,
+      "super_five_limit": 5,
+      "super_five_wicket_limit": 2
+    },
+    "2023": {
+      "id": "hundred-2023-core-v1",
+      "season": "2023",
+      "document_url": "https://resources.ecb.co.uk/ecb/document/2023/03/31/8c3be811-94f1-4025-8ed0-b1ea3263b8d1/4-Playing-Conditions-The-Hundred-2023.pdf",
+      "document_sha256": "08d87555e95d1b19df6c59ca74d4232cc103258907da756b581cb82375cc78d5",
+      "verification_status": "verified_core_rules",
+      "legal_balls_per_set": 5,
+      "main_innings_limit": 100,
+      "no_ball_penalty_runs": 2,
+      "points": {
+        "win": 2,
+        "tie_or_no_result": 1,
+        "loss": 0
+      },
+      "full_bowler_limit": 20,
+      "super_five_limit": 5,
+      "super_five_wicket_limit": 2
+    },
+    "2024": {
+      "id": "hundred-2024-core-v1",
+      "season": "2024",
+      "document_url": "https://resources.ecb.co.uk/ecb/document/2024/07/17/a74b00ab-9cbf-4869-a555-87cc7f6e26d5/32-The-Hundred-2024.pdf",
+      "document_sha256": "978e036193d09ae3f0b0c0708a67380955a153f3585813df652e9cb96ee2875f",
+      "verification_status": "verified_core_rules",
+      "legal_balls_per_set": 5,
+      "main_innings_limit": 100,
+      "no_ball_penalty_runs": 2,
+      "points": {
+        "win": 2,
+        "tie_or_no_result": 1,
+        "loss": 0
+      },
+      "full_bowler_limit": 20,
+      "super_five_limit": 5,
+      "super_five_wicket_limit": 2
+    },
+    "2025": {
+      "id": "hundred-2025-core-v1",
+      "season": "2025",
+      "document_url": "https://resources.ecb.co.uk/ecb/document/2025/05/14/8bd24152-c515-42a0-83b2-b22e03da8045/The-Hundred-2025.pdf",
+      "document_sha256": "260963ff3e5c06171530b9346430f0394232595234be04b96a396bcffbc3b7b8",
+      "verification_status": "verified_core_rules",
+      "legal_balls_per_set": 5,
+      "main_innings_limit": 100,
+      "no_ball_penalty_runs": 2,
+      "points": {
+        "win": 4,
+        "tie_or_no_result": 2,
+        "loss": 0
+      },
+      "full_bowler_limit": 20,
+      "super_five_limit": 5,
+      "super_five_wicket_limit": 2
+    },
+    "2026": {
+      "id": "hundred-2026-core-v1",
+      "season": "2026",
+      "document_url": "https://resources.ecb.co.uk/ecb/document/2026/03/24/f8005182-b39c-4c25-83bd-1ffff0415b7a/The-Hundred-2026.pdf",
+      "document_sha256": "4cf4cb3e7fc5f1e079f78382e3b2679900ea73cb76fd506d7450e9da82026a8f",
+      "verification_status": "verified_core_rules",
+      "legal_balls_per_set": 5,
+      "main_innings_limit": 100,
+      "no_ball_penalty_runs": 1,
+      "points": {
+        "win": 4,
+        "tie_or_no_result": 2,
+        "loss": 0
+      },
+      "full_bowler_limit": 20,
+      "super_five_limit": 5,
+      "super_five_wicket_limit": 2
+    }
+  },
+  "reduced_powerplay_balls": {
+    "5": 6,
+    "6": 8,
+    "7": 9,
+    "8": 10,
+    "9": 11,
+    "10": 13,
+    "11": 14,
+    "12": 15,
+    "13": 16,
+    "14": 18,
+    "15": 19,
+    "16": 20,
+    "17": 21,
+    "18": 23,
+    "19": 24,
+    "20": 25
+  }
+}

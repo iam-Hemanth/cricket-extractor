@@ -6,6 +6,8 @@ import re
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 
+from src import hundred
+
 from src.participants import build_participant_registry, extract_participation_events, confirmed_lineups, _id
 
 LEAGUE_COMPETITIONS = {
@@ -54,16 +56,16 @@ def normalize_delivery_runs(ball: dict, match_meta: dict) -> Tuple[dict, dict, O
         raise ValueError(f"Invalid total run component: {total!r}")
     note = None
     dates = match_meta.get("dates") or []
-    year = str(dates[0])[:4] if dates else ""
     other_extras = sum(value for name, value in extras.items() if name != "noballs")
+    rule_pack = hundred.ruleset(match_meta.get("season"), dates[0] if dates else None, match_meta.get("competition"))
     if (total != component_total and extras["noballs"] == 1
-            and match_meta.get("competition") == "The Hundred Men's Competition"
-            and year in {"2021", "2023"} and total - batter - other_extras == 2):
+            and rule_pack and rule_pack["no_ball_penalty_runs"] == 2
+            and total - batter - other_extras == 2):
         extras["noballs"] = 2
         component_total += 1
         note = {"source_ball_id": ball.get("id"), "field": "extras.noballs",
                 "source_value": 1, "normalized_value": 2,
-                "rule_id": "hundred_no_ball_2021_2023"}
+                "rule_id": rule_pack["id"]}
     if total != component_total:
         raise ValueError(f"Run component mismatch at {ball.get('oversActual')}: "
                          f"source total {total} != components {component_total}")
@@ -116,6 +118,11 @@ def construct_match_v3(
     comp_name = series.get("name") or (match_info.get("event") or {}).get("name")
     raw_fmt = match_info.get("format")
     meta_fmt, db_fmt_bucket = determine_format_bucket(raw_fmt, comp_name)
+    is_hundred = hundred.is_hundred(raw_fmt, comp_name)
+    if is_hundred:
+        meta_fmt, db_fmt_bucket = "T20", "T20"
+        if match_info.get("ballsPerOver") not in (None, 5):
+            return None, f"Match {mid}: conflicting Hundred ballsPerOver"
 
     # Dates: Multi-day expansion for Tests
     start_str = (match_info.get("startDate") or "").split("T")[0]
@@ -130,6 +137,8 @@ def construct_match_v3(
                 dates = [start_str]
         else:
             dates = [start_str]
+
+    hundred_meta = hundred.match_metadata(match_info, comp_name, dates) if is_hundred else {}
 
     ground = match_info.get("ground") or {}
     venue_name = ground.get("name") or ground.get("smallName") or "Unknown Venue"
@@ -192,6 +201,8 @@ def construct_match_v3(
 
     for inn_idx, inn in enumerate(content.get("innings") or []):
         is_so = bool(inn.get("isSuperOver"))
+        if is_hundred and inn.get("ballsPerOver") not in (None, 5):
+            return None, f"Match {mid}: conflicting innings ballsPerOver"
         if is_so and db_fmt_bucket in ("T20", "T20I", "IPL", "ODI"):
             inn_num = super_over_counter
             super_over_counter += 1
@@ -225,12 +236,19 @@ def construct_match_v3(
 
         overs_dict = {}
         for b in raw_balls:
+            if is_hundred and not re.fullmatch(r"[0-9]+\.[0-9]+", str(b.get("oversActual"))):
+                return None, f"Match {mid}: invalid Hundred delivery marker for ball {b.get('id')}"
             if b.get("oversActual") is None:
+                if is_hundred:
+                    return None, f"Match {mid}: missing Hundred delivery marker for ball {b.get('id')}"
                 continue
             ov_num = (b.get("overNumber", 1) - 1) if b.get("overNumber") else int(float(b.get("oversActual", 0)))
             overs_dict.setdefault(ov_num, []).append(b)
 
 
+        hundred_innings = hundred.innings_metadata(inn, raw_balls, hundred_meta.get("ruleset"), is_so) if is_hundred else {}
+        legal_balls = 0
+        delivery_sequence = 0
         enriched_overs = []
         seen_dismissed_batters = set()
         prev_inning_cricinfo_total = 0
@@ -265,7 +283,7 @@ def construct_match_v3(
 
                 try:
                     runs, extras_dict, note = normalize_delivery_runs(
-                        ball, {"competition": comp_name, "dates": dates}
+                        ball, {"competition": comp_name, "dates": dates, "season": match_info.get("season")}
                     )
                 except ValueError as exc:
                     return None, f"Match {mid}: {exc}"
@@ -375,6 +393,15 @@ def construct_match_v3(
                     "tactical": tactical,
                     "review": review_obj
                 }
+                if is_hundred:
+                    delivery_sequence += 1
+                    deliv_obj.update(delivery_sequence=delivery_sequence, legal_balls_before=legal_balls,
+                                     legal_balls_after=legal_balls + int(is_legal),
+                                     source_over_number=ball.get("overNumber"),
+                                     source_legal_ball_marker=ball.get("ballsActual"),
+                                     phase=hundred.delivery_phase(legal_balls, hundred_innings),
+                                     nominal_phase=hundred.nominal_phase(legal_balls, hundred_innings))
+                    legal_balls += int(is_legal)
                 enriched_deliveries.append(deliv_obj)
 
             enriched_overs.append({
@@ -390,7 +417,8 @@ def construct_match_v3(
             "declared": bool(inn.get("isDeclared")),
             "follow_on": bool(inn.get("isFollowOn")),
             "super_over": is_so,
-            "overs": enriched_overs
+            "overs": enriched_overs,
+            **(dict(hundred_innings, legal_balls=legal_balls, delivered_balls=delivery_sequence) if is_hundred else {})
         })
 
     # Toss & Outcome
@@ -448,7 +476,7 @@ def construct_match_v3(
     raw_bpo = match_info.get("ballsPerOver")
     if raw_bpo and isinstance(raw_bpo, int) and raw_bpo > 0:
         balls_per_over = raw_bpo
-    elif comp_name == "The Hundred Men's Competition":
+    elif is_hundred:
         balls_per_over = 5
     else:
         balls_per_over = 6
@@ -456,7 +484,7 @@ def construct_match_v3(
     match_v3 = {
         "match_id": str(mid),
         "meta": {
-            "schema_version": "3.1.0",
+            "schema_version": "3.2.0" if is_hundred else "3.1.0",
             "format": meta_fmt,
             "format_bucket": db_fmt_bucket,
             "competition": comp_name,
@@ -475,7 +503,8 @@ def construct_match_v3(
             "normalization_notes": normalization_notes,
             "identity_issues": identity_issues,
             "playing_xi_status": playing_xi_status,
-            "missing_non_striker_deliveries": missing_non_striker_deliveries
+            "missing_non_striker_deliveries": missing_non_striker_deliveries,
+            **hundred_meta
         },
         "outcome": {
             "winner": winner_name,

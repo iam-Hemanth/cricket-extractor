@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "MatchJSONv3.1",
-  "description": "Source-backed participants and consistent scoring in Match JSON 3.1",
+  "title": "MatchJSONv3.1/v3.2",
+  "description": "Participants/scoring v3.1 with format-aware Hundred v3.2 candidates",
   "type": "object",
   "required": [
     "match_id",
@@ -31,7 +31,10 @@
       "properties": {
         "schema_version": {
           "type": "string",
-          "const": "3.1.0"
+          "enum": [
+            "3.1.0",
+            "3.2.0"
+          ]
         },
         "format": {
           "type": "string"
@@ -84,7 +87,8 @@
           "type": "string",
           "enum": [
             "male",
-            "female"
+            "female",
+            "unknown"
           ]
         },
         "day_night": {
@@ -176,6 +180,44 @@
         "missing_non_striker_deliveries": {
           "type": "integer",
           "minimum": 0
+        },
+        "playing_format": {
+          "const": "hundred_ball"
+        },
+        "source_classification": {
+          "type": "object",
+          "required": [
+            "format",
+            "general_class_id",
+            "international_class_id"
+          ]
+        },
+        "ruleset_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "ruleset_status": {
+          "enum": [
+            "verified_core_rules",
+            "unverified"
+          ]
+        },
+        "ruleset": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "display_unit": {
+          "const": "balls"
+        },
+        "economy_basis_balls": {
+          "const": 6
+        },
+        "phase_policy_id": {
+          "type": "string"
         }
       }
     },
@@ -513,12 +555,120 @@
                             "type": "string"
                           }
                         }
+                      },
+                      "delivery_sequence": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "legal_balls_before": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "legal_balls_after": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "source_over_number": {
+                        "type": [
+                          "integer",
+                          "null"
+                        ],
+                        "minimum": 1
+                      },
+                      "source_legal_ball_marker": {
+                        "type": [
+                          "integer",
+                          "null"
+                        ],
+                        "minimum": 0
+                      },
+                      "nominal_phase": {
+                        "enum": [
+                          "powerplay",
+                          "middle",
+                          "death",
+                          "neutral",
+                          "unknown"
+                        ]
                       }
                     }
                   }
                 }
               }
             }
+          },
+          "innings_kind": {
+            "enum": [
+              "main",
+              "super_five"
+            ]
+          },
+          "include_in_standard_stats": {
+            "type": "boolean"
+          },
+          "allocated_legal_balls": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "allocation_source": {
+            "enum": [
+              "scorecard.totalBalls",
+              "unknown"
+            ]
+          },
+          "source_allocations": {
+            "type": "object",
+            "required": [
+              "scorecard_total_balls",
+              "commentary_ball_limits"
+            ],
+            "properties": {
+              "commentary_ball_limits": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          },
+          "nominal_powerplay_balls": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "nominal_death_start_ball": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "phase_basis": {
+            "enum": [
+              "nominal_conditions",
+              "special_innings",
+              "unknown"
+            ]
+          },
+          "rule_review_issues": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "legal_balls": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "delivered_balls": {
+            "type": "integer",
+            "minimum": 0
           }
         }
       }
@@ -674,5 +824,86 @@
         }
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "meta": {
+            "properties": {
+              "schema_version": {
+                "const": "3.2.0"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "meta": {
+            "required": [
+              "playing_format",
+              "source_classification",
+              "ruleset_id",
+              "ruleset_status",
+              "ruleset",
+              "display_unit",
+              "economy_basis_balls",
+              "phase_policy_id"
+            ],
+            "properties": {
+              "format": {
+                "const": "T20"
+              },
+              "format_bucket": {
+                "const": "T20"
+              },
+              "balls_per_over": {
+                "const": 5
+              }
+            }
+          },
+          "innings": {
+            "items": {
+              "required": [
+                "innings_kind",
+                "include_in_standard_stats",
+                "allocated_legal_balls",
+                "allocation_source",
+                "source_allocations",
+                "nominal_powerplay_balls",
+                "nominal_death_start_ball",
+                "phase_basis",
+                "rule_review_issues",
+                "legal_balls",
+                "delivered_balls",
+                "super_over"
+              ],
+              "properties": {
+                "overs": {
+                  "items": {
+                    "properties": {
+                      "deliveries": {
+                        "items": {
+                          "required": [
+                            "delivery_sequence",
+                            "legal_balls_before",
+                            "legal_balls_after",
+                            "source_over_number",
+                            "source_legal_ball_marker",
+                            "phase",
+                            "nominal_phase"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }

@@ -6,6 +6,9 @@ from typing import Dict, List, Optional, Tuple
 from functools import lru_cache
 from pathlib import Path
 import json
+from collections import Counter
+
+from src import hundred
 
 NON_DISMISSAL_KINDS = {"retired hurt", "retired not out"}
 DISMISSAL_KINDS = {
@@ -53,6 +56,8 @@ def validate_match_data(match: dict, scorecard_innings: Optional[List[dict]] = N
         _, innings_errors = validate_innings(inn, source, is_last_innings=index == len(innings)-1,
                                              balls_per_over=match["meta"]["balls_per_over"])
         errors.extend(innings_errors)
+    if match["meta"]["schema_version"] == "3.2.0":
+        errors.extend(validate_hundred_contract(match))
     return errors
 
 def parse_delivery_key(actual_str: str) -> Tuple[int, int]:
@@ -129,9 +134,13 @@ def validate_innings(
             if d.get("is_legal"):
                 legal_count += 1
 
-        # Completed overs must be within balls_per_over - 1 and balls_per_over + 2
-        # (e.g. 5, 6, 7, 8 legal balls for 6-ball overs due to rain, bowler injuries, declarations, or umpire miscounts)
-        if not is_final_over and (legal_count < balls_per_over - 1 or legal_count > balls_per_over + 2):
+        # Hundred miscounts require review; final partial sets are legitimate.
+        # Retain the existing non-Hundred tolerance in this bounded repair.
+        if balls_per_over == 5:
+            invalid_set = legal_count > 5 or (not is_final_over and legal_count != 5)
+        else:
+            invalid_set = not is_final_over and not balls_per_over-1 <= legal_count <= balls_per_over+2
+        if invalid_set:
             errors.append(
                 f"Inn {inn.get('innings_number')} Over {ov.get('over')} has {legal_count} legal balls (expected {balls_per_over})"
             )
@@ -213,7 +222,7 @@ def validate_innings(
 def validate_player_registry(match_data: dict) -> Tuple[bool, List[str]]:
     """Verify that every player ID referenced in deliveries exists in playing_xi or substitutes."""
     errors = []
-    if (match_data.get("meta") or {}).get("schema_version") == "3.1.0":
+    if (match_data.get("meta") or {}).get("schema_version") in {"3.1.0", "3.2.0"}:
         registry = match_data.get("players") or {}
         for pid, player in registry.items():
             if player.get("player_id") != pid or pid != f"espn_{player.get('espn_id')}":
@@ -259,3 +268,62 @@ def validate_player_registry(match_data: dict) -> Tuple[bool, List[str]]:
                         pass
 
     return True, errors
+
+
+def validate_hundred_contract(match: dict) -> List[str]:
+    """Recompute clocks/derived policy; do not trust caller-supplied phase labels."""
+    errors=[]
+    meta=match['meta']
+    source=meta['source_classification']
+    expected=hundred.match_metadata({'season':meta.get('season'),
+        'format':source.get('format'),'generalClassId':source.get('general_class_id'),
+        'internationalClassId':source.get('international_class_id')},meta.get('competition'),meta.get('dates') or [])
+    for key,value in expected.items():
+        if meta.get(key)!=value:
+            errors.append(f'Hundred metadata mismatch: {key}')
+    pack=expected['ruleset']
+    for inn in match['innings']:
+        special=inn['super_over']
+        allocations=inn['source_allocations']
+        expected_inn=hundred.innings_metadata({'totalBalls':allocations.get('scorecard_total_balls')},
+            [{'over':{'ballLimit':v}} for v in allocations.get('commentary_ball_limits',[])],pack,special)
+        for key,value in expected_inn.items():
+            if inn.get(key)!=value:
+                errors.append(f'Hundred innings metadata mismatch: {key}')
+        balls=[d for ov in inn['overs'] for d in ov['deliveries']]
+        for ov in inn['overs']:
+            for d in ov['deliveries']:
+                if d['source_over_number'] is not None and d['source_over_number']!=ov['over']+1:
+                    errors.append('Hundred native group conflicts with source over number')
+        legal=0;bowler_balls=Counter()
+        consecutive=0;previous_bowler=None
+        for sequence,d in enumerate(balls,1):
+            after=legal+int(d['is_legal'])
+            if (d['delivery_sequence'],d['legal_balls_before'],d['legal_balls_after'])!=(sequence,legal,after):
+                errors.append(f'Hundred ball clock mismatch at delivery {sequence}')
+            if d['phase']!=hundred.delivery_phase(legal,expected_inn) or d['nominal_phase']!=hundred.nominal_phase(legal,expected_inn):
+                errors.append(f'Hundred phase mismatch at delivery {sequence}')
+            if d['bowler_id']!=previous_bowler:
+                consecutive=0;previous_bowler=d['bowler_id']
+            consecutive+=int(d['is_legal'])
+            if pack and consecutive>10:
+                errors.append('Hundred bowler exceeds ten consecutive legal balls; requires source review')
+            if d['is_legal']:bowler_balls[d['bowler_id']]+=1
+            legal=after
+        if inn['legal_balls']!=legal or inn['delivered_balls']!=len(balls):
+            errors.append('Hundred innings clock totals mismatch')
+        maximum=5 if special else 100
+        if legal>maximum:
+            errors.append(f'Hundred innings exceeds {maximum} legal balls')
+        if special:
+            try:
+                if count_team_wickets(balls)>2:
+                    errors.append('Super Five exceeds two dismissals')
+            except ValueError as exc:
+                errors.append(str(exc))
+        quota=expected_inn['allocated_legal_balls']
+        if quota and legal>quota:
+            errors.append('Hundred innings exceeds reported allocation; requires source review')
+        if pack and quota==100 and any(v>20 for v in bowler_balls.values()):
+            errors.append('Hundred bowler exceeds 20 legal balls; requires source review')
+    return errors
