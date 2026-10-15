@@ -55,7 +55,7 @@ An independent, production-grade cricket data extraction, validation, and lake-b
 ### B. Akamai EdgeAuth Key Mechanism
 - ESPNcricinfo's Next.js web application invokes internal consumer API endpoints (`https://hs-consumer-api.cricinfo.com/v1/pages/match/comments`) protected by Akamai EdgeAuth.
 - Requires header `x-hsci-auth-token` generated using HMAC-SHA256 (`src/auth.py`).
-- Key extracted from Next.js webpack bundle module 40734 (`edgeAuth.encryptionKey`): `9ced54a89687e1173e91c1f225fc02abf275a119fda8a41d731d2b04dac95ff5`.
+- The key is read from the current Next.js webpack bundle at `edgeAuth.encryptionKey`; never copy key material into documentation.
 - `scripts/refresh_akamai_key.py` automatically discovers and rotates the key if updated by ESPNcricinfo.
 
 ### C. Format Bucketing Contract
@@ -133,7 +133,7 @@ python scripts/discover_recent_matches.py --since 2026-09-18
   - Tested edge cases: `335982` (1st IPL match 2008), `1144530` (2019 WC Final tied + super over), `1415752` (2024 T20 WC DLS), `1216517` (double super over).
 
 ### Tue Oct 06 12:28:00 IST 2026
-- **Akamai EdgeAuth Reverse Engineering**: Located client-side encryption key in Next.js bundle chunk (`9ced54a89687e1173e91c1f225fc02abf275a119fda8a41d731d2b04dac95ff5`) and built `scripts/refresh_akamai_key.py`.
+- **Akamai EdgeAuth Reverse Engineering**: Located the client-side encryption key in the Next.js bundle and built `scripts/refresh_akamai_key.py`; the key is not recorded here.
 
 ### Tue Oct 06 13:04:00 IST 2026
 - **20-Runner Parallel Matrix Extraction**: Built `.github/workflows/parallel_extract.yml` running 20 concurrent Azure VM workers across 23 batches (250 matches each).
