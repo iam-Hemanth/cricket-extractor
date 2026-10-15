@@ -57,10 +57,54 @@ upstream input, not itself the compact import payload.
 The importer creates stable identity/dictionary maps and preserves the original
 source documents and held records. Participant profile versions are stored once
 and referenced from matches. Deliveries are encoded in versioned, checksummed
-blocks (up to 35 consecutive deliveries per block); a separate SQL decoder checks
-that the compact representation reconstructs the source values exactly. The
-storage work did not sample matches, round statistics or discard the extra
-source fields needed to rebuild answers.
+blocks of up to 35 consecutive deliveries. Each version-1 delivery occupies exactly
+55 bytes; the database checks `payload` length equals `record_count × 55` and checks
+its SHA-256. Match ID, innings number and delivery ordinal are carried outside the
+record. The fixed layout keeps observed and scored components separate, uses
+bounded integer fields and dictionary codes for repeated categories, and preserves
+null separately from zero. Group/ball/legal-clock and code fields have declared
+16-bit ranges, twelve run-component values use 8-bit fields, two tactical coordinates
+use signed 16-bit fields, and review codes have a wider declared bound. Values beyond
+their range fail import; changing widths or fields requires a deliberate codec
+version update. A separate SQL decoder checks exact reconstruction.
+
+For the historical proof, the adapter created `matches.jsonl`, `checks.jsonl`,
+`identity-crosswalk.json` and `verification.json`. The manifest pins each file's
+hash, source-code hashes, admitted record IDs and held IDs. The compact importer
+accepts the specific `d3_verified_test_subset_v1` manifest and pinned source
+selection for 5,215 records plus 18 holds, marked
+`full_admitted_snapshot_ready=false`. The adapter itself is pinned to the frozen
+selection receipt. This exact proof package is not a general converter for any
+newer or larger lake ZIP. A new snapshot needs its own reviewed selection receipt,
+adapter verification and manifest; don't bypass the pinned checks to force it
+through the old importer.
+
+Historical proof command shape (all paths below are private local inputs; this
+imports only into a fresh guarded proof database and does not create the ten views):
+
+```sh
+python scripts/verify_source_adapter.py \
+  --selection-report <pinned-selection-report.json> \
+  --input-dir <curated-match-json-dir> \
+  --people-csv <identity-registry.csv> \
+  --output-dir <fresh-adapter-output>
+
+python scripts/compact_database_proof.py import \
+  --descriptor <private-database-descriptor.json> \
+  --manifest <verified-subset-manifest.json> \
+  --payload-dir <verified-payload-dir> \
+  --staging <new-private-staging-dir>
+
+python scripts/compact_database_proof.py verify \
+  --descriptor <private-database-descriptor.json> \
+  --manifest <verified-subset-manifest.json> \
+  --payload-dir <verified-payload-dir> \
+  --report <verification-report.json>
+```
+
+The commands are historical proof entry points, not a ready six-hour job. In
+particular, do not place descriptor contents or credentials in the repository or
+pass the proof descriptor to a hosted production database.
 
 The fresh proof importer intentionally refuses to load into a populated database.
 It is for a new, explicitly identified proof database; it is not the six-hour
@@ -87,6 +131,14 @@ The participant compatibility output is reconstructed with a join; it did not
 replace one of the ten summaries. Verification checked the imported source rows,
 delivery round trips, participant versions, source documents, holds and the result
 rows from every summary. The report records 17 valid helper indexes.
+
+There is no single checked-in command that safely recreates the final integrated
+480.6 MB database from the current extractor ZIP. The compact proof command above
+creates/verifies the base store; the ten materialized definitions are separate in
+`db/materialized_views.sql` and were measured as a distinct stage. The sibling
+`db/create_views.py` loads `.env`; don't run it against an ordinary database while
+trying to reproduce the private proof. Any rebuild must target a newly identified,
+isolated local database and verify the resulting size and all-ten parity.
 
 ## Why it took several attempts to reach the final size
 
@@ -131,7 +183,8 @@ each value:
 | External player ID | `BIGINT` | Preserve the provider's numeric identity with headroom; it is not the same as a compact internal key. |
 | Internal match/player map keys | `SMALLINT` | The verified snapshot used 5,215 matches and 2,493 players, within signed `SMALLINT` range (−32,768 to 32,767). The schema checks positive keys and the importer refuses overflow. |
 | Innings numbers, source counters and participant profile keys | `INTEGER` | Small in this snapshot, but retained as ordinary integers in the proof schema; the build did not shrink every plausible-looking column. |
-| Compact block keys and coordinates | `SMALLINT` for map key, innings, start ordinal, record count and codec version | The block contract bounds these values; the importer validates them before encoding. |
+| Compact block metadata | `SMALLINT` for map key, innings, start ordinal, record count and codec version | The block contract bounds these values; the importer validates them before encoding. |
+| Tactical coordinates in the codec | Two signed 16-bit values inside the `BYTEA` block | Null and `(0, 0)` stay distinct; out-of-range coordinates fail instead of being rounded. |
 | Actor-inning aggregates | `SMALLINT` for role/player/match/innings keys; `INTEGER` for runs, balls and dismissals | Narrow the repeated join keys; retain wider exact counters for totals. |
 | Dictionary IDs | `BIGINT` with explicit per-dictionary range checks | Most dictionaries cap at 32,767; review codes may use values up to 4,294,967,295. |
 | Match dates | `DATE` | Store calendar dates as dates rather than repeated text. |
