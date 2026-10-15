@@ -66,7 +66,10 @@ null separately from zero. Group/ball/legal-clock and code fields have declared
 16-bit ranges, twelve run-component values use 8-bit fields, two tactical coordinates
 use signed 16-bit fields, and review codes have a wider declared bound. Values beyond
 their range fail import; changing widths or fields requires a deliberate codec
-version update. A separate SQL decoder checks exact reconstruction.
+version update. In version 1, source-group value 65,535 is reserved to mean null, so
+an actual source group numbered 65,535 cannot be represented; a future extract with
+that value must be held until an explicit wider/versioned representation is added.
+A separate SQL decoder checks exact reconstruction.
 
 For the historical proof, the adapter created `matches.jsonl`, `checks.jsonl`,
 `identity-crosswalk.json` and `verification.json`. The manifest pins each file's
