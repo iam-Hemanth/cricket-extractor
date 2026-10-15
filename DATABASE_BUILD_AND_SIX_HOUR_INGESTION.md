@@ -119,6 +119,47 @@ fresh schema/import path and the integration stage differ. Use the exact final b
 count above rather than presenting all experiments as one linear result. The final
 recorded size is **480.6 decimal MB (480,573,119 bytes)**, not 480.3 MB.
 
+## Schema types that mattered
+
+The storage win did **not** come from changing every column to the smallest type.
+The compact schema uses different types according to the meaning and safe range of
+each value:
+
+| Data | Type used in the compact base schema | Reason and guard |
+| --- | --- | --- |
+| External match ID | `TEXT` | Preserve the source ID exactly; validate that it contains the expected digits. Do not assume future provider IDs fit a small integer. |
+| External player ID | `BIGINT` | Preserve the provider's numeric identity with headroom; it is not the same as a compact internal key. |
+| Internal match/player map keys | `SMALLINT` | The verified snapshot used 5,215 matches and 2,493 players, within signed `SMALLINT` range (−32,768 to 32,767). The schema checks positive keys and the importer refuses overflow. |
+| Innings numbers, source counters and participant profile keys | `INTEGER` | Small in this snapshot, but retained as ordinary integers in the proof schema; the build did not shrink every plausible-looking column. |
+| Compact block keys and coordinates | `SMALLINT` for map key, innings, start ordinal, record count and codec version | The block contract bounds these values; the importer validates them before encoding. |
+| Actor-inning aggregates | `SMALLINT` for role/player/match/innings keys; `INTEGER` for runs, balls and dismissals | Narrow the repeated join keys; retain wider exact counters for totals. |
+| Dictionary IDs | `BIGINT` with explicit per-dictionary range checks | Most dictionaries cap at 32,767; review codes may use values up to 4,294,967,295. |
+| Match dates | `DATE` | Store calendar dates as dates rather than repeated text. |
+| Match metadata, outcomes and source facts | `JSONB` | Preserve structured values and their types for reconstruction and queries. |
+| Original compressed source documents | `BYTEA` plus SHA-256 | Keep the exact compressed source bytes and verify them. |
+| Compact delivery blocks | `BYTEA` payload and checksum | Keep the versioned packed delivery bytes intact; blocks are bounded and checksummed. |
+| Query rates and averages | `NUMERIC` expressions in SQL | Compute from exact counters and denominators; do not use floating-point approximations to save space. |
+
+The separate all-ten experiment narrowed **only the `batter_vs_bowler`
+materialized summary** after checking the minimum and maximum of every column fit
+signed `SMALLINT`; the largest noted matchup ball counter was 510. It rebuilt the
+summary, retained its indexes, and compared the values exactly with the original
+result. This is why the guide lists that attempt as a measured optimization. It is
+not a blanket instruction to convert all run, ball, ID or event columns to
+`SMALLINT`; for example, actor-inning run/ball/dismissal counters in the compact
+base schema remain `INTEGER`, and source provider IDs remain wider.
+
+### Safe type-selection rule for future schema work
+
+First define what a field means and its valid contract range, including corrections,
+future imports and edge cases. Then choose a native type that covers that full range,
+add a database check, and test minimum/maximum values. Only narrow a populated
+summary after measuring every column, rebuilding it, and proving exact value parity
+and refresh behavior. On overflow, reject or plan a versioned migration; never clip,
+round or silently wrap a value. For the space target, the measured high-volume
+delivery encoding and sharing repeated profile versions mattered more than changing
+small metadata columns.
+
 ## Current capacity warning
 
 The working limit has been 485 MB. At 480.6 MB, the final database has only about
