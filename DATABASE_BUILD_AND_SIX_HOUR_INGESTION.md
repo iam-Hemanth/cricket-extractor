@@ -88,10 +88,36 @@ replace one of the ten summaries. Verification checked the imported source rows,
 delivery round trips, participant versions, source documents, holds and the result
 rows from every summary. The report records 17 valid helper indexes.
 
-The earlier all-ten storage experiment measured **471,258,815 bytes**. The later
-local backend report recorded the final integrated database at **480,573,119 bytes**.
-These are measurements from different stages; use the latter as the final figure
-for the database described here.
+## Why it took several attempts to reach the final size
+
+The figures below come from different build stages. They explain the experiments;
+they are not one continuous subtraction where each line can be added to the next.
+
+| Attempt | Measured size | What changed or was learned |
+| --- | ---: | --- |
+| Original full relational proof database | 1,516,320,447 bytes (1.52 GB) | Deliveries and indexes used about 1.23 GB; tactical JSON alone represented about 507 MB before table overhead. |
+| First compact-storage prototype | 469,931,711 bytes (469.9 MB) | Kept source documents and current data, but did not yet include replacements for all ten legacy materialized views. It proved a compact layout, not the final application budget. |
+| Early all-ten layout | 513,865,407 bytes (513.9 MB) | Keeping all ten stored summaries in that layout pushed it over the target. |
+| Compression-only control restore | 515,716,799 bytes (515.7 MB) | Changing PostgreSQL compression alone did not solve the storage problem. |
+| Share repeated participant profiles | 479,057,599 bytes (479.1 MB) | Stored 2,504 exact participant profile versions once and referenced them from match participants. Match-specific roles, teams and references remained attached to each match. |
+| Narrow selected summary counters | 470,496,959 bytes (470.5 MB) | Used smaller integer storage only after checking every current value fit, then compared answers exactly. No rounding or row removal. |
+| Refresh and verify all ten summaries | 471,258,815 bytes (471.3 MB) | All ten summaries were populated again and their answers/indexes checked. This was still a storage experiment, not the final integrated database. |
+| Fresh compact-store base import | 444,085,951 bytes (444.1 MB) | Later compact schema/import proof, measured before the ten consumer summaries were included. |
+| Final integrated local backend database | 480,573,119 bytes (480.6 MB) | Later private PostgreSQL measurement with all ten materialized summary families and the read service. This is the final size quoted in this guide. |
+
+Two choices saved most space without removing current facts: encode each delivery in
+a small versioned block and dictionary-encode repeated categories; store identical
+participant profile versions once while keeping distinct historical versions. We
+rejected whole tactical-record deduplication because most combinations were unique,
+and rejected compression settings as a sufficient fix. Counter narrowing was limited
+to summary columns with proven bounds; future imports must retain range checks and
+fail safely if a value outgrows those bounds.
+
+The early 469.9 MB prototype and 471.3 MB all-ten experiment are useful proof, but
+they are not the final integrated 480.6 MB database. Physical packing, the later
+fresh schema/import path and the integration stage differ. Use the exact final byte
+count above rather than presenting all experiments as one linear result. The final
+recorded size is **480.6 decimal MB (480,573,119 bytes)**, not 480.3 MB.
 
 ## Current capacity warning
 
