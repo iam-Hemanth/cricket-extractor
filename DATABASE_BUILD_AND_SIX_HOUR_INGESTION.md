@@ -211,13 +211,22 @@ The checked notes contain several different historical numbers:
   and 162 excluded. The database proof's 5,215 match records plus 18 holds are a
   separate pinned database snapshot, not a new count of all missing fixtures.
 
-I found **no saved source manifest supporting "only 15 matches missing."** The
-reported 53 edge cases are not interchangeable with missing matches, held records
-or an incomplete ball-level statistic. To publish a missing-match number, first
-name the exact population (dates, formats, competitions and gender), then reconcile
-every expected ID to selected, held, excluded or genuinely absent. Do not label
-99.56% coverage or the 99.68% historical claim as a current certification until the
-full source snapshot is replayed and independently checked.
+The **18 source holds** are the clearest saved count that may match the remembered
+review set for the compact database: they are retained in the hold ledger and left
+out of imported match facts. A separate 15-match real-data cohort in the compact
+store report was used to exercise edge cases (Hundred, multi-day Tests, old extras,
+impact participation and timed-out/no-innings cases); it was a validation sample,
+not 15 excluded matches. Other snapshots report 53 unreconciled full-lake edge cases,
+115 classification-review records or 132 curated holds. None of those counts should
+be substituted for another.
+
+So the saved evidence does **not** establish a single "15 matches missing" count.
+Held records are not missing fixtures, and the reported 53 edge cases are not the
+same as 53 missing matches. To publish a missing-match number, first name the exact
+population (dates, formats, competitions and gender), then reconcile every expected
+ID to selected, held, excluded or genuinely absent. Do not label 99.56% coverage or
+the 99.68% historical claim as a current certification until the full source snapshot
+is replayed and independently checked.
 
 ## Schema types that mattered
 
