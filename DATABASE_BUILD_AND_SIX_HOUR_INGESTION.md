@@ -135,13 +135,35 @@ replace one of the ten summaries. Verification checked the imported source rows,
 delivery round trips, participant versions, source documents, holds and the result
 rows from every summary. The report records 17 valid helper indexes.
 
-There is no single checked-in command that safely recreates the final integrated
-480.6 MB database from the current extractor ZIP. The compact proof command above
-creates/verifies the base store; the ten materialized definitions are separate in
-`db/materialized_views.sql` and were measured as a distinct stage. The sibling
-`db/create_views.py` loads `.env`; don't run it against an ordinary database while
-trying to reproduce the private proof. Any rebuild must target a newly identified,
-isolated local database and verify the resulting size and all-ten parity.
+### Can another agent rebuild the final database from this guide and raw data?
+
+**Not reliably yet.** A guide plus an arbitrary raw lake dump is insufficient to
+reproduce an equivalent, correctly verified 480.6 MB database:
+
+- The proof adapter and importer are pinned to one frozen source-selection receipt,
+  one subset-manifest hash and specific converter/code hashes. The exact receipt,
+  manifest and `matches.jsonl`/`checks.jsonl`/`identity-crosswalk.json` payload used
+  for that proof are not checked into this extractor repository. A newer curated ZIP
+  is not interchangeable with them.
+- `compact_database_proof.py` can import and verify the compact base in a fresh,
+  explicitly marked database. It refuses a populated target and does not create the
+  ten summaries.
+- The ten-view size experiment used a local `.omx` prototype builder that is ignored
+  by Git. Its own report marks it `prototype_only` and says full consumer API
+  semantic parity was **not** proven. The tracked `db/materialized_views.sql` is
+  the legacy definitions; those are not a verified replacement for all current
+  consumer queries on the compact schema. The generic `db/create_views.py` reads
+  `.env`, so it must not be run blindly against an ordinary database.
+- PostgreSQL page packing and maintenance can make byte size differ across rebuilds.
+  Reproduction should target verified contents and a measured safe budget, not a
+  promise of the identical 480,573,119-byte physical size.
+
+To close this gap, a future build must bundle or regenerate a versioned source
+receipt and every hash-pinned payload, provide a portable fresh-database builder,
+implement and test all ten compact-summary definitions against the intended page
+and Stat Builder answers, and run an independent parity/size/refresh proof on a
+fresh isolated PostgreSQL 18 target. Record both steady size and refresh peak. The
+hosted database and six-hour writer remain separate gates.
 
 ## Why it took several attempts to reach the final size
 
