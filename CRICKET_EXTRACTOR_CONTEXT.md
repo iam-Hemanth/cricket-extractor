@@ -167,3 +167,11 @@ python scripts/discover_recent_matches.py --since 2026-09-18
 
 ### Wed Oct 07 17:23:00 IST 2026
 - **Master Lake Refreshed**: Master consolidation completed (Run ID: `37616341448`). Published updated `cricket_lake_v3.zip` (89.46 MB), `matches_index.csv` (1.09 MB), and `README.txt` covering **5,503 matches** up to **October 06, 2026**.
+
+## Standalone verified database rebuild
+
+See [DATABASE_BUILD_AND_SIX_HOUR_INGESTION.md](DATABASE_BUILD_AND_SIX_HOUR_INGESTION.md)
+for the portable `database/rebuild.py` commands, hash-pinned frozen input release,
+all ten final summaries, index packing and the actual size/correctness evidence.
+This reconstructs 5,215 verified matches with 18 separate review holds. It does not
+activate incremental six-hour ingestion or certify the full unfiltered lake.

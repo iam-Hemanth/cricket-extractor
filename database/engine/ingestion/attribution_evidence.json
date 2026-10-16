@@ -1,0 +1,4957 @@
+{
+  "version": "extras_evidence_v1",
+  "authority": "Frozen raw figures plus seven ICC historical interpretations;contradictory current ICC reference remains held",
+  "rules": {
+    "icc_pre_2017_no_ball_byes": {
+      "url": "https://documents.bcci.tv/documents/ICC/document/2017/09/26/774502d6-15ca-4844-b8a6-5bc379b3edb2/Playing-conditions-26-September.pdf",
+      "effective_new_series_from": "2017-09-28"
+    },
+    "verified_legbye": {
+      "method": "Exact source marker and explicit prose corroborated by innings+batter+bowler figures"
+    }
+  },
+  "matches": {
+    "1033365": {
+      "match_id": "1033365",
+      "source_sha256": "4e43cd48cdf5de2d1443f65650e015078491c61fe4c4ca37fc6e710e991d2217",
+      "raw_scorecard_compressed_sha256": "56f0500cfd92db85a4e5b666e0a1999bb48f0a7ccce25fec2c2fcc94c2bd6468",
+      "raw_scorecard_reference": {
+        "archive": "raw_batch_9.tar.gz",
+        "member": "./1033365/scorecard.json.gz",
+        "compressed_sha256": "56f0500cfd92db85a4e5b666e0a1999bb48f0a7ccce25fec2c2fcc94c2bd6468"
+      },
+      "record_class": "odi",
+      "date": "2017-05-17",
+      "rule": "unresolved",
+      "innings": [
+        {
+          "innings_number": 1,
+          "source_scorecard": {
+            "runs": 257,
+            "wickets": 9,
+            "balls": 300,
+            "penalties": 0,
+            "wides": 10,
+            "noballs": 0,
+            "byes": 1,
+            "legbyes": 1,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_56194": {
+              "runs": 23,
+              "balls": 42
+            },
+            "espn_436677": {
+              "runs": 61,
+              "balls": 67
+            },
+            "espn_373538": {
+              "runs": 1,
+              "balls": 4
+            },
+            "espn_56029": {
+              "runs": 55,
+              "balls": 66
+            },
+            "espn_56143": {
+              "runs": 6,
+              "balls": 14
+            },
+            "espn_56025": {
+              "runs": 51,
+              "balls": 56
+            },
+            "espn_550133": {
+              "runs": 41,
+              "balls": 41
+            },
+            "espn_629063": {
+              "runs": 6,
+              "balls": 6
+            },
+            "espn_56007": {
+              "runs": 1,
+              "balls": 3
+            },
+            "espn_300619": {
+              "runs": 0,
+              "balls": 0
+            },
+            "espn_330902": {
+              "runs": 0,
+              "balls": 1
+            }
+          },
+          "bowlers": {
+            "espn_395057": {
+              "conceded": 66,
+              "balls": 54
+            },
+            "espn_226493": {
+              "conceded": 31,
+              "balls": 60
+            },
+            "espn_502714": {
+              "conceded": 36,
+              "balls": 60
+            },
+            "espn_355269": {
+              "conceded": 68,
+              "balls": 54
+            },
+            "espn_559066": {
+              "conceded": 40,
+              "balls": 60
+            },
+            "espn_232359": {
+              "conceded": 14,
+              "balls": 12
+            }
+          }
+        },
+        {
+          "innings_number": 2,
+          "source_scorecard": {
+            "runs": 258,
+            "wickets": 6,
+            "balls": 285,
+            "penalties": 0,
+            "wides": 10,
+            "noballs": 0,
+            "byes": 0,
+            "legbyes": 4,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_388802": {
+              "runs": 54,
+              "balls": 64
+            },
+            "espn_7502": {
+              "runs": 27,
+              "balls": 27
+            },
+            "espn_277911": {
+              "runs": 17,
+              "balls": 24
+            },
+            "espn_38699": {
+              "runs": 25,
+              "balls": 40
+            },
+            "espn_36581": {
+              "runs": 48,
+              "balls": 65
+            },
+            "espn_355269": {
+              "runs": 52,
+              "balls": 48
+            },
+            "espn_232359": {
+              "runs": 16,
+              "balls": 14
+            },
+            "espn_502714": {
+              "runs": 5,
+              "balls": 3
+            },
+            "espn_395057": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_559066": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_226493": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_56007": {
+              "conceded": 58,
+              "balls": 39
+            },
+            "espn_56143": {
+              "conceded": 50,
+              "balls": 60
+            },
+            "espn_330902": {
+              "conceded": 33,
+              "balls": 54
+            },
+            "espn_629063": {
+              "conceded": 45,
+              "balls": 48
+            },
+            "espn_56025": {
+              "conceded": 8,
+              "balls": 6
+            },
+            "espn_550133": {
+              "conceded": 7,
+              "balls": 18
+            },
+            "espn_300619": {
+              "conceded": 53,
+              "balls": 60
+            }
+          }
+        }
+      ],
+      "corrections": []
+    },
+    "1122278": {
+      "match_id": "1122278",
+      "source_sha256": "77124e0676792c0e837b5e0a5e3cdfa0d425c9793f128673365cdfe3cb0a9747",
+      "raw_scorecard_compressed_sha256": "f5cfb82849448962d640dcb6eeef6ef78b7626550b765ba98dbafee238b231d8",
+      "raw_scorecard_reference": {
+        "archive": "raw_batch_10.tar.gz",
+        "member": "./1122278/scorecard.json.gz",
+        "compressed_sha256": "f5cfb82849448962d640dcb6eeef6ef78b7626550b765ba98dbafee238b231d8"
+      },
+      "record_class": "test",
+      "date": "2018-01-24",
+      "rule": "unresolved",
+      "innings": [
+        {
+          "innings_number": 1,
+          "source_scorecard": {
+            "runs": 187,
+            "wickets": 10,
+            "balls": 460,
+            "penalties": 0,
+            "wides": 6,
+            "noballs": 2,
+            "byes": 10,
+            "legbyes": 8,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_237095": {
+              "runs": 8,
+              "balls": 32
+            },
+            "espn_422108": {
+              "runs": 0,
+              "balls": 7
+            },
+            "espn_32540": {
+              "runs": 50,
+              "balls": 179
+            },
+            "espn_253802": {
+              "runs": 54,
+              "balls": 106
+            },
+            "espn_277916": {
+              "runs": 9,
+              "balls": 27
+            },
+            "espn_32242": {
+              "runs": 2,
+              "balls": 22
+            },
+            "espn_625371": {
+              "runs": 0,
+              "balls": 5
+            },
+            "espn_326016": {
+              "runs": 30,
+              "balls": 49
+            },
+            "espn_481896": {
+              "runs": 8,
+              "balls": 16
+            },
+            "espn_236779": {
+              "runs": 0,
+              "balls": 12
+            },
+            "espn_625383": {
+              "runs": 0,
+              "balls": 7
+            }
+          },
+          "bowlers": {
+            "espn_46538": {
+              "conceded": 47,
+              "balls": 102
+            },
+            "espn_46945": {
+              "conceded": 31,
+              "balls": 114
+            },
+            "espn_550215": {
+              "conceded": 39,
+              "balls": 112
+            },
+            "espn_542023": {
+              "conceded": 27,
+              "balls": 90
+            },
+            "espn_540316": {
+              "conceded": 25,
+              "balls": 42
+            }
+          }
+        },
+        {
+          "innings_number": 2,
+          "source_scorecard": {
+            "runs": 194,
+            "wickets": 10,
+            "balls": 395,
+            "penalties": 0,
+            "wides": 9,
+            "noballs": 0,
+            "byes": 0,
+            "legbyes": 14,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_230852": {
+              "runs": 4,
+              "balls": 40
+            },
+            "espn_600498": {
+              "runs": 2,
+              "balls": 8
+            },
+            "espn_550215": {
+              "runs": 30,
+              "balls": 84
+            },
+            "espn_43906": {
+              "runs": 61,
+              "balls": 121
+            },
+            "espn_44936": {
+              "runs": 5,
+              "balls": 19
+            },
+            "espn_44828": {
+              "runs": 8,
+              "balls": 19
+            },
+            "espn_379143": {
+              "runs": 8,
+              "balls": 22
+            },
+            "espn_46945": {
+              "runs": 35,
+              "balls": 55
+            },
+            "espn_540316": {
+              "runs": 9,
+              "balls": 17
+            },
+            "espn_46538": {
+              "runs": 9,
+              "balls": 8
+            },
+            "espn_542023": {
+              "runs": 0,
+              "balls": 2
+            }
+          },
+          "bowlers": {
+            "espn_326016": {
+              "conceded": 44,
+              "balls": 114
+            },
+            "espn_625383": {
+              "conceded": 54,
+              "balls": 113
+            },
+            "espn_236779": {
+              "conceded": 33,
+              "balls": 84
+            },
+            "espn_481896": {
+              "conceded": 46,
+              "balls": 72
+            },
+            "espn_625371": {
+              "conceded": 3,
+              "balls": 12
+            }
+          }
+        },
+        {
+          "innings_number": 3,
+          "source_scorecard": {
+            "runs": 247,
+            "wickets": 10,
+            "balls": 481,
+            "penalties": 0,
+            "wides": 12,
+            "noballs": 0,
+            "byes": 5,
+            "legbyes": 12,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_237095": {
+              "runs": 25,
+              "balls": 127
+            },
+            "espn_32242": {
+              "runs": 16,
+              "balls": 15
+            },
+            "espn_422108": {
+              "runs": 16,
+              "balls": 44
+            },
+            "espn_32540": {
+              "runs": 1,
+              "balls": 10
+            },
+            "espn_253802": {
+              "runs": 41,
+              "balls": 79
+            },
+            "espn_277916": {
+              "runs": 48,
+              "balls": 68
+            },
+            "espn_625371": {
+              "runs": 4,
+              "balls": 11
+            },
+            "espn_326016": {
+              "runs": 33,
+              "balls": 76
+            },
+            "espn_481896": {
+              "runs": 27,
+              "balls": 28
+            },
+            "espn_236779": {
+              "runs": 7,
+              "balls": 16
+            },
+            "espn_625383": {
+              "runs": 0,
+              "balls": 7
+            }
+          },
+          "bowlers": {
+            "espn_46945": {
+              "conceded": 61,
+              "balls": 127
+            },
+            "espn_550215": {
+              "conceded": 69,
+              "balls": 138
+            },
+            "espn_46538": {
+              "conceded": 47,
+              "balls": 126
+            },
+            "espn_542023": {
+              "conceded": 38,
+              "balls": 72
+            },
+            "espn_540316": {
+              "conceded": 15,
+              "balls": 18
+            }
+          }
+        },
+        {
+          "innings_number": 4,
+          "source_scorecard": {
+            "runs": 177,
+            "wickets": 10,
+            "balls": 441,
+            "penalties": 0,
+            "wides": 6,
+            "noballs": 0,
+            "byes": 7,
+            "legbyes": 0,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_600498": {
+              "runs": 4,
+              "balls": 7
+            },
+            "espn_230852": {
+              "runs": 86,
+              "balls": 240
+            },
+            "espn_43906": {
+              "runs": 52,
+              "balls": 140
+            },
+            "espn_44936": {
+              "runs": 6,
+              "balls": 13
+            },
+            "espn_44828": {
+              "runs": 2,
+              "balls": 9
+            },
+            "espn_379143": {
+              "runs": 0,
+              "balls": 1
+            },
+            "espn_46945": {
+              "runs": 10,
+              "balls": 18
+            },
+            "espn_540316": {
+              "runs": 0,
+              "balls": 3
+            },
+            "espn_550215": {
+              "runs": 0,
+              "balls": 3
+            },
+            "espn_46538": {
+              "runs": 0,
+              "balls": 1
+            },
+            "espn_542023": {
+              "runs": 4,
+              "balls": 6
+            }
+          },
+          "bowlers": {
+            "espn_326016": {
+              "conceded": 39,
+              "balls": 108
+            },
+            "espn_481896": {
+              "conceded": 28,
+              "balls": 75
+            },
+            "espn_625383": {
+              "conceded": 57,
+              "balls": 126
+            },
+            "espn_236779": {
+              "conceded": 31,
+              "balls": 96
+            },
+            "espn_625371": {
+              "conceded": 15,
+              "balls": 36
+            }
+          }
+        }
+      ],
+      "corrections": []
+    },
+    "1233461": {
+      "match_id": "1233461",
+      "source_sha256": "c37fbefb1f27721bb1bdde0098cbbd1a6a732a6a88765928913ce95724f6fbff",
+      "raw_scorecard_compressed_sha256": "57548ded70cbcb7848e15a9f6ac901ff98892bdfff6e3b1a38b1e089be074cbd",
+      "raw_scorecard_reference": {
+        "archive": "raw_batch_12.tar.gz",
+        "member": "./1233461/scorecard.json.gz",
+        "compressed_sha256": "57548ded70cbcb7848e15a9f6ac901ff98892bdfff6e3b1a38b1e089be074cbd"
+      },
+      "record_class": "odi",
+      "date": "2020-10-30",
+      "rule": "unresolved",
+      "innings": [
+        {
+          "innings_number": 1,
+          "source_scorecard": {
+            "runs": 281,
+            "wickets": 8,
+            "balls": 300,
+            "penalties": 0,
+            "wides": 11,
+            "noballs": 1,
+            "byes": 0,
+            "legbyes": 1,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_568276": {
+              "runs": 58,
+              "balls": 75
+            },
+            "espn_39950": {
+              "runs": 21,
+              "balls": 30
+            },
+            "espn_348144": {
+              "runs": 19,
+              "balls": 18
+            },
+            "espn_318788": {
+              "runs": 71,
+              "balls": 82
+            },
+            "espn_323389": {
+              "runs": 14,
+              "balls": 29
+            },
+            "espn_480603": {
+              "runs": 12,
+              "balls": 14
+            },
+            "espn_681117": {
+              "runs": 23,
+              "balls": 16
+            },
+            "espn_227758": {
+              "runs": 34,
+              "balls": 26
+            },
+            "espn_43590": {
+              "runs": 8,
+              "balls": 6
+            },
+            "espn_1072470": {
+              "runs": 8,
+              "balls": 5
+            },
+            "espn_1161606": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_806241": {
+              "conceded": 49,
+              "balls": 60
+            },
+            "espn_672775": {
+              "conceded": 69,
+              "balls": 48
+            },
+            "espn_827051": {
+              "conceded": 39,
+              "balls": 54
+            },
+            "espn_55354": {
+              "conceded": 16,
+              "balls": 12
+            },
+            "espn_938959": {
+              "conceded": 31,
+              "balls": 42
+            },
+            "espn_299572": {
+              "conceded": 45,
+              "balls": 54
+            },
+            "espn_235519": {
+              "conceded": 31,
+              "balls": 30
+            }
+          }
+        },
+        {
+          "innings_number": 2,
+          "source_scorecard": {
+            "runs": 255,
+            "wickets": 10,
+            "balls": 298,
+            "penalties": 0,
+            "wides": 7,
+            "noballs": 0,
+            "byes": 0,
+            "legbyes": 2,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_427178": {
+              "runs": 2,
+              "balls": 3
+            },
+            "espn_55354": {
+              "runs": 13,
+              "balls": 13
+            },
+            "espn_55412": {
+              "runs": 41,
+              "balls": 68
+            },
+            "espn_55814": {
+              "runs": 112,
+              "balls": 117
+            },
+            "espn_55870": {
+              "runs": 4,
+              "balls": 14
+            },
+            "espn_938959": {
+              "runs": 55,
+              "balls": 61
+            },
+            "espn_299572": {
+              "runs": 8,
+              "balls": 7
+            },
+            "espn_235519": {
+              "runs": 5,
+              "balls": 6
+            },
+            "espn_672775": {
+              "runs": 1,
+              "balls": 3
+            },
+            "espn_806241": {
+              "runs": 0,
+              "balls": 0
+            },
+            "espn_827051": {
+              "runs": 5,
+              "balls": 6
+            }
+          },
+          "bowlers": {
+            "espn_1072470": {
+              "conceded": 49,
+              "balls": 60
+            },
+            "espn_1161606": {
+              "conceded": 57,
+              "balls": 60
+            },
+            "espn_681117": {
+              "conceded": 57,
+              "balls": 60
+            },
+            "espn_43590": {
+              "conceded": 41,
+              "balls": 58
+            },
+            "espn_227758": {
+              "conceded": 49,
+              "balls": 60
+            }
+          }
+        }
+      ],
+      "corrections": []
+    },
+    "1439901": {
+      "match_id": "1439901",
+      "source_sha256": "ef762eb569209dfd2803753a70f3994e1acdd04bdb0c1f8397f19a3a47cb47a9",
+      "raw_scorecard_compressed_sha256": "b4b0c061274d38550fe443b1a642c97d50d244c982b2582435daeb020a6e11c8",
+      "raw_scorecard_reference": {
+        "archive": "raw_batch_18.tar.gz",
+        "member": "./1439901/scorecard.json.gz",
+        "compressed_sha256": "b4b0c061274d38550fe443b1a642c97d50d244c982b2582435daeb020a6e11c8"
+      },
+      "record_class": "t20i",
+      "date": "2025-01-28",
+      "rule": "source_conflict",
+      "innings": [
+        {
+          "innings_number": 1,
+          "source_scorecard": {
+            "runs": 171,
+            "wickets": 9,
+            "balls": 120,
+            "penalties": 0,
+            "wides": 5,
+            "noballs": 1,
+            "byes": 5,
+            "legbyes": 0,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_669365": {
+              "runs": 5,
+              "balls": 7
+            },
+            "espn_521637": {
+              "runs": 51,
+              "balls": 28
+            },
+            "espn_308967": {
+              "runs": 24,
+              "balls": 22
+            },
+            "espn_911707": {
+              "runs": 8,
+              "balls": 10
+            },
+            "espn_403902": {
+              "runs": 43,
+              "balls": 24
+            },
+            "espn_1096092": {
+              "runs": 6,
+              "balls": 4
+            },
+            "espn_510530": {
+              "runs": 0,
+              "balls": 1
+            },
+            "espn_596417": {
+              "runs": 3,
+              "balls": 4
+            },
+            "espn_669855": {
+              "runs": 0,
+              "balls": 2
+            },
+            "espn_244497": {
+              "runs": 10,
+              "balls": 9
+            },
+            "espn_351588": {
+              "runs": 10,
+              "balls": 10
+            }
+          },
+          "bowlers": {
+            "espn_481896": {
+              "conceded": 25,
+              "balls": 18
+            },
+            "espn_625371": {
+              "conceded": 33,
+              "balls": 24
+            },
+            "espn_719715": {
+              "conceded": 15,
+              "balls": 6
+            },
+            "espn_1108375": {
+              "conceded": 24,
+              "balls": 24
+            },
+            "espn_1175441": {
+              "conceded": 46,
+              "balls": 24
+            },
+            "espn_554691": {
+              "conceded": 19,
+              "balls": 18
+            },
+            "espn_1070183": {
+              "conceded": 4,
+              "balls": 6
+            }
+          }
+        },
+        {
+          "innings_number": 2,
+          "source_scorecard": {
+            "runs": 145,
+            "wickets": 9,
+            "balls": 120,
+            "penalties": 0,
+            "wides": 6,
+            "noballs": 0,
+            "byes": 0,
+            "legbyes": 6,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_425943": {
+              "runs": 3,
+              "balls": 6
+            },
+            "espn_1070183": {
+              "runs": 24,
+              "balls": 14
+            },
+            "espn_446507": {
+              "runs": 14,
+              "balls": 7
+            },
+            "espn_1170265": {
+              "runs": 18,
+              "balls": 14
+            },
+            "espn_625371": {
+              "runs": 40,
+              "balls": 35
+            },
+            "espn_719715": {
+              "runs": 6,
+              "balls": 15
+            },
+            "espn_554691": {
+              "runs": 15,
+              "balls": 16
+            },
+            "espn_1175488": {
+              "runs": 2,
+              "balls": 4
+            },
+            "espn_481896": {
+              "runs": 6,
+              "balls": 4
+            },
+            "espn_1175441": {
+              "runs": 4,
+              "balls": 3
+            },
+            "espn_1108375": {
+              "runs": 1,
+              "balls": 2
+            }
+          },
+          "bowlers": {
+            "espn_669855": {
+              "conceded": 33,
+              "balls": 24
+            },
+            "espn_351588": {
+              "conceded": 29,
+              "balls": 18
+            },
+            "espn_596417": {
+              "conceded": 28,
+              "balls": 24
+            },
+            "espn_403902": {
+              "conceded": 11,
+              "balls": 6
+            },
+            "espn_244497": {
+              "conceded": 15,
+              "balls": 24
+            },
+            "espn_510530": {
+              "conceded": 23,
+              "balls": 24
+            }
+          }
+        }
+      ],
+      "corrections": [],
+      "withdrawn_proposal": [
+        {
+          "source_ball_id": 48143727,
+          "innings_index": 1,
+          "over_index": 18,
+          "delivery_index": 2,
+          "selector": {
+            "source_over_number": 19,
+            "source_ball_number": 3,
+            "source_unique_marker": "18.03",
+            "batter_id": "espn_481896",
+            "bowler_id": "espn_510530"
+          },
+          "observed_runs": {
+            "batter": 1,
+            "extras": 0,
+            "total": 1
+          },
+          "observed_extras": {},
+          "statistical_runs": {
+            "batter": 0,
+            "extras": 1,
+            "total": 1
+          },
+          "statistical_extras": {
+            "legbyes": 1
+          },
+          "raw_commentary_reference": {
+            "archive": "raw_batch_18.tar.gz",
+            "member": "./1439901/commentary_inn2_chunk0.json.gz",
+            "compressed_sha256": "040fa5e9575195cae34f7aaf39ff19ac567a32dff78e8eb5e7ec5f07f4bc5e8a"
+          },
+          "explicit_comment_html": "lobs off the thigh pad into the leg side, they take a leg bye"
+        }
+      ],
+      "external_authority": {
+        "url": "https://www.icc-cricket.com/matches/247153/india-vs-england",
+        "observed_date": "2026-10-08",
+        "method": "Browser-rendered visible scorecard,linked from ICC match report",
+        "fixture": "28 January2025,3rdT20I,Rajkot",
+        "india_total": "145/9(20.0)",
+        "england_total": "171/9(20.0)",
+        "result": "England beat India by26runs",
+        "shami": {
+          "runs": 7,
+          "balls": 4
+        },
+        "overton": {
+          "overs": 4,
+          "conceded": 24,
+          "wickets": 3
+        },
+        "india_extras": {
+          "noballs": 0,
+          "wides": 6,
+          "byes": 0,
+          "legbyes": 5,
+          "penalties": 0
+        },
+        "archived_espn": {
+          "shami_runs": 6,
+          "overton_conceded": 23,
+          "india_legbyes": 6
+        },
+        "disposition": "Hold1439901;do notchoose one authority without explanation of revision/disagreement"
+      }
+    },
+    "1521232": {
+      "match_id": "1521232",
+      "source_sha256": "d23305d54404c736552cbbdee33a859a81fe3bd5637f140a18e5bf2f8c9dda5f",
+      "raw_scorecard_compressed_sha256": "2afe8402f2a5dd8597f2f62afeb945dc863b4d01753ada797529c78bf5bfca76",
+      "raw_scorecard_reference": {
+        "archive": "raw_batch_21.tar.gz",
+        "member": "./1521232/scorecard.json.gz",
+        "compressed_sha256": "2afe8402f2a5dd8597f2f62afeb945dc863b4d01753ada797529c78bf5bfca76"
+      },
+      "record_class": "t20",
+      "date": "2026-07-22",
+      "rule": "unresolved",
+      "innings": [
+        {
+          "innings_number": 1,
+          "source_scorecard": {
+            "runs": 135,
+            "wickets": 7,
+            "balls": 100,
+            "penalties": 0,
+            "wides": 4,
+            "noballs": 2,
+            "byes": 0,
+            "legbyes": 7,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_1096092": {
+              "runs": 3,
+              "balls": 3
+            },
+            "espn_1280097": {
+              "runs": 4,
+              "balls": 9
+            },
+            "espn_1379431": {
+              "runs": 41,
+              "balls": 30
+            },
+            "espn_321777": {
+              "runs": 44,
+              "balls": 35
+            },
+            "espn_595978": {
+              "runs": 4,
+              "balls": 7
+            },
+            "espn_1079380": {
+              "runs": 19,
+              "balls": 12
+            },
+            "espn_669855": {
+              "runs": 4,
+              "balls": 4
+            },
+            "espn_288992": {
+              "runs": 1,
+              "balls": 1
+            },
+            "espn_573170": {
+              "runs": 2,
+              "balls": 1
+            },
+            "espn_244497": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_557298": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_247235": {
+              "conceded": 28,
+              "balls": 20
+            },
+            "espn_772061": {
+              "conceded": 26,
+              "balls": 20
+            },
+            "espn_696401": {
+              "conceded": 17,
+              "balls": 20
+            },
+            "espn_493773": {
+              "conceded": 34,
+              "balls": 20
+            },
+            "espn_605575": {
+              "conceded": 5,
+              "balls": 10
+            },
+            "espn_303669": {
+              "conceded": 18,
+              "balls": 10
+            }
+          }
+        },
+        {
+          "innings_number": 2,
+          "source_scorecard": {
+            "runs": 138,
+            "wickets": 4,
+            "balls": 98,
+            "penalties": 0,
+            "wides": 3,
+            "noballs": 1,
+            "byes": 4,
+            "legbyes": 7,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_669365": {
+              "runs": 47,
+              "balls": 37
+            },
+            "espn_605575": {
+              "runs": 20,
+              "balls": 15
+            },
+            "espn_303669": {
+              "runs": 15,
+              "balls": 15
+            },
+            "espn_959767": {
+              "runs": 24,
+              "balls": 16
+            },
+            "espn_1112537": {
+              "runs": 6,
+              "balls": 4
+            },
+            "espn_1195664": {
+              "runs": 11,
+              "balls": 12
+            },
+            "espn_1200126": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_696401": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_247235": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_493773": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_772061": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_573170": {
+              "conceded": 29,
+              "balls": 15
+            },
+            "espn_557298": {
+              "conceded": 15,
+              "balls": 15
+            },
+            "espn_669855": {
+              "conceded": 22,
+              "balls": 20
+            },
+            "espn_244497": {
+              "conceded": 18,
+              "balls": 20
+            },
+            "espn_288992": {
+              "conceded": 24,
+              "balls": 13
+            },
+            "espn_1079380": {
+              "conceded": 19,
+              "balls": 15
+            }
+          }
+        }
+      ],
+      "corrections": []
+    },
+    "238195": {
+      "match_id": "238195",
+      "source_sha256": "b86097e18b640952ae8fbb632354b66db0bac4f57907716acc568cf2d5fb12f8",
+      "raw_scorecard_compressed_sha256": "9893a41ae8f30a39b16b769b25c1ed87498e7053dd81b476039906a40edd9692",
+      "raw_scorecard_reference": {
+        "archive": "raw_batch_0.tar.gz",
+        "member": "./238195/scorecard.json.gz",
+        "compressed_sha256": "9893a41ae8f30a39b16b769b25c1ed87498e7053dd81b476039906a40edd9692"
+      },
+      "record_class": "t20i",
+      "date": "2006-02-24",
+      "rule": "unresolved",
+      "innings": [
+        {
+          "innings_number": 1,
+          "source_scorecard": {
+            "runs": 201,
+            "wickets": 4,
+            "balls": 120,
+            "penalties": 0,
+            "wides": 4,
+            "noballs": 0,
+            "byes": 3,
+            "legbyes": 10,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_47270": {
+              "runs": 89,
+              "balls": 58
+            },
+            "espn_44098": {
+              "runs": 23,
+              "balls": 18
+            },
+            "espn_45224": {
+              "runs": 56,
+              "balls": 34
+            },
+            "espn_46774": {
+              "runs": 2,
+              "balls": 3
+            },
+            "espn_47693": {
+              "runs": 14,
+              "balls": 7
+            },
+            "espn_44936": {
+              "runs": 0,
+              "balls": 0
+            },
+            "espn_46208": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_45396": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_46750": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_47539": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_46592": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_6278": {
+              "conceded": 15,
+              "balls": 18
+            },
+            "espn_4185": {
+              "conceded": 44,
+              "balls": 24
+            },
+            "espn_6291": {
+              "conceded": 31,
+              "balls": 24
+            },
+            "espn_4582": {
+              "conceded": 25,
+              "balls": 24
+            },
+            "espn_8180": {
+              "conceded": 35,
+              "balls": 18
+            },
+            "espn_5681": {
+              "conceded": 38,
+              "balls": 12
+            }
+          }
+        },
+        {
+          "innings_number": 2,
+          "source_scorecard": {
+            "runs": 199,
+            "wickets": 7,
+            "balls": 120,
+            "penalties": 0,
+            "wides": 5,
+            "noballs": 0,
+            "byes": 0,
+            "legbyes": 3,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_5390": {
+              "runs": 1,
+              "balls": 2
+            },
+            "espn_6128": {
+              "runs": 39,
+              "balls": 22
+            },
+            "espn_7133": {
+              "runs": 6,
+              "balls": 8
+            },
+            "espn_6513": {
+              "runs": 17,
+              "balls": 9
+            },
+            "espn_4578": {
+              "runs": 37,
+              "balls": 24
+            },
+            "espn_8180": {
+              "runs": 4,
+              "balls": 6
+            },
+            "espn_5681": {
+              "runs": 41,
+              "balls": 25
+            },
+            "espn_6278": {
+              "runs": 43,
+              "balls": 21
+            },
+            "espn_4185": {
+              "runs": 3,
+              "balls": 3
+            },
+            "espn_6291": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_4582": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_46592": {
+              "conceded": 44,
+              "balls": 18
+            },
+            "espn_45396": {
+              "conceded": 22,
+              "balls": 24
+            },
+            "espn_47539": {
+              "conceded": 40,
+              "balls": 24
+            },
+            "espn_47693": {
+              "conceded": 40,
+              "balls": 24
+            },
+            "espn_47270": {
+              "conceded": 21,
+              "balls": 12
+            },
+            "espn_46750": {
+              "conceded": 29,
+              "balls": 18
+            }
+          }
+        }
+      ],
+      "corrections": []
+    },
+    "287857": {
+      "match_id": "287857",
+      "source_sha256": "5b3a32914e65732c4d4fb7a2af416d419dbd58dde59235e1fc4a698cee8e59cf",
+      "raw_scorecard_compressed_sha256": "1f66830810af558f8ef170a526fe3c7c1e873d29e0147a2ac8b4a4cc588d2b19",
+      "raw_scorecard_reference": {
+        "archive": "raw_batch_0.tar.gz",
+        "member": "./287857/scorecard.json.gz",
+        "compressed_sha256": "1f66830810af558f8ef170a526fe3c7c1e873d29e0147a2ac8b4a4cc588d2b19"
+      },
+      "record_class": "t20i",
+      "date": "2007-09-13",
+      "rule": "icc_pre_2017_no_ball_byes",
+      "innings": [
+        {
+          "innings_number": 1,
+          "source_scorecard": {
+            "runs": 164,
+            "wickets": 8,
+            "balls": 120,
+            "penalties": 0,
+            "wides": 8,
+            "noballs": 0,
+            "byes": 0,
+            "legbyes": 2,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_51880": {
+              "runs": 0,
+              "balls": 3
+            },
+            "espn_52962": {
+              "runs": 51,
+              "balls": 52
+            },
+            "espn_51469": {
+              "runs": 37,
+              "balls": 31
+            },
+            "espn_52983": {
+              "runs": 27,
+              "balls": 14
+            },
+            "espn_52969": {
+              "runs": 5,
+              "balls": 7
+            },
+            "espn_52917": {
+              "runs": 2,
+              "balls": 3
+            },
+            "espn_53118": {
+              "runs": 29,
+              "balls": 7
+            },
+            "espn_51439": {
+              "runs": 2,
+              "balls": 2
+            },
+            "espn_52790": {
+              "runs": 1,
+              "balls": 1
+            },
+            "espn_52912": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_51782": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_56160": {
+              "conceded": 10,
+              "balls": 24
+            },
+            "espn_56283": {
+              "conceded": 25,
+              "balls": 24
+            },
+            "espn_56007": {
+              "conceded": 16,
+              "balls": 12
+            },
+            "espn_55894": {
+              "conceded": 22,
+              "balls": 12
+            },
+            "espn_56143": {
+              "conceded": 34,
+              "balls": 24
+            },
+            "espn_55988": {
+              "conceded": 55,
+              "balls": 24
+            }
+          }
+        },
+        {
+          "innings_number": 2,
+          "source_scorecard": {
+            "runs": 165,
+            "wickets": 4,
+            "balls": 108,
+            "penalties": 0,
+            "wides": 8,
+            "noballs": 2,
+            "byes": 0,
+            "legbyes": 3,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_56194": {
+              "runs": 10,
+              "balls": 13
+            },
+            "espn_56059": {
+              "runs": 1,
+              "balls": 4
+            },
+            "espn_56266": {
+              "runs": 62,
+              "balls": 49
+            },
+            "espn_55988": {
+              "runs": 61,
+              "balls": 27
+            },
+            "espn_56143": {
+              "runs": 13,
+              "balls": 9
+            },
+            "espn_56251": {
+              "runs": 5,
+              "balls": 7
+            },
+            "espn_55894": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_56029": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_56007": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_56160": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_56283": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_52790": {
+              "conceded": 28,
+              "balls": 18
+            },
+            "espn_52912": {
+              "conceded": 35,
+              "balls": 24
+            },
+            "espn_51880": {
+              "conceded": 22,
+              "balls": 24
+            },
+            "espn_51782": {
+              "conceded": 33,
+              "balls": 18
+            },
+            "espn_51439": {
+              "conceded": 34,
+              "balls": 12
+            },
+            "espn_52969": {
+              "conceded": 10,
+              "balls": 12
+            }
+          }
+        }
+      ],
+      "corrections": []
+    },
+    "335346": {
+      "match_id": "335346",
+      "source_sha256": "0931f97691170cb426e7b991ddaa5f29594d63edaa71d09e2f154e22ed183930",
+      "raw_scorecard_compressed_sha256": "303ca6571e1dffd1c3b27e2699d645af2746000b5efd3a25f39173a7bd5a52ab",
+      "raw_scorecard_reference": {
+        "archive": "raw_batch_1.tar.gz",
+        "member": "./335346/scorecard.json.gz",
+        "compressed_sha256": "303ca6571e1dffd1c3b27e2699d645af2746000b5efd3a25f39173a7bd5a52ab"
+      },
+      "record_class": "odi",
+      "date": "2008-06-24",
+      "rule": "unresolved",
+      "innings": [
+        {
+          "innings_number": 1,
+          "source_scorecard": {
+            "runs": 300,
+            "wickets": 8,
+            "balls": 300,
+            "penalties": 0,
+            "wides": 16,
+            "noballs": 0,
+            "byes": 0,
+            "legbyes": 2,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_56194": {
+              "runs": 40,
+              "balls": 66
+            },
+            "espn_56059": {
+              "runs": 2,
+              "balls": 8
+            },
+            "espn_55988": {
+              "runs": 109,
+              "balls": 126
+            },
+            "espn_56093": {
+              "runs": 83,
+              "balls": 63
+            },
+            "espn_56251": {
+              "runs": 1,
+              "balls": 4
+            },
+            "espn_56007": {
+              "runs": 3,
+              "balls": 4
+            },
+            "espn_56025": {
+              "runs": 8,
+              "balls": 9
+            },
+            "espn_56029": {
+              "runs": 16,
+              "balls": 11
+            },
+            "espn_56209": {
+              "runs": 20,
+              "balls": 9
+            },
+            "espn_56283": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_56149": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_43735": {
+              "conceded": 49,
+              "balls": 60
+            },
+            "espn_220521": {
+              "conceded": 21,
+              "balls": 30
+            },
+            "espn_25613": {
+              "conceded": 24,
+              "balls": 12
+            },
+            "espn_25601": {
+              "conceded": 6,
+              "balls": 18
+            },
+            "espn_50460": {
+              "conceded": 33,
+              "balls": 42
+            },
+            "espn_42746": {
+              "conceded": 13,
+              "balls": 18
+            },
+            "espn_25589": {
+              "conceded": 78,
+              "balls": 60
+            },
+            "espn_25591": {
+              "conceded": 74,
+              "balls": 60
+            }
+          }
+        },
+        {
+          "innings_number": 2,
+          "source_scorecard": {
+            "runs": 204,
+            "wickets": 10,
+            "balls": 274,
+            "penalties": 0,
+            "wides": 8,
+            "noballs": 0,
+            "byes": 0,
+            "legbyes": 2,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_25613": {
+              "runs": 10,
+              "balls": 10
+            },
+            "espn_25591": {
+              "runs": 41,
+              "balls": 79
+            },
+            "espn_48321": {
+              "runs": 0,
+              "balls": 2
+            },
+            "espn_39745": {
+              "runs": 19,
+              "balls": 18
+            },
+            "espn_42746": {
+              "runs": 10,
+              "balls": 21
+            },
+            "espn_25589": {
+              "runs": 78,
+              "balls": 81
+            },
+            "espn_342182": {
+              "runs": 7,
+              "balls": 17
+            },
+            "espn_25601": {
+              "runs": 17,
+              "balls": 21
+            },
+            "espn_50460": {
+              "runs": 7,
+              "balls": 13
+            },
+            "espn_43735": {
+              "runs": 5,
+              "balls": 9
+            },
+            "espn_220521": {
+              "runs": 0,
+              "balls": 3
+            }
+          },
+          "bowlers": {
+            "espn_56007": {
+              "conceded": 46,
+              "balls": 42
+            },
+            "espn_56149": {
+              "conceded": 24,
+              "balls": 29
+            },
+            "espn_56283": {
+              "conceded": 20,
+              "balls": 60
+            },
+            "espn_56209": {
+              "conceded": 47,
+              "balls": 37
+            },
+            "espn_56025": {
+              "conceded": 38,
+              "balls": 60
+            },
+            "espn_56251": {
+              "conceded": 27,
+              "balls": 46
+            }
+          }
+        }
+      ],
+      "corrections": []
+    },
+    "350348": {
+      "match_id": "350348",
+      "source_sha256": "46be931ef10c647f462761fbf826b86c8424c8b857aefe6fbf66f7660a79ab45",
+      "raw_scorecard_compressed_sha256": "461d8469588fd96a96a2a8e89e299bdfe1ed88a031dabe7d308aa78fc91320e4",
+      "raw_scorecard_reference": {
+        "archive": "raw_batch_1.tar.gz",
+        "member": "./350348/scorecard.json.gz",
+        "compressed_sha256": "461d8469588fd96a96a2a8e89e299bdfe1ed88a031dabe7d308aa78fc91320e4"
+      },
+      "record_class": "odi",
+      "date": "2008-11-07",
+      "rule": "unresolved",
+      "innings": [
+        {
+          "innings_number": 1,
+          "source_scorecard": {
+            "runs": 283,
+            "wickets": 8,
+            "balls": 300,
+            "penalties": 0,
+            "wides": 3,
+            "noballs": 2,
+            "byes": 0,
+            "legbyes": 4,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_43906": {
+              "runs": 35,
+              "balls": 34
+            },
+            "espn_46681": {
+              "runs": 27,
+              "balls": 38
+            },
+            "espn_45789": {
+              "runs": 50,
+              "balls": 73
+            },
+            "espn_44936": {
+              "runs": 35,
+              "balls": 43
+            },
+            "espn_44932": {
+              "runs": 36,
+              "balls": 39
+            },
+            "espn_44111": {
+              "runs": 8,
+              "balls": 11
+            },
+            "espn_46248": {
+              "runs": 31,
+              "balls": 39
+            },
+            "espn_44149": {
+              "runs": 23,
+              "balls": 15
+            },
+            "espn_46075": {
+              "runs": 23,
+              "balls": 7
+            },
+            "espn_46538": {
+              "runs": 6,
+              "balls": 3
+            },
+            "espn_47492": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_56007": {
+              "conceded": 52,
+              "balls": 54
+            },
+            "espn_56160": {
+              "conceded": 56,
+              "balls": 60
+            },
+            "espn_56143": {
+              "conceded": 48,
+              "balls": 60
+            },
+            "espn_56283": {
+              "conceded": 55,
+              "balls": 60
+            },
+            "espn_56054": {
+              "conceded": 59,
+              "balls": 60
+            },
+            "espn_55946": {
+              "conceded": 9,
+              "balls": 6
+            }
+          }
+        },
+        {
+          "innings_number": 2,
+          "source_scorecard": {
+            "runs": 222,
+            "wickets": 10,
+            "balls": 266,
+            "penalties": 0,
+            "wides": 25,
+            "noballs": 2,
+            "byes": 0,
+            "legbyes": 11,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_56194": {
+              "runs": 24,
+              "balls": 39
+            },
+            "espn_280734": {
+              "runs": 1,
+              "balls": 10
+            },
+            "espn_55946": {
+              "runs": 2,
+              "balls": 9
+            },
+            "espn_55988": {
+              "runs": 73,
+              "balls": 78
+            },
+            "espn_56029": {
+              "runs": 1,
+              "balls": 5
+            },
+            "espn_56143": {
+              "runs": 51,
+              "balls": 77
+            },
+            "espn_56093": {
+              "runs": 0,
+              "balls": 1
+            },
+            "espn_56054": {
+              "runs": 25,
+              "balls": 31
+            },
+            "espn_56007": {
+              "runs": 0,
+              "balls": 4
+            },
+            "espn_56283": {
+              "runs": 0,
+              "balls": 2
+            },
+            "espn_56160": {
+              "runs": 7,
+              "balls": 12
+            }
+          },
+          "bowlers": {
+            "espn_47492": {
+              "conceded": 16,
+              "balls": 48
+            },
+            "espn_46075": {
+              "conceded": 50,
+              "balls": 42
+            },
+            "espn_46248": {
+              "conceded": 40,
+              "balls": 44
+            },
+            "espn_46538": {
+              "conceded": 44,
+              "balls": 60
+            },
+            "espn_44149": {
+              "conceded": 30,
+              "balls": 42
+            },
+            "espn_45789": {
+              "conceded": 31,
+              "balls": 30
+            }
+          }
+        }
+      ],
+      "corrections": []
+    },
+    "355995": {
+      "match_id": "355995",
+      "source_sha256": "9ec8ffdad33c675882b6bb4b0586b6db850019eed9d8c2403f4783e74f89279d",
+      "raw_scorecard_compressed_sha256": "5ee62f378f39072a82681d4608c15dec60c056a57261e2dd3e1e60a85b6385e5",
+      "raw_scorecard_reference": {
+        "archive": "raw_batch_1.tar.gz",
+        "member": "./355995/scorecard.json.gz",
+        "compressed_sha256": "5ee62f378f39072a82681d4608c15dec60c056a57261e2dd3e1e60a85b6385e5"
+      },
+      "record_class": "t20i",
+      "date": "2009-06-07",
+      "rule": "icc_pre_2017_no_ball_byes",
+      "innings": [
+        {
+          "innings_number": 1,
+          "source_scorecard": {
+            "runs": 211,
+            "wickets": 5,
+            "balls": 120,
+            "penalties": 0,
+            "wides": 1,
+            "noballs": 3,
+            "byes": 0,
+            "legbyes": 0,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_47270": {
+              "runs": 38,
+              "balls": 29
+            },
+            "espn_45789": {
+              "runs": 48,
+              "balls": 31
+            },
+            "espn_45224": {
+              "runs": 16,
+              "balls": 14
+            },
+            "espn_44936": {
+              "runs": 79,
+              "balls": 34
+            },
+            "espn_46248": {
+              "runs": 24,
+              "balls": 11
+            },
+            "espn_44111": {
+              "runs": 2,
+              "balls": 3
+            },
+            "espn_44932": {
+              "runs": 0,
+              "balls": 0
+            },
+            "espn_47850": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_47492": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_265564": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_44149": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_232435": {
+              "conceded": 37,
+              "balls": 24
+            },
+            "espn_295644": {
+              "conceded": 40,
+              "balls": 24
+            },
+            "espn_298195": {
+              "conceded": 21,
+              "balls": 6
+            },
+            "espn_272473": {
+              "conceded": 52,
+              "balls": 24
+            },
+            "espn_25451": {
+              "conceded": 25,
+              "balls": 24
+            },
+            "espn_25428": {
+              "conceded": 36,
+              "balls": 18
+            }
+          }
+        },
+        {
+          "innings_number": 2,
+          "source_scorecard": {
+            "runs": 81,
+            "wickets": 10,
+            "balls": 94,
+            "penalties": 0,
+            "wides": 2,
+            "noballs": 0,
+            "byes": 0,
+            "legbyes": 1,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_14020": {
+              "runs": 5,
+              "balls": 6
+            },
+            "espn_25428": {
+              "runs": 4,
+              "balls": 4
+            },
+            "espn_19276": {
+              "runs": 0,
+              "balls": 1
+            },
+            "espn_25446": {
+              "runs": 42,
+              "balls": 32
+            },
+            "espn_25112": {
+              "runs": 0,
+              "balls": 1
+            },
+            "espn_25430": {
+              "runs": 8,
+              "balls": 16
+            },
+            "espn_298195": {
+              "runs": 2,
+              "balls": 6
+            },
+            "espn_25451": {
+              "runs": 15,
+              "balls": 20
+            },
+            "espn_295644": {
+              "runs": 1,
+              "balls": 2
+            },
+            "espn_272473": {
+              "runs": 1,
+              "balls": 3
+            },
+            "espn_232435": {
+              "runs": 0,
+              "balls": 3
+            }
+          },
+          "bowlers": {
+            "espn_47492": {
+              "conceded": 21,
+              "balls": 18
+            },
+            "espn_265564": {
+              "conceded": 6,
+              "balls": 12
+            },
+            "espn_45789": {
+              "conceded": 4,
+              "balls": 6
+            },
+            "espn_44149": {
+              "conceded": 17,
+              "balls": 24
+            },
+            "espn_47850": {
+              "conceded": 17,
+              "balls": 24
+            },
+            "espn_46248": {
+              "conceded": 15,
+              "balls": 10
+            }
+          }
+        }
+      ],
+      "corrections": []
+    },
+    "412694": {
+      "match_id": "412694",
+      "source_sha256": "b78bbb3d26629d328c1cbf8f7b7973661b4d723b3979e8481d22251cba3a6351",
+      "raw_scorecard_compressed_sha256": "d6603ad162dead51e27bde82960014bb38ff45b4ba9bc55fd990606c8de3a525",
+      "raw_scorecard_reference": {
+        "archive": "raw_batch_2.tar.gz",
+        "member": "./412694/scorecard.json.gz",
+        "compressed_sha256": "d6603ad162dead51e27bde82960014bb38ff45b4ba9bc55fd990606c8de3a525"
+      },
+      "record_class": "t20i",
+      "date": "2010-05-08",
+      "rule": "icc_pre_2017_no_ball_byes",
+      "innings": [
+        {
+          "innings_number": 1,
+          "source_scorecard": {
+            "runs": 168,
+            "wickets": 7,
+            "balls": 120,
+            "penalties": 0,
+            "wides": 7,
+            "noballs": 4,
+            "byes": 0,
+            "legbyes": 3,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_16406": {
+              "runs": 3,
+              "balls": 4
+            },
+            "espn_230855": {
+              "runs": 41,
+              "balls": 42
+            },
+            "espn_19296": {
+              "runs": 53,
+              "balls": 33
+            },
+            "espn_10772": {
+              "runs": 14,
+              "balls": 9
+            },
+            "espn_24598": {
+              "runs": 21,
+              "balls": 14
+            },
+            "espn_23460": {
+              "runs": 0,
+              "balls": 2
+            },
+            "espn_9310": {
+              "runs": 13,
+              "balls": 13
+            },
+            "espn_23523": {
+              "runs": 8,
+              "balls": 5
+            },
+            "espn_20431": {
+              "runs": 1,
+              "balls": 1
+            },
+            "espn_10617": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_20187": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_44149": {
+              "conceded": 15,
+              "balls": 24
+            },
+            "espn_47492": {
+              "conceded": 50,
+              "balls": 24
+            },
+            "espn_46538": {
+              "conceded": 40,
+              "balls": 24
+            },
+            "espn_45963": {
+              "conceded": 34,
+              "balls": 24
+            },
+            "espn_45789": {
+              "conceded": 15,
+              "balls": 18
+            },
+            "espn_44932": {
+              "conceded": 11,
+              "balls": 6
+            }
+          }
+        },
+        {
+          "innings_number": 2,
+          "source_scorecard": {
+            "runs": 129,
+            "wickets": 10,
+            "balls": 114,
+            "penalties": 0,
+            "wides": 6,
+            "noballs": 1,
+            "byes": 2,
+            "legbyes": 9,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_47270": {
+              "runs": 19,
+              "balls": 24
+            },
+            "espn_45789": {
+              "runs": 11,
+              "balls": 13
+            },
+            "espn_45224": {
+              "runs": 8,
+              "balls": 8
+            },
+            "espn_44936": {
+              "runs": 5,
+              "balls": 9
+            },
+            "espn_46248": {
+              "runs": 0,
+              "balls": 2
+            },
+            "espn_44932": {
+              "runs": 39,
+              "balls": 25
+            },
+            "espn_44111": {
+              "runs": 9,
+              "balls": 11
+            },
+            "espn_44149": {
+              "runs": 12,
+              "balls": 12
+            },
+            "espn_47492": {
+              "runs": 5,
+              "balls": 6
+            },
+            "espn_46538": {
+              "runs": 1,
+              "balls": 2
+            },
+            "espn_45963": {
+              "runs": 2,
+              "balls": 3
+            }
+          },
+          "bowlers": {
+            "espn_20187": {
+              "conceded": 23,
+              "balls": 24
+            },
+            "espn_9310": {
+              "conceded": 14,
+              "balls": 18
+            },
+            "espn_10617": {
+              "conceded": 26,
+              "balls": 24
+            },
+            "espn_23523": {
+              "conceded": 31,
+              "balls": 24
+            },
+            "espn_20431": {
+              "conceded": 24,
+              "balls": 24
+            }
+          }
+        }
+      ],
+      "corrections": []
+    },
+    "464991": {
+      "match_id": "464991",
+      "source_sha256": "be1c24e5563dbee9b39ab3beea5889d482bae731bd30f35188e28ca848ba884a",
+      "raw_scorecard_compressed_sha256": "9f36269a3760d0c450ab8d995f54facf016ab29a8738afd7f5d057fc9cb19fdd",
+      "raw_scorecard_reference": {
+        "archive": "raw_batch_3.tar.gz",
+        "member": "./464991/scorecard.json.gz",
+        "compressed_sha256": "9f36269a3760d0c450ab8d995f54facf016ab29a8738afd7f5d057fc9cb19fdd"
+      },
+      "record_class": "odi",
+      "date": "2011-02-03",
+      "rule": "unresolved",
+      "innings": [
+        {
+          "innings_number": 1,
+          "source_scorecard": {
+            "runs": 203,
+            "wickets": 10,
+            "balls": 300,
+            "penalties": 0,
+            "wides": 9,
+            "noballs": 0,
+            "byes": 1,
+            "legbyes": 8,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_51880": {
+              "runs": 28,
+              "balls": 30
+            },
+            "espn_274926": {
+              "runs": 12,
+              "balls": 30
+            },
+            "espn_277472": {
+              "runs": 39,
+              "balls": 64
+            },
+            "espn_52969": {
+              "runs": 21,
+              "balls": 48
+            },
+            "espn_51439": {
+              "runs": 39,
+              "balls": 55
+            },
+            "espn_230559": {
+              "runs": 4,
+              "balls": 8
+            },
+            "espn_51446": {
+              "runs": 28,
+              "balls": 38
+            },
+            "espn_53115": {
+              "runs": 4,
+              "balls": 8
+            },
+            "espn_52622": {
+              "runs": 0,
+              "balls": 1
+            },
+            "espn_52912": {
+              "runs": 1,
+              "balls": 10
+            },
+            "espn_230553": {
+              "runs": 9,
+              "balls": 8
+            }
+          },
+          "bowlers": {
+            "espn_49758": {
+              "conceded": 30,
+              "balls": 60
+            },
+            "espn_49535": {
+              "conceded": 42,
+              "balls": 60
+            },
+            "espn_49764": {
+              "conceded": 20,
+              "balls": 24
+            },
+            "espn_49636": {
+              "conceded": 42,
+              "balls": 60
+            },
+            "espn_48472": {
+              "conceded": 27,
+              "balls": 42
+            },
+            "espn_49178": {
+              "conceded": 33,
+              "balls": 54
+            }
+          }
+        },
+        {
+          "innings_number": 2,
+          "source_scorecard": {
+            "runs": 199,
+            "wickets": 2,
+            "balls": 255,
+            "penalties": 0,
+            "wides": 16,
+            "noballs": 0,
+            "byes": 0,
+            "legbyes": 3,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_50747": {
+              "runs": 101,
+              "balls": 143
+            },
+            "espn_48472": {
+              "runs": 11,
+              "balls": 23
+            },
+            "espn_50710": {
+              "runs": 20,
+              "balls": 43
+            },
+            "espn_49289": {
+              "runs": 48,
+              "balls": 46
+            },
+            "espn_50424": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_209457": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_49764": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_49758": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_49535": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_49178": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_49636": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_52912": {
+              "conceded": 27,
+              "balls": 42
+            },
+            "espn_230553": {
+              "conceded": 29,
+              "balls": 48
+            },
+            "espn_53115": {
+              "conceded": 42,
+              "balls": 54
+            },
+            "espn_51880": {
+              "conceded": 18,
+              "balls": 24
+            },
+            "espn_51439": {
+              "conceded": 29,
+              "balls": 30
+            },
+            "espn_52622": {
+              "conceded": 33,
+              "balls": 39
+            },
+            "espn_230559": {
+              "conceded": 18,
+              "balls": 18
+            }
+          }
+        }
+      ],
+      "corrections": []
+    },
+    "464992": {
+      "match_id": "464992",
+      "source_sha256": "cc38c90ec96615325519450ca71c743d38e9d4830ed2fcd8980ab4943b89cf83",
+      "raw_scorecard_compressed_sha256": "89b6f0c4dbcac3a54aff12e1383abc13354681495b4e7a700baa202cde904c62",
+      "raw_scorecard_reference": {
+        "archive": "raw_batch_3.tar.gz",
+        "member": "./464992/scorecard.json.gz",
+        "compressed_sha256": "89b6f0c4dbcac3a54aff12e1383abc13354681495b4e7a700baa202cde904c62"
+      },
+      "record_class": "odi",
+      "date": "2011-02-06",
+      "rule": "unresolved",
+      "innings": [
+        {
+          "innings_number": 1,
+          "source_scorecard": {
+            "runs": 277,
+            "wickets": 9,
+            "balls": 300,
+            "penalties": 0,
+            "wides": 9,
+            "noballs": 0,
+            "byes": 0,
+            "legbyes": 7,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_50747": {
+              "runs": 39,
+              "balls": 52
+            },
+            "espn_48472": {
+              "runs": 30,
+              "balls": 28
+            },
+            "espn_50710": {
+              "runs": 75,
+              "balls": 105
+            },
+            "espn_49289": {
+              "runs": 44,
+              "balls": 51
+            },
+            "espn_209457": {
+              "runs": 17,
+              "balls": 17
+            },
+            "espn_50424": {
+              "runs": 4,
+              "balls": 7
+            },
+            "espn_233514": {
+              "runs": 6,
+              "balls": 8
+            },
+            "espn_49764": {
+              "runs": 36,
+              "balls": 22
+            },
+            "espn_49178": {
+              "runs": 2,
+              "balls": 4
+            },
+            "espn_268739": {
+              "runs": 8,
+              "balls": 6
+            },
+            "espn_48835": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_52912": {
+              "conceded": 44,
+              "balls": 30
+            },
+            "espn_53115": {
+              "conceded": 61,
+              "balls": 60
+            },
+            "espn_51439": {
+              "conceded": 58,
+              "balls": 60
+            },
+            "espn_51880": {
+              "conceded": 34,
+              "balls": 60
+            },
+            "espn_51248": {
+              "conceded": 38,
+              "balls": 60
+            },
+            "espn_52622": {
+              "conceded": 35,
+              "balls": 30
+            }
+          }
+        },
+        {
+          "innings_number": 2,
+          "source_scorecard": {
+            "runs": 251,
+            "wickets": 10,
+            "balls": 294,
+            "penalties": 0,
+            "wides": 10,
+            "noballs": 0,
+            "byes": 1,
+            "legbyes": 4,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_51880": {
+              "runs": 0,
+              "balls": 1
+            },
+            "espn_274926": {
+              "runs": 0,
+              "balls": 6
+            },
+            "espn_277472": {
+              "runs": 79,
+              "balls": 91
+            },
+            "espn_52969": {
+              "runs": 51,
+              "balls": 66
+            },
+            "espn_51469": {
+              "runs": 3,
+              "balls": 5
+            },
+            "espn_51439": {
+              "runs": 32,
+              "balls": 42
+            },
+            "espn_53115": {
+              "runs": 3,
+              "balls": 2
+            },
+            "espn_51446": {
+              "runs": 49,
+              "balls": 54
+            },
+            "espn_52622": {
+              "runs": 13,
+              "balls": 17
+            },
+            "espn_51248": {
+              "runs": 6,
+              "balls": 10
+            },
+            "espn_52912": {
+              "runs": 0,
+              "balls": 0
+            }
+          },
+          "bowlers": {
+            "espn_48835": {
+              "conceded": 45,
+              "balls": 60
+            },
+            "espn_233514": {
+              "conceded": 36,
+              "balls": 54
+            },
+            "espn_49764": {
+              "conceded": 33,
+              "balls": 36
+            },
+            "espn_268739": {
+              "conceded": 46,
+              "balls": 60
+            },
+            "espn_209457": {
+              "conceded": 7,
+              "balls": 6
+            },
+            "espn_48472": {
+              "conceded": 25,
+              "balls": 18
+            },
+            "espn_49178": {
+              "conceded": 54,
+              "balls": 60
+            }
+          }
+        }
+      ],
+      "corrections": []
+    },
+    "514024": {
+      "match_id": "514024",
+      "source_sha256": "d96e30ef1c7bca0761df009d63339bee40aa524d312bc7db4944669f685f977c",
+      "raw_scorecard_compressed_sha256": "d8db602c02901ff48a0aff359985bc06da68d4df4c63f61b9e4d7802410396e6",
+      "raw_scorecard_reference": {
+        "archive": "raw_batch_3.tar.gz",
+        "member": "./514024/scorecard.json.gz",
+        "compressed_sha256": "d8db602c02901ff48a0aff359985bc06da68d4df4c63f61b9e4d7802410396e6"
+      },
+      "record_class": "t20i",
+      "date": "2011-10-16",
+      "rule": "unresolved",
+      "innings": [
+        {
+          "innings_number": 1,
+          "source_scorecard": {
+            "runs": 147,
+            "wickets": 8,
+            "balls": 120,
+            "penalties": 0,
+            "wides": 6,
+            "noballs": 0,
+            "byes": 0,
+            "legbyes": 1,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_219889": {
+              "runs": 0,
+              "balls": 9
+            },
+            "espn_230193": {
+              "runs": 10,
+              "balls": 13
+            },
+            "espn_6683": {
+              "runs": 26,
+              "balls": 23
+            },
+            "espn_5766": {
+              "runs": 12,
+              "balls": 14
+            },
+            "espn_8291": {
+              "runs": 39,
+              "balls": 26
+            },
+            "espn_267192": {
+              "runs": 9,
+              "balls": 8
+            },
+            "espn_272450": {
+              "runs": 36,
+              "balls": 21
+            },
+            "espn_7069": {
+              "runs": 3,
+              "balls": 3
+            },
+            "espn_272465": {
+              "runs": 5,
+              "balls": 3
+            },
+            "espn_489889": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_4508": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_47666": {
+              "conceded": 11,
+              "balls": 24
+            },
+            "espn_46538": {
+              "conceded": 37,
+              "balls": 24
+            },
+            "espn_265564": {
+              "conceded": 44,
+              "balls": 24
+            },
+            "espn_223642": {
+              "conceded": 28,
+              "balls": 24
+            },
+            "espn_44149": {
+              "conceded": 26,
+              "balls": 24
+            }
+          }
+        },
+        {
+          "innings_number": 2,
+          "source_scorecard": {
+            "runs": 148,
+            "wickets": 7,
+            "balls": 115,
+            "penalties": 0,
+            "wides": 6,
+            "noballs": 0,
+            "byes": 0,
+            "legbyes": 2,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_43906": {
+              "runs": 4,
+              "balls": 6
+            },
+            "espn_47270": {
+              "runs": 24,
+              "balls": 22
+            },
+            "espn_45705": {
+              "runs": 5,
+              "balls": 6
+            },
+            "espn_44932": {
+              "runs": 0,
+              "balls": 4
+            },
+            "espn_44149": {
+              "runs": 34,
+              "balls": 28
+            },
+            "espn_321777": {
+              "runs": 10,
+              "balls": 13
+            },
+            "espn_45955": {
+              "runs": 3,
+              "balls": 9
+            },
+            "espn_265564": {
+              "runs": 29,
+              "balls": 11
+            },
+            "espn_223642": {
+              "runs": 31,
+              "balls": 16
+            },
+            "espn_46538": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_47666": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_4508": {
+              "conceded": 36,
+              "balls": 24
+            },
+            "espn_489889": {
+              "conceded": 27,
+              "balls": 24
+            },
+            "espn_272465": {
+              "conceded": 17,
+              "balls": 24
+            },
+            "espn_5766": {
+              "conceded": 20,
+              "balls": 13
+            },
+            "espn_7069": {
+              "conceded": 35,
+              "balls": 24
+            },
+            "espn_272450": {
+              "conceded": 11,
+              "balls": 6
+            }
+          }
+        }
+      ],
+      "corrections": []
+    },
+    "520592": {
+      "match_id": "520592",
+      "source_sha256": "f57a5229bf9be7d93cb524b8ed763441a013c14fcd46b1bcdc8992e5a11689f1",
+      "raw_scorecard_compressed_sha256": "06e67f1085c1cdbbf258dca3ad945edfafdd8046207ba97e5af070626faeecce",
+      "raw_scorecard_reference": {
+        "archive": "raw_batch_4.tar.gz",
+        "member": "./520592/scorecard.json.gz",
+        "compressed_sha256": "06e67f1085c1cdbbf258dca3ad945edfafdd8046207ba97e5af070626faeecce"
+      },
+      "record_class": "odi",
+      "date": "2012-02-03",
+      "rule": "unresolved",
+      "innings": [
+        {
+          "innings_number": 1,
+          "source_scorecard": {
+            "runs": 248,
+            "wickets": 10,
+            "balls": 291,
+            "penalties": 0,
+            "wides": 9,
+            "noballs": 0,
+            "byes": 0,
+            "legbyes": 7,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_38058": {
+              "runs": 0,
+              "balls": 5
+            },
+            "espn_226492": {
+              "runs": 70,
+              "balls": 66
+            },
+            "espn_37737": {
+              "runs": 3,
+              "balls": 3
+            },
+            "espn_277906": {
+              "runs": 35,
+              "balls": 53
+            },
+            "espn_388802": {
+              "runs": 24,
+              "balls": 33
+            },
+            "espn_4493": {
+              "runs": 19,
+              "balls": 28
+            },
+            "espn_37749": {
+              "runs": 30,
+              "balls": 42
+            },
+            "espn_36993": {
+              "runs": 33,
+              "balls": 30
+            },
+            "espn_362541": {
+              "runs": 8,
+              "balls": 15
+            },
+            "espn_37740": {
+              "runs": 7,
+              "balls": 12
+            },
+            "espn_232364": {
+              "runs": 3,
+              "balls": 4
+            }
+          },
+          "bowlers": {
+            "espn_232443": {
+              "conceded": 48,
+              "balls": 42
+            },
+            "espn_332996": {
+              "conceded": 41,
+              "balls": 54
+            },
+            "espn_343529": {
+              "conceded": 46,
+              "balls": 57
+            },
+            "espn_55343": {
+              "conceded": 46,
+              "balls": 60
+            },
+            "espn_55698": {
+              "conceded": 47,
+              "balls": 60
+            },
+            "espn_55608": {
+              "conceded": 13,
+              "balls": 18
+            }
+          }
+        },
+        {
+          "innings_number": 2,
+          "source_scorecard": {
+            "runs": 158,
+            "wickets": 10,
+            "balls": 247,
+            "penalties": 0,
+            "wides": 3,
+            "noballs": 0,
+            "byes": 0,
+            "legbyes": 0,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_55608": {
+              "runs": 7,
+              "balls": 19
+            },
+            "espn_55612": {
+              "runs": 1,
+              "balls": 2
+            },
+            "espn_293831": {
+              "runs": 2,
+              "balls": 12
+            },
+            "espn_55814": {
+              "runs": 58,
+              "balls": 68
+            },
+            "espn_55805": {
+              "runs": 20,
+              "balls": 39
+            },
+            "espn_55872": {
+              "runs": 12,
+              "balls": 20
+            },
+            "espn_55343": {
+              "runs": 15,
+              "balls": 16
+            },
+            "espn_232443": {
+              "runs": 10,
+              "balls": 26
+            },
+            "espn_343529": {
+              "runs": 2,
+              "balls": 5
+            },
+            "espn_55698": {
+              "runs": 26,
+              "balls": 35
+            },
+            "espn_332996": {
+              "runs": 2,
+              "balls": 5
+            }
+          },
+          "bowlers": {
+            "espn_37740": {
+              "conceded": 26,
+              "balls": 48
+            },
+            "espn_362541": {
+              "conceded": 33,
+              "balls": 48
+            },
+            "espn_232364": {
+              "conceded": 27,
+              "balls": 48
+            },
+            "espn_36993": {
+              "conceded": 34,
+              "balls": 48
+            },
+            "espn_38058": {
+              "conceded": 19,
+              "balls": 25
+            },
+            "espn_37749": {
+              "conceded": 19,
+              "balls": 30
+            }
+          }
+        }
+      ],
+      "corrections": []
+    },
+    "548318": {
+      "match_id": "548318",
+      "source_sha256": "dc980234c4345365cda9ab1379d552af5ccedb3418dda184ff557677b87355a3",
+      "raw_scorecard_compressed_sha256": "d4dac3843a0b11ac22f89725a33fc6ac33947fa01310056b073decfad1da7595",
+      "raw_scorecard_reference": {
+        "archive": "raw_batch_4.tar.gz",
+        "member": "./548318/scorecard.json.gz",
+        "compressed_sha256": "d4dac3843a0b11ac22f89725a33fc6ac33947fa01310056b073decfad1da7595"
+      },
+      "record_class": "t20",
+      "date": "2012-04-12",
+      "rule": "unresolved",
+      "innings": [
+        {
+          "innings_number": 1,
+          "source_scorecard": {
+            "runs": 205,
+            "wickets": 8,
+            "balls": 120,
+            "penalties": 0,
+            "wides": 14,
+            "noballs": 0,
+            "byes": 2,
+            "legbyes": 0,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_398438": {
+              "runs": 45,
+              "balls": 26
+            },
+            "espn_51880": {
+              "runs": 68,
+              "balls": 35
+            },
+            "espn_253802": {
+              "runs": 57,
+              "balls": 46
+            },
+            "espn_44936": {
+              "runs": 4,
+              "balls": 2
+            },
+            "espn_35390": {
+              "runs": 8,
+              "balls": 6
+            },
+            "espn_27150": {
+              "runs": 0,
+              "balls": 2
+            },
+            "espn_32540": {
+              "runs": 0,
+              "balls": 1
+            },
+            "espn_38710": {
+              "runs": 1,
+              "balls": 1
+            },
+            "espn_35731": {
+              "runs": 6,
+              "balls": 1
+            },
+            "espn_30102": {
+              "runs": 0,
+              "balls": 0
+            },
+            "espn_49636": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_26421": {
+              "conceded": 46,
+              "balls": 24
+            },
+            "espn_4508": {
+              "conceded": 24,
+              "balls": 18
+            },
+            "espn_46248": {
+              "conceded": 37,
+              "balls": 24
+            },
+            "espn_51439": {
+              "conceded": 30,
+              "balls": 24
+            },
+            "espn_33335": {
+              "conceded": 21,
+              "balls": 6
+            },
+            "espn_29655": {
+              "conceded": 27,
+              "balls": 12
+            },
+            "espn_234675": {
+              "conceded": 18,
+              "balls": 12
+            }
+          }
+        },
+        {
+          "innings_number": 2,
+          "source_scorecard": {
+            "runs": 208,
+            "wickets": 5,
+            "balls": 120,
+            "penalties": 0,
+            "wides": 2,
+            "noballs": 2,
+            "byes": 0,
+            "legbyes": 1,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_237095": {
+              "runs": 11,
+              "balls": 15
+            },
+            "espn_44828": {
+              "runs": 71,
+              "balls": 46
+            },
+            "espn_33335": {
+              "runs": 23,
+              "balls": 14
+            },
+            "espn_28081": {
+              "runs": 41,
+              "balls": 24
+            },
+            "espn_51439": {
+              "runs": 25,
+              "balls": 15
+            },
+            "espn_46248": {
+              "runs": 28,
+              "balls": 7
+            },
+            "espn_234675": {
+              "runs": 4,
+              "balls": 1
+            },
+            "espn_26806": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_26421": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_29655": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_4508": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_38710": {
+              "conceded": 30,
+              "balls": 24
+            },
+            "espn_30102": {
+              "conceded": 32,
+              "balls": 24
+            },
+            "espn_35731": {
+              "conceded": 53,
+              "balls": 24
+            },
+            "espn_27150": {
+              "conceded": 35,
+              "balls": 12
+            },
+            "espn_49636": {
+              "conceded": 21,
+              "balls": 24
+            },
+            "espn_253802": {
+              "conceded": 36,
+              "balls": 12
+            }
+          }
+        }
+      ],
+      "corrections": []
+    },
+    "569242": {
+      "match_id": "569242",
+      "source_sha256": "d6b52252ccba30616518e2ea8626ed08235dbb3e1bf2256a411e589dff60c365",
+      "raw_scorecard_compressed_sha256": "9ab3aa59269806db0538a900a9675e82e4b32aa74e70e960f422b174534cf4cc",
+      "raw_scorecard_reference": {
+        "archive": "raw_batch_5.tar.gz",
+        "member": "./569242/scorecard.json.gz",
+        "compressed_sha256": "9ab3aa59269806db0538a900a9675e82e4b32aa74e70e960f422b174534cf4cc"
+      },
+      "record_class": "odi",
+      "date": "2013-02-23",
+      "rule": "unresolved",
+      "innings": [
+        {
+          "innings_number": 1,
+          "source_scorecard": {
+            "runs": 185,
+            "wickets": 10,
+            "balls": 263,
+            "penalties": 0,
+            "wides": 8,
+            "noballs": 0,
+            "byes": 0,
+            "legbyes": 3,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_38924": {
+              "runs": 1,
+              "balls": 10
+            },
+            "espn_331375": {
+              "runs": 2,
+              "balls": 19
+            },
+            "espn_277906": {
+              "runs": 7,
+              "balls": 12
+            },
+            "espn_38699": {
+              "runs": 28,
+              "balls": 52
+            },
+            "espn_44956": {
+              "runs": 24,
+              "balls": 48
+            },
+            "espn_37737": {
+              "runs": 79,
+              "balls": 68
+            },
+            "espn_37004": {
+              "runs": 13,
+              "balls": 26
+            },
+            "espn_37749": {
+              "runs": 4,
+              "balls": 8
+            },
+            "espn_36993": {
+              "runs": 9,
+              "balls": 11
+            },
+            "espn_37740": {
+              "runs": 2,
+              "balls": 6
+            },
+            "espn_232364": {
+              "runs": 5,
+              "balls": 3
+            }
+          },
+          "bowlers": {
+            "espn_8608": {
+              "conceded": 34,
+              "balls": 48
+            },
+            "espn_210283": {
+              "conceded": 27,
+              "balls": 54
+            },
+            "espn_247235": {
+              "conceded": 34,
+              "balls": 54
+            },
+            "espn_10617": {
+              "conceded": 38,
+              "balls": 54
+            },
+            "espn_20431": {
+              "conceded": 49,
+              "balls": 53
+            }
+          }
+        },
+        {
+          "innings_number": 2,
+          "source_scorecard": {
+            "runs": 186,
+            "wickets": 5,
+            "balls": 225,
+            "penalties": 0,
+            "wides": 4,
+            "noballs": 0,
+            "byes": 0,
+            "legbyes": 1,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_11728": {
+              "runs": 46,
+              "balls": 67
+            },
+            "espn_9062": {
+              "runs": 24,
+              "balls": 22
+            },
+            "espn_47623": {
+              "runs": 38,
+              "balls": 44
+            },
+            "espn_303669": {
+              "runs": 28,
+              "balls": 56
+            },
+            "espn_24598": {
+              "runs": 39,
+              "balls": 24
+            },
+            "espn_308967": {
+              "runs": 3,
+              "balls": 4
+            },
+            "espn_247235": {
+              "runs": 3,
+              "balls": 8
+            },
+            "espn_10617": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_20431": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_210283": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_8608": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_37740": {
+              "conceded": 34,
+              "balls": 45
+            },
+            "espn_232364": {
+              "conceded": 48,
+              "balls": 60
+            },
+            "espn_36993": {
+              "conceded": 35,
+              "balls": 48
+            },
+            "espn_37749": {
+              "conceded": 39,
+              "balls": 42
+            },
+            "espn_277906": {
+              "conceded": 9,
+              "balls": 6
+            },
+            "espn_37004": {
+              "conceded": 20,
+              "balls": 24
+            }
+          }
+        }
+      ],
+      "corrections": []
+    },
+    "582190": {
+      "match_id": "582190",
+      "source_sha256": "c00f9ceb9ba99743ac826a9fee0e7fb6f17f14cf88de229fa29baa4e8c005cbf",
+      "raw_scorecard_compressed_sha256": "6f35a82f5cd1c6ff8c5472b7e90651370b8b9c9bb30bb0c3784d45d5dc138fd2",
+      "raw_scorecard_reference": {
+        "archive": "raw_batch_5.tar.gz",
+        "member": "./582190/scorecard.json.gz",
+        "compressed_sha256": "6f35a82f5cd1c6ff8c5472b7e90651370b8b9c9bb30bb0c3784d45d5dc138fd2"
+      },
+      "record_class": "odi",
+      "date": "2012-11-10",
+      "rule": "unresolved",
+      "innings": [
+        {
+          "innings_number": 1,
+          "source_scorecard": {
+            "runs": 131,
+            "wickets": 8,
+            "balls": 192,
+            "penalties": 0,
+            "wides": 5,
+            "noballs": 0,
+            "byes": 0,
+            "legbyes": 3,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_38058": {
+              "runs": 11,
+              "balls": 24
+            },
+            "espn_38924": {
+              "runs": 15,
+              "balls": 26
+            },
+            "espn_37737": {
+              "runs": 30,
+              "balls": 44
+            },
+            "espn_38699": {
+              "runs": 6,
+              "balls": 17
+            },
+            "espn_277906": {
+              "runs": 21,
+              "balls": 29
+            },
+            "espn_37004": {
+              "runs": 21,
+              "balls": 37
+            },
+            "espn_37749": {
+              "runs": 0,
+              "balls": 1
+            },
+            "espn_36993": {
+              "runs": 0,
+              "balls": 3
+            },
+            "espn_232364": {
+              "runs": 7,
+              "balls": 8
+            },
+            "espn_450860": {
+              "runs": 12,
+              "balls": 3
+            },
+            "espn_277912": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_49758": {
+              "conceded": 38,
+              "balls": 36
+            },
+            "espn_49535": {
+              "conceded": 17,
+              "balls": 30
+            },
+            "espn_49764": {
+              "conceded": 19,
+              "balls": 36
+            },
+            "espn_233514": {
+              "conceded": 16,
+              "balls": 30
+            },
+            "espn_49178": {
+              "conceded": 23,
+              "balls": 36
+            },
+            "espn_49700": {
+              "conceded": 15,
+              "balls": 24
+            }
+          }
+        },
+        {
+          "innings_number": 2,
+          "source_scorecard": {
+            "runs": 131,
+            "wickets": 3,
+            "balls": 158,
+            "penalties": 0,
+            "wides": 9,
+            "noballs": 2,
+            "byes": 4,
+            "legbyes": 2,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_50747": {
+              "runs": 27,
+              "balls": 28
+            },
+            "espn_300628": {
+              "runs": 43,
+              "balls": 65
+            },
+            "espn_50710": {
+              "runs": 42,
+              "balls": 55
+            },
+            "espn_301236": {
+              "runs": 0,
+              "balls": 8
+            },
+            "espn_49764": {
+              "runs": 2,
+              "balls": 4
+            },
+            "espn_49289": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_49700": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_233514": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_49535": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_49178": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_49758": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_277912": {
+              "conceded": 32,
+              "balls": 42
+            },
+            "espn_232364": {
+              "conceded": 32,
+              "balls": 42
+            },
+            "espn_450860": {
+              "conceded": 21,
+              "balls": 26
+            },
+            "espn_36993": {
+              "conceded": 23,
+              "balls": 36
+            },
+            "espn_37749": {
+              "conceded": 17,
+              "balls": 12
+            }
+          }
+        }
+      ],
+      "corrections": []
+    },
+    "593983": {
+      "match_id": "593983",
+      "source_sha256": "0207323419a5fa160b1bf0c056f436c37cf4d850d9e9c10732e66b5811a2edf0",
+      "raw_scorecard_compressed_sha256": "c48a4ea54d299a4158036adada226d23205afefddac1db177e3dda45d90c9eb4",
+      "raw_scorecard_reference": {
+        "archive": "raw_batch_5.tar.gz",
+        "member": "./593983/scorecard.json.gz",
+        "compressed_sha256": "c48a4ea54d299a4158036adada226d23205afefddac1db177e3dda45d90c9eb4"
+      },
+      "record_class": "odi",
+      "date": "2013-02-22",
+      "rule": "unresolved",
+      "innings": [
+        {
+          "innings_number": 1,
+          "source_scorecard": {
+            "runs": 337,
+            "wickets": 4,
+            "balls": 300,
+            "penalties": 0,
+            "wides": 3,
+            "noballs": 1,
+            "byes": 2,
+            "legbyes": 2,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_333066": {
+              "runs": 130,
+              "balls": 111
+            },
+            "espn_252932": {
+              "runs": 79,
+              "balls": 88
+            },
+            "espn_277472": {
+              "runs": 100,
+              "balls": 71
+            },
+            "espn_276298": {
+              "runs": 4,
+              "balls": 9
+            },
+            "espn_51439": {
+              "runs": 9,
+              "balls": 18
+            },
+            "espn_52969": {
+              "runs": 7,
+              "balls": 4
+            },
+            "espn_52917": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_51659": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_230558": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_230553": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_51436": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_332996": {
+              "conceded": 65,
+              "balls": 60
+            },
+            "espn_55820": {
+              "conceded": 60,
+              "balls": 60
+            },
+            "espn_55633": {
+              "conceded": 83,
+              "balls": 60
+            },
+            "espn_55354": {
+              "conceded": 19,
+              "balls": 18
+            },
+            "espn_392944": {
+              "conceded": 56,
+              "balls": 60
+            },
+            "espn_55608": {
+              "conceded": 35,
+              "balls": 30
+            },
+            "espn_55872": {
+              "conceded": 15,
+              "balls": 12
+            }
+          }
+        },
+        {
+          "innings_number": 2,
+          "source_scorecard": {
+            "runs": 181,
+            "wickets": 9,
+            "balls": 300,
+            "penalties": 0,
+            "wides": 10,
+            "noballs": 3,
+            "byes": 4,
+            "legbyes": 5,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_55787": {
+              "runs": 12,
+              "balls": 15
+            },
+            "espn_55354": {
+              "runs": 6,
+              "balls": 16
+            },
+            "espn_55608": {
+              "runs": 4,
+              "balls": 11
+            },
+            "espn_55814": {
+              "runs": 8,
+              "balls": 22
+            },
+            "espn_55412": {
+              "runs": 41,
+              "balls": 51
+            },
+            "espn_55872": {
+              "runs": 51,
+              "balls": 75
+            },
+            "espn_293831": {
+              "runs": 4,
+              "balls": 19
+            },
+            "espn_55820": {
+              "runs": 18,
+              "balls": 67
+            },
+            "espn_332996": {
+              "runs": 1,
+              "balls": 10
+            },
+            "espn_392944": {
+              "runs": 14,
+              "balls": 16
+            },
+            "espn_55633": {
+              "runs": 0,
+              "balls": 1
+            }
+          },
+          "bowlers": {
+            "espn_230553": {
+              "conceded": 15,
+              "balls": 48
+            },
+            "espn_51436": {
+              "conceded": 38,
+              "balls": 60
+            },
+            "espn_230558": {
+              "conceded": 28,
+              "balls": 60
+            },
+            "espn_51659": {
+              "conceded": 37,
+              "balls": 42
+            },
+            "espn_51439": {
+              "conceded": 30,
+              "balls": 48
+            },
+            "espn_276298": {
+              "conceded": 24,
+              "balls": 42
+            }
+          }
+        }
+      ],
+      "corrections": []
+    },
+    "668959": {
+      "match_id": "668959",
+      "source_sha256": "3b67b8d7099d6c3690463d577069f520dfacea691396d16f63ee47c67199f981",
+      "raw_scorecard_compressed_sha256": "d916dfd4edf4ed7a9355f09d548300ea5ef58535dd0f54196493d632ecdf7961",
+      "raw_scorecard_reference": {
+        "archive": "raw_batch_6.tar.gz",
+        "member": "./668959/scorecard.json.gz",
+        "compressed_sha256": "d916dfd4edf4ed7a9355f09d548300ea5ef58535dd0f54196493d632ecdf7961"
+      },
+      "record_class": "t20i",
+      "date": "2013-11-06",
+      "rule": "unresolved",
+      "innings": [
+        {
+          "innings_number": 1,
+          "source_scorecard": {
+            "runs": 204,
+            "wickets": 5,
+            "balls": 120,
+            "penalties": 0,
+            "wides": 7,
+            "noballs": 0,
+            "byes": 0,
+            "legbyes": 2,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_36948": {
+              "runs": 59,
+              "balls": 31
+            },
+            "espn_331375": {
+              "runs": 17,
+              "balls": 17
+            },
+            "espn_38699": {
+              "runs": 28,
+              "balls": 25
+            },
+            "espn_232359": {
+              "runs": 73,
+              "balls": 39
+            },
+            "espn_277662": {
+              "runs": 18,
+              "balls": 6
+            },
+            "espn_7502": {
+              "runs": 0,
+              "balls": 2
+            },
+            "espn_37749": {
+              "runs": 0,
+              "balls": 0
+            },
+            "espn_388802": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_37740": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_232364": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_319439": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_56007": {
+              "conceded": 46,
+              "balls": 24
+            },
+            "espn_444135": {
+              "conceded": 30,
+              "balls": 18
+            },
+            "espn_511532": {
+              "conceded": 31,
+              "balls": 24
+            },
+            "espn_300618": {
+              "conceded": 16,
+              "balls": 6
+            },
+            "espn_56025": {
+              "conceded": 34,
+              "balls": 24
+            },
+            "espn_56283": {
+              "conceded": 19,
+              "balls": 12
+            },
+            "espn_56167": {
+              "conceded": 26,
+              "balls": 12
+            }
+          }
+        },
+        {
+          "innings_number": 2,
+          "source_scorecard": {
+            "runs": 189,
+            "wickets": 9,
+            "balls": 120,
+            "penalties": 0,
+            "wides": 1,
+            "noballs": 0,
+            "byes": 0,
+            "legbyes": 3,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_56154": {
+              "runs": 4,
+              "balls": 2
+            },
+            "espn_56167": {
+              "runs": 6,
+              "balls": 2
+            },
+            "espn_373696": {
+              "runs": 9,
+              "balls": 6
+            },
+            "espn_56029": {
+              "runs": 50,
+              "balls": 29
+            },
+            "espn_56054": {
+              "runs": 18,
+              "balls": 10
+            },
+            "espn_300618": {
+              "runs": 28,
+              "balls": 20
+            },
+            "espn_56025": {
+              "runs": 34,
+              "balls": 25
+            },
+            "espn_444135": {
+              "runs": 24,
+              "balls": 15
+            },
+            "espn_56007": {
+              "runs": 7,
+              "balls": 7
+            },
+            "espn_56283": {
+              "runs": 0,
+              "balls": 1
+            },
+            "espn_511532": {
+              "runs": 5,
+              "balls": 3
+            }
+          },
+          "bowlers": {
+            "espn_232364": {
+              "conceded": 38,
+              "balls": 24
+            },
+            "espn_319439": {
+              "conceded": 45,
+              "balls": 18
+            },
+            "espn_37740": {
+              "conceded": 32,
+              "balls": 24
+            },
+            "espn_37749": {
+              "conceded": 18,
+              "balls": 12
+            },
+            "espn_36948": {
+              "conceded": 32,
+              "balls": 18
+            },
+            "espn_277662": {
+              "conceded": 21,
+              "balls": 24
+            }
+          }
+        }
+      ],
+      "corrections": []
+    },
+    "800469": {
+      "match_id": "800469",
+      "source_sha256": "4e8e83d9699e62e9d535a7f848ee3d5d5490d47e7c5e9b8513142337be45224f",
+      "raw_scorecard_compressed_sha256": "728c9cac281ba3ec2b47f2b60fec9761534f0b109dda70437ec05810f17cb5da",
+      "raw_scorecard_reference": {
+        "archive": "raw_batch_8.tar.gz",
+        "member": "./800469/scorecard.json.gz",
+        "compressed_sha256": "728c9cac281ba3ec2b47f2b60fec9761534f0b109dda70437ec05810f17cb5da"
+      },
+      "record_class": "odi",
+      "date": "2016-02-03",
+      "rule": "icc_pre_2017_no_ball_byes",
+      "innings": [
+        {
+          "innings_number": 1,
+          "source_scorecard": {
+            "runs": 399,
+            "wickets": 9,
+            "balls": 300,
+            "penalties": 0,
+            "wides": 4,
+            "noballs": 9,
+            "byes": 0,
+            "legbyes": 4,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_298438": {
+              "runs": 48,
+              "balls": 30
+            },
+            "espn_249866": {
+              "runs": 57,
+              "balls": 47
+            },
+            "espn_303669": {
+              "runs": 52,
+              "balls": 58
+            },
+            "espn_308967": {
+              "runs": 105,
+              "balls": 76
+            },
+            "espn_24598": {
+              "runs": 23,
+              "balls": 21
+            },
+            "espn_311158": {
+              "runs": 57,
+              "balls": 38
+            },
+            "espn_8917": {
+              "runs": 19,
+              "balls": 15
+            },
+            "espn_288992": {
+              "runs": 14,
+              "balls": 10
+            },
+            "espn_244497": {
+              "runs": 2,
+              "balls": 3
+            },
+            "espn_308251": {
+              "runs": 5,
+              "balls": 5
+            },
+            "espn_461632": {
+              "runs": 0,
+              "balls": 2
+            }
+          },
+          "bowlers": {
+            "espn_439952": {
+              "conceded": 74,
+              "balls": 60
+            },
+            "espn_393279": {
+              "conceded": 87,
+              "balls": 60
+            },
+            "espn_46538": {
+              "conceded": 70,
+              "balls": 60
+            },
+            "espn_44932": {
+              "conceded": 48,
+              "balls": 30
+            },
+            "espn_40618": {
+              "conceded": 71,
+              "balls": 60
+            },
+            "espn_44410": {
+              "conceded": 45,
+              "balls": 30
+            }
+          }
+        },
+        {
+          "innings_number": 2,
+          "source_scorecard": {
+            "runs": 250,
+            "wickets": 5,
+            "balls": 201,
+            "penalties": 0,
+            "wides": 2,
+            "noballs": 0,
+            "byes": 0,
+            "legbyes": 5,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_379143": {
+              "runs": 138,
+              "balls": 96
+            },
+            "espn_43906": {
+              "runs": 6,
+              "balls": 9
+            },
+            "espn_44828": {
+              "runs": 55,
+              "balls": 44
+            },
+            "espn_44936": {
+              "runs": 8,
+              "balls": 10
+            },
+            "espn_44932": {
+              "runs": 13,
+              "balls": 21
+            },
+            "espn_318845": {
+              "runs": 19,
+              "balls": 20
+            },
+            "espn_44410": {
+              "runs": 4,
+              "balls": 1
+            },
+            "espn_439952": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_46538": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_393279": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_40618": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_308251": {
+              "conceded": 30,
+              "balls": 30
+            },
+            "espn_461632": {
+              "conceded": 43,
+              "balls": 36
+            },
+            "espn_288992": {
+              "conceded": 56,
+              "balls": 33
+            },
+            "espn_244497": {
+              "conceded": 42,
+              "balls": 36
+            },
+            "espn_8917": {
+              "conceded": 43,
+              "balls": 36
+            },
+            "espn_311158": {
+              "conceded": 31,
+              "balls": 30
+            }
+          }
+        }
+      ],
+      "corrections": []
+    },
+    "913657": {
+      "match_id": "913657",
+      "source_sha256": "510a099640b9da1e105e6f95aded0a5168f1d21b82bf08a8c615b3e72a0c08aa",
+      "raw_scorecard_compressed_sha256": "97790d591fa750332ca4313c23959fa2ca712e36d4a015920a8c714e3010646e",
+      "raw_scorecard_reference": {
+        "archive": "raw_batch_8.tar.gz",
+        "member": "./913657/scorecard.json.gz",
+        "compressed_sha256": "97790d591fa750332ca4313c23959fa2ca712e36d4a015920a8c714e3010646e"
+      },
+      "record_class": "odi",
+      "date": "2016-08-30",
+      "rule": "icc_pre_2017_no_ball_byes",
+      "innings": [
+        {
+          "innings_number": 1,
+          "source_scorecard": {
+            "runs": 444,
+            "wickets": 3,
+            "balls": 300,
+            "penalties": 0,
+            "wides": 3,
+            "noballs": 9,
+            "byes": 6,
+            "legbyes": 8,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_298438": {
+              "runs": 15,
+              "balls": 19
+            },
+            "espn_249866": {
+              "runs": 171,
+              "balls": 122
+            },
+            "espn_303669": {
+              "runs": 85,
+              "balls": 86
+            },
+            "espn_308967": {
+              "runs": 90,
+              "balls": 51
+            },
+            "espn_24598": {
+              "runs": 57,
+              "balls": 27
+            },
+            "espn_311158": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_8917": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_247235": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_244497": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_19264": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_351588": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_290948": {
+              "conceded": 72,
+              "balls": 60
+            },
+            "espn_681305": {
+              "conceded": 74,
+              "balls": 60
+            },
+            "espn_43590": {
+              "conceded": 110,
+              "balls": 60
+            },
+            "espn_348148": {
+              "conceded": 62,
+              "balls": 60
+            },
+            "espn_43685": {
+              "conceded": 48,
+              "balls": 36
+            },
+            "espn_39037": {
+              "conceded": 20,
+              "balls": 6
+            },
+            "espn_42657": {
+              "conceded": 44,
+              "balls": 18
+            }
+          }
+        },
+        {
+          "innings_number": 2,
+          "source_scorecard": {
+            "runs": 275,
+            "wickets": 10,
+            "balls": 256,
+            "penalties": 0,
+            "wides": 5,
+            "noballs": 1,
+            "byes": 4,
+            "legbyes": 2,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_547079": {
+              "runs": 8,
+              "balls": 13
+            },
+            "espn_227762": {
+              "runs": 58,
+              "balls": 30
+            },
+            "espn_39037": {
+              "runs": 13,
+              "balls": 14
+            },
+            "espn_348144": {
+              "runs": 9,
+              "balls": 19
+            },
+            "espn_227760": {
+              "runs": 38,
+              "balls": 43
+            },
+            "espn_42657": {
+              "runs": 1,
+              "balls": 7
+            },
+            "espn_348148": {
+              "runs": 34,
+              "balls": 36
+            },
+            "espn_681305": {
+              "runs": 4,
+              "balls": 13
+            },
+            "espn_43590": {
+              "runs": 14,
+              "balls": 22
+            },
+            "espn_43685": {
+              "runs": 26,
+              "balls": 32
+            },
+            "espn_290948": {
+              "runs": 58,
+              "balls": 28
+            }
+          },
+          "bowlers": {
+            "espn_351588": {
+              "conceded": 75,
+              "balls": 60
+            },
+            "espn_247235": {
+              "conceded": 41,
+              "balls": 34
+            },
+            "espn_19264": {
+              "conceded": 30,
+              "balls": 36
+            },
+            "espn_311158": {
+              "conceded": 14,
+              "balls": 24
+            },
+            "espn_8917": {
+              "conceded": 36,
+              "balls": 42
+            },
+            "espn_244497": {
+              "conceded": 73,
+              "balls": 60
+            }
+          }
+        }
+      ],
+      "corrections": []
+    },
+    "915785": {
+      "match_id": "915785",
+      "source_sha256": "750e6f587c8a6843fe1adaf320d51f9e9c481ea5b6712983c6f35f07365d5069",
+      "raw_scorecard_compressed_sha256": "054c4db7f164153d71eb4d2a47e8d2f8d0a684e28068d4562ac8b79e115dd19a",
+      "raw_scorecard_reference": {
+        "archive": "raw_batch_8.tar.gz",
+        "member": "./915785/scorecard.json.gz",
+        "compressed_sha256": "054c4db7f164153d71eb4d2a47e8d2f8d0a684e28068d4562ac8b79e115dd19a"
+      },
+      "record_class": "t20i",
+      "date": "2015-11-11",
+      "rule": "icc_pre_2017_no_ball_byes",
+      "innings": [
+        {
+          "innings_number": 1,
+          "source_scorecard": {
+            "runs": 162,
+            "wickets": 6,
+            "balls": 120,
+            "penalties": 0,
+            "wides": 7,
+            "noballs": 0,
+            "byes": 0,
+            "legbyes": 6,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_51862": {
+              "runs": 23,
+              "balls": 21
+            },
+            "espn_333066": {
+              "runs": 34,
+              "balls": 25
+            },
+            "espn_52983": {
+              "runs": 1,
+              "balls": 1
+            },
+            "espn_51439": {
+              "runs": 31,
+              "balls": 31
+            },
+            "espn_276298": {
+              "runs": 9,
+              "balls": 9
+            },
+            "espn_52917": {
+              "runs": 34,
+              "balls": 22
+            },
+            "espn_230559": {
+              "runs": 5,
+              "balls": 4
+            },
+            "espn_53115": {
+              "runs": 12,
+              "balls": 7
+            },
+            "espn_230558": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_53191": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_52912": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_49758": {
+              "conceded": 16,
+              "balls": 24
+            },
+            "espn_49535": {
+              "conceded": 22,
+              "balls": 24
+            },
+            "espn_273439": {
+              "conceded": 38,
+              "balls": 18
+            },
+            "espn_552152": {
+              "conceded": 36,
+              "balls": 18
+            },
+            "espn_222354": {
+              "conceded": 17,
+              "balls": 18
+            },
+            "espn_422965": {
+              "conceded": 27,
+              "balls": 18
+            }
+          }
+        },
+        {
+          "innings_number": 2,
+          "source_scorecard": {
+            "runs": 139,
+            "wickets": 10,
+            "balls": 120,
+            "penalties": 0,
+            "wides": 3,
+            "noballs": 2,
+            "byes": 1,
+            "legbyes": 4,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_300631": {
+              "runs": 12,
+              "balls": 11
+            },
+            "espn_48472": {
+              "runs": 52,
+              "balls": 38
+            },
+            "espn_422965": {
+              "runs": 30,
+              "balls": 32
+            },
+            "espn_300628": {
+              "runs": 1,
+              "balls": 2
+            },
+            "espn_49764": {
+              "runs": 5,
+              "balls": 6
+            },
+            "espn_222354": {
+              "runs": 15,
+              "balls": 11
+            },
+            "espn_209457": {
+              "runs": 2,
+              "balls": 3
+            },
+            "espn_273439": {
+              "runs": 3,
+              "balls": 4
+            },
+            "espn_49535": {
+              "runs": 4,
+              "balls": 6
+            },
+            "espn_49758": {
+              "runs": 2,
+              "balls": 4
+            },
+            "espn_552152": {
+              "runs": 3,
+              "balls": 4
+            }
+          },
+          "bowlers": {
+            "espn_230558": {
+              "conceded": 24,
+              "balls": 24
+            },
+            "espn_52912": {
+              "conceded": 20,
+              "balls": 24
+            },
+            "espn_53191": {
+              "conceded": 22,
+              "balls": 12
+            },
+            "espn_230559": {
+              "conceded": 23,
+              "balls": 24
+            },
+            "espn_53115": {
+              "conceded": 17,
+              "balls": 12
+            },
+            "espn_51439": {
+              "conceded": 28,
+              "balls": 24
+            }
+          }
+        }
+      ],
+      "corrections": []
+    },
+    "951355": {
+      "match_id": "951355",
+      "source_sha256": "0769eecefcbf0f672839eba7a8894c9f7da6e9e56a4dfce8c6a05867e897b6ea",
+      "raw_scorecard_compressed_sha256": "320fc258efd8e5ededba809bebce21a05e3d87f50147794a20651939db6f2253",
+      "raw_scorecard_reference": {
+        "archive": "raw_batch_8.tar.gz",
+        "member": "./951355/scorecard.json.gz",
+        "compressed_sha256": "320fc258efd8e5ededba809bebce21a05e3d87f50147794a20651939db6f2253"
+      },
+      "record_class": "t20i",
+      "date": "2016-03-25",
+      "rule": "unresolved",
+      "innings": [
+        {
+          "innings_number": 1,
+          "source_scorecard": {
+            "runs": 193,
+            "wickets": 4,
+            "balls": 120,
+            "penalties": 0,
+            "wides": 5,
+            "noballs": 0,
+            "byes": 0,
+            "legbyes": 8,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_215155": {
+              "runs": 21,
+              "balls": 16
+            },
+            "espn_5334": {
+              "runs": 15,
+              "balls": 16
+            },
+            "espn_219889": {
+              "runs": 9,
+              "balls": 6
+            },
+            "espn_267192": {
+              "runs": 61,
+              "balls": 43
+            },
+            "espn_325026": {
+              "runs": 30,
+              "balls": 18
+            },
+            "espn_8180": {
+              "runs": 44,
+              "balls": 21
+            },
+            "espn_270484": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_6973": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_379504": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_261354": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_288284": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_290948": {
+              "conceded": 39,
+              "balls": 24
+            },
+            "espn_41324": {
+              "conceded": 53,
+              "balls": 24
+            },
+            "espn_43590": {
+              "conceded": 35,
+              "balls": 24
+            },
+            "espn_42639": {
+              "conceded": 27,
+              "balls": 24
+            },
+            "espn_227758": {
+              "conceded": 31,
+              "balls": 24
+            }
+          }
+        },
+        {
+          "innings_number": 2,
+          "source_scorecard": {
+            "runs": 172,
+            "wickets": 8,
+            "balls": 120,
+            "penalties": 0,
+            "wides": 1,
+            "noballs": 0,
+            "byes": 1,
+            "legbyes": 1,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_227762": {
+              "runs": 30,
+              "balls": 19
+            },
+            "espn_259410": {
+              "runs": 1,
+              "balls": 6
+            },
+            "espn_41046": {
+              "runs": 46,
+              "balls": 41
+            },
+            "espn_317273": {
+              "runs": 32,
+              "balls": 20
+            },
+            "espn_42639": {
+              "runs": 14,
+              "balls": 7
+            },
+            "espn_42657": {
+              "runs": 40,
+              "balls": 20
+            },
+            "espn_227758": {
+              "runs": 0,
+              "balls": 1
+            },
+            "espn_227760": {
+              "runs": 2,
+              "balls": 3
+            },
+            "espn_43590": {
+              "runs": 0,
+              "balls": 1
+            },
+            "espn_41324": {
+              "runs": 4,
+              "balls": 2
+            },
+            "espn_290948": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_288284": {
+              "conceded": 26,
+              "balls": 24
+            },
+            "espn_261354": {
+              "conceded": 45,
+              "balls": 24
+            },
+            "espn_270484": {
+              "conceded": 27,
+              "balls": 24
+            },
+            "espn_8180": {
+              "conceded": 27,
+              "balls": 12
+            },
+            "espn_379504": {
+              "conceded": 32,
+              "balls": 24
+            },
+            "espn_325026": {
+              "conceded": 13,
+              "balls": 12
+            }
+          }
+        }
+      ],
+      "corrections": []
+    },
+    "966747": {
+      "match_id": "966747",
+      "source_sha256": "d9d4fcd87f6642e5c43c69d9f7b8ce80db30e3126bbc2ec49c163ebad4e26b73",
+      "raw_scorecard_compressed_sha256": "d5a89dcff920efaf2aaac5d113c941fb57f9fcb85c1f86b0129cca16342b6f7c",
+      "raw_scorecard_reference": {
+        "archive": "raw_batch_8.tar.gz",
+        "member": "./966747/scorecard.json.gz",
+        "compressed_sha256": "d5a89dcff920efaf2aaac5d113c941fb57f9fcb85c1f86b0129cca16342b6f7c"
+      },
+      "record_class": "t20i",
+      "date": "2016-02-25",
+      "rule": "icc_pre_2017_no_ball_byes",
+      "innings": [
+        {
+          "innings_number": 1,
+          "source_scorecard": {
+            "runs": 129,
+            "wickets": 8,
+            "balls": 120,
+            "penalties": 0,
+            "wides": 4,
+            "noballs": 0,
+            "byes": 0,
+            "legbyes": 1,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_300628": {
+              "runs": 50,
+              "balls": 39
+            },
+            "espn_48472": {
+              "runs": 27,
+              "balls": 28
+            },
+            "espn_222354": {
+              "runs": 6,
+              "balls": 7
+            },
+            "espn_437316": {
+              "runs": 5,
+              "balls": 11
+            },
+            "espn_49764": {
+              "runs": 8,
+              "balls": 9
+            },
+            "espn_422965": {
+              "runs": 10,
+              "balls": 7
+            },
+            "espn_209457": {
+              "runs": 10,
+              "balls": 11
+            },
+            "espn_49535": {
+              "runs": 7,
+              "balls": 7
+            },
+            "espn_552152": {
+              "runs": 1,
+              "balls": 1
+            },
+            "espn_49178": {
+              "runs": null,
+              "balls": null
+            },
+            "espn_49758": {
+              "runs": null,
+              "balls": null
+            }
+          },
+          "bowlers": {
+            "espn_533862": {
+              "conceded": 27,
+              "balls": 24
+            },
+            "espn_941959": {
+              "conceded": 18,
+              "balls": 12
+            },
+            "espn_25613": {
+              "conceded": 25,
+              "balls": 24
+            },
+            "espn_738445": {
+              "conceded": 27,
+              "balls": 18
+            },
+            "espn_245490": {
+              "conceded": 14,
+              "balls": 24
+            },
+            "espn_307808": {
+              "conceded": 17,
+              "balls": 18
+            }
+          }
+        },
+        {
+          "innings_number": 2,
+          "source_scorecard": {
+            "runs": 115,
+            "wickets": 9,
+            "balls": 120,
+            "penalties": 0,
+            "wides": 6,
+            "noballs": 7,
+            "byes": 1,
+            "legbyes": 2,
+            "timed_out": 0
+          },
+          "batters": {
+            "espn_307808": {
+              "runs": 0,
+              "balls": 1
+            },
+            "espn_943295": {
+              "runs": 7,
+              "balls": 11
+            },
+            "espn_738445": {
+              "runs": 1,
+              "balls": 2
+            },
+            "espn_974719": {
+              "runs": 6,
+              "balls": 9
+            },
+            "espn_43121": {
+              "runs": 13,
+              "balls": 15
+            },
+            "espn_447458": {
+              "runs": 37,
+              "balls": 36
+            },
+            "espn_779973": {
+              "runs": 1,
+              "balls": 9
+            },
+            "espn_25613": {
+              "runs": 13,
+              "balls": 18
+            },
+            "espn_533862": {
+              "runs": 10,
+              "balls": 10
+            },
+            "espn_245490": {
+              "runs": 9,
+              "balls": 8
+            },
+            "espn_941959": {
+              "runs": 2,
+              "balls": 4
+            }
+          },
+          "bowlers": {
+            "espn_49758": {
+              "conceded": 26,
+              "balls": 24
+            },
+            "espn_49535": {
+              "conceded": 10,
+              "balls": 24
+            },
+            "espn_49764": {
+              "conceded": 24,
+              "balls": 22
+            },
+            "espn_49178": {
+              "conceded": 22,
+              "balls": 24
+            },
+            "espn_552152": {
+              "conceded": 22,
+              "balls": 20
+            },
+            "espn_222354": {
+              "conceded": 8,
+              "balls": 6
+            }
+          }
+        }
+      ],
+      "corrections": []
+    }
+  }
+}

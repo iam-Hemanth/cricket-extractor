@@ -1,0 +1,2 @@
+# Existing backend driver; use Python 3.11+ and PostgreSQL 18.
+psycopg2-binary==2.9.10

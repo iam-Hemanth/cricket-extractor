@@ -1,9 +1,90 @@
 # CricStats database build and six-hour ingestion guide
 
-This guide explains the measured local database built from a pinned Cricket
-Extractor data snapshot, and the work required before future extracts can flow
-into it every six hours. It is a handoff for the next coding session. The schedule
-and incremental-ingestion path below are a design, not a currently running job.
+The repository contains a portable builder and the final compact-schema code for
+reproducing the frozen verified snapshot. A hash-pinned release provides the input
+files, so another agent does not need the original workstation or sibling checkout.
+"Complete" here means all 5,215 verified matches, 2,686,884 deliveries, the 18
+separate review holds and all ten final materialized summaries. It does not turn
+held matches into accepted facts or mean the entire unfiltered lake.
+
+The new standalone rebuild passed at **475,559,615 bytes (475.56 decimal MB)**
+with all ten final summaries; see [the fresh verification report](database/REBUILD_VERIFICATION.md).
+
+## Start here: reproduce the verified database
+
+Supported environment: Linux/macOS (or Linux in WSL), Python 3.11+, PostgreSQL 18
+server/client binaries, network access to the public snapshot release, and at least
+10 GB free working disk. The database-size limit is not the size of the PostgreSQL
+installation, staging CSVs, source files, WAL or exported dump combined.
+
+```sh
+git clone https://github.com/iam-Hemanth/cricket-extractor.git
+cd cricket-extractor
+python3.12 -m venv .venv
+. .venv/bin/activate
+python -m pip install -r requirements-database.txt
+
+# Resolve the OS temporary directory (macOS /tmp is a symlink).
+task_tmp=$(python -c "import pathlib,tempfile; print(pathlib.Path(tempfile.gettempdir()).resolve())")
+
+# Both output paths must be NEW. The artifact is about 119 MB compressed;
+# the three authenticated input files expand to about 1.67 GB.
+python database/rebuild.py fetch --output "$task_tmp/cricstats-input-v1"
+python database/rebuild.py build \
+  --payload-dir "$task_tmp/cricstats-input-v1" \
+  --work-dir "$task_tmp/cricstats-db-v1" \
+  --pg-bin "$(pg_config --bindir)" \
+  --export-dump
+```
+
+Use `python3` instead of `python3.12` if that interpreter is already version 3.11+.
+If `pg_config` does not point at PostgreSQL 18, provide its actual `bin` directory
+explicitly, for example `/Library/PostgreSQL/18/bin` on the original Mac. Install
+PostgreSQL before running the commands. Run as an ordinary OS user, not root.
+
+The build creates only a new user-private, socket-only PostgreSQL cluster. It
+verifies input and implementation hashes, imports the complete compact base,
+checks every source relation/delivery, installs all ten FINAL summary families,
+rebuilds their existing B-tree indexes with snapshot packing,
+runs the independent summary oracles and checks populated views/indexes. It refuses
+to overwrite an existing work directory and never reads `.env` or `DATABASE_URL`.
+
+The size preference is **below 480,000,000 bytes**. The hard success gate is
+**strictly below 481,000,000 bytes**, including all ten materializations/indexes.
+A larger build must fail the handoff; do not delete data or omit a summary to pass.
+Physical size varies with PostgreSQL environment; the guard measures the actual
+build instead of promising byte-identical storage on every machine.
+
+Outputs inside `$task_tmp/cricstats-db-v1` (the resolved temporary directory):
+
+- `build-report.json`: `status=passed` only after the source/native/summary checks
+  and hard size gate pass; `all_ten_populated=true`; `source_full_ready=false`
+  remains explicit because the 18 holds are still not admitted.
+- `database.dump` with `--export-dump`: PostgreSQL custom-format dump containing
+  the compact schema, original source documents, holds and final summaries.
+- `data/`, `socket/`, `full.json`: the local cluster and private descriptor.
+- `base-verification.json`, import/staging receipt and PostgreSQL logs.
+
+The builder stops its new server on completion by default. Keep the verified data
+files for reuse. To inspect the local database, run:
+
+```sh
+python database/rebuild.py start --work-dir "$task_tmp/cricstats-db-v1"
+# Prints socket, port and database name for psql / another local client.
+python database/rebuild.py stop --work-dir "$task_tmp/cricstats-db-v1"
+```
+
+Use `--leave-running` during build if a running server is desired after a successful
+proof. A failed build is stopped and retained for diagnosis; a retry uses a new
+work directory. Never point these proof descriptors at hosted Supabase.
+
+`database/snapshot-lock.json` pins the archive, each input file, source manifest,
+and 33 backend implementation files. `fetch --archive /path/to/archive.tar.gz`
+supports an already downloaded copy with the same checks. If any hash differs,
+stop; don't edit the lock merely to suppress an error.
+
+See `database/REBUILD_VERIFICATION.md` for the independent fresh-build evidence and
+scope. Six-hour incremental updates remain a separate design later in this guide.
 
 ## The short version
 
@@ -13,7 +94,7 @@ that snapshot, maps it into relational records, stores ball deliveries compactly
 and calculates ten query summaries. The import is checked against source hashes
 before it is treated as a valid database.
 
-The final local measurement was **480,573,119 bytes (480.6 decimal MB)**, including
+The historical final local measurement was **480,573,119 bytes (480.6 decimal MB)**, including
 all ten materialized summaries. This was a private local PostgreSQL 18 database,
 not a hosted Supabase database or a production migration. Its snapshot contained
 5,215 matches, 2,686,884 deliveries and 18 separately retained source holds. The
@@ -36,7 +117,7 @@ In `cricket-extractor`, the pipeline is:
    match or changed policy creates a new snapshot; it must not silently alter the
    evidence for an earlier import.
 
-Use `prepare_curated_launch.py` for a product-ready subset. The generic lake
+Use `prepare_curated_launch.py` for the source-backed curated selection. The generic lake
 consolidator inventories/combines records; it is not the authority for curated
 admission. The builder refuses an existing output folder so stale records from a
 prior run cannot accidentally survive into a new archive.
@@ -47,7 +128,8 @@ manifest and selection report before importing.
 
 ### 2. Project source JSON into database records
 
-In the sibling `cricket-stats` repository, the source adapter checks the expected
+The source adapter (originally from `cricket-stats`, now bundled under
+`database/engine/`) checks the expected
 match contract, participant identities, source hashes and cricket-specific facts.
 The compact importer consumes a pinned manifest and a newline-delimited match
 payload; it verifies that every expected ID is present exactly once and that the
@@ -82,31 +164,13 @@ newer or larger lake ZIP. A new snapshot needs its own reviewed selection receip
 adapter verification and manifest; don't bypass the pinned checks to force it
 through the old importer.
 
-Historical proof command shape (all paths below are private local inputs; this
-imports only into a fresh guarded proof database and does not create the ten views):
+Use the `database/rebuild.py fetch` and `build` commands at the top of this
+guide. Older backend reports used `scripts/compact_database_proof.py`; that
+historical CLI is not needed or included in this standalone package. The frozen
+source adapter is bundled for provenance and verification dependencies, not as
+a general admission tool for arbitrary new lake records.
 
-```sh
-python scripts/verify_source_adapter.py \
-  --selection-report <pinned-selection-report.json> \
-  --input-dir <curated-match-json-dir> \
-  --people-csv <identity-registry.csv> \
-  --output-dir <fresh-adapter-output>
-
-python scripts/compact_database_proof.py import \
-  --descriptor <private-database-descriptor.json> \
-  --manifest <verified-subset-manifest.json> \
-  --payload-dir <verified-payload-dir> \
-  --staging <new-private-staging-dir>
-
-python scripts/compact_database_proof.py verify \
-  --descriptor <private-database-descriptor.json> \
-  --manifest <verified-subset-manifest.json> \
-  --payload-dir <verified-payload-dir> \
-  --report <verification-report.json>
-```
-
-The commands are historical proof entry points, not a ready six-hour job. In
-particular, do not place descriptor contents or credentials in the repository or
+Never place descriptor contents or credentials in the repository, and never
 pass the proof descriptor to a hosted production database.
 
 The fresh proof importer intentionally refuses to load into a populated database.
@@ -131,39 +195,44 @@ families and their helper indexes:
 10. Stat card candidates
 
 The participant compatibility output is reconstructed with a join; it did not
-replace one of the ten summaries. Verification checked the imported source rows,
-delivery round trips, participant versions, source documents, holds and the result
-rows from every summary. The report records 17 valid helper indexes.
+replace one of the ten summaries. Verification checks the imported source rows,
+delivery round trips, participant versions, source documents and holds. Summary
+oracles compare all player, matchup, opposition, team, venue and default-card rows;
+partnership checks compare whole-family run/ball totals plus independent stint
+segmentation on six real matches and representative profile reads. Each final installer authenticates its own required indexes; the builder also rejects invalid or unready indexes across the compact and final read schemas. The 17-index count in the older all-ten storage report belongs to that earlier experiment.
 
-### Can another agent rebuild the final database from this guide and raw data?
+### Reproduction package and final summary definitions
 
-**Not reliably yet.** A guide plus an arbitrary raw lake dump is insufficient to
-reproduce an equivalent, correctly verified 480.6 MB database:
+The earlier guide incorrectly treated the old all-ten cache experiment as the only
+available builder. The final guarded installers do exist in the backend code and
+are now bundled unchanged under `database/engine/`:
 
-- The proof adapter and importer are pinned to one frozen source-selection receipt,
-  one subset-manifest hash and specific converter/code hashes. The exact receipt,
-  manifest and `matches.jsonl`/`checks.jsonl`/`identity-crosswalk.json` payload used
-  for that proof are not checked into this extractor repository. A newer curated ZIP
-  is not interchangeable with them.
-- `compact_database_proof.py` can import and verify the compact base in a fresh,
-  explicitly marked database. It refuses a populated target and does not create the
-  ten summaries.
-- The ten-view size experiment used a local `.omx` prototype builder that is ignored
-  by Git. Its own report marks it `prototype_only` and says full consumer API
-  semantic parity was **not** proven. The tracked `db/materialized_views.sql` is
-  the legacy definitions; those are not a verified replacement for all current
-  consumer queries on the compact schema. The generic `db/create_views.py` reads
-  `.env`, so it must not be run blindly against an ordinary database.
-- PostgreSQL page packing and maintenance can make byte size differ across rebuilds.
-  Reproduction should target verified contents and a measured safe budget, not a
-  promise of the identical 480,573,119-byte physical size.
+1. `db.player_summary.install_player_summaries`: batting and bowling.
+2. `db.matchup_read.install_matchup_summaries`: directional matchup counters.
+3. `db.partnership_read.install_partnership_summaries`: observed partnership stints.
+4. `db.opposition_read.install_opposition_summaries`: player versus team.
+5. `db.team_summary.install_team_summaries`: team pair, seasons, recent matches,
+   venues and stat cards.
 
-To close this gap, a future build must bundle or regenerate a versioned source
-receipt and every hash-pinned payload, provide a portable fresh-database builder,
-implement and test all ten compact-summary definitions against the intended page
-and Stat Builder answers, and run an independent parity/size/refresh proof on a
-fresh isolated PostgreSQL 18 target. Record both steady size and refresh peak. The
-hosted database and six-hour writer remain separate gates.
+The orchestration installs and commits each group in dependency order, then runs
+four independent oracle suites covering all ten final materializations. These use
+source counters/direct calculations and observed partnership segmentation, not only
+checks of view names or sizes. The final homepage materialization has four default
+cards; scoped card candidates remain views. This differs from the older experiment's
+9,299 candidate-card rows and 433-row venue grain.
+
+The public frozen input archive resolves the old missing-payload problem without
+removing the trusted receipt/code/payload guards. The exact original source
+manifest remains byte-identical; its historical informational local path is not
+used to locate inputs. CLI paths supply the authenticated downloaded files.
+A newer lake ZIP is still not interchangeable with this frozen input package.
+
+Do not run legacy `db/materialized_views.sql`, the dotenv-backed `create_views.py`,
+or ignored `.omx` experiment scripts. The correct final SQL files are the bundled
+`player_summary.sql`, `matchup_summary.sql`, `partnership_summary.sql`,
+`opposition_summary.sql` and `team_summary.sql`. No second repository is required
+for the frozen rebuild. The package preserves backend commit 02394689 code bytes;
+its source inventory and snapshot lock make changes visible.
 
 ## Why it took several attempts to reach the final size
 
@@ -180,7 +249,8 @@ they are not one continuous subtraction where each line can be added to the next
 | Narrow selected summary counters | 470,496,959 bytes (470.5 MB) | Used smaller integer storage only after checking every current value fit, then compared answers exactly. No rounding or row removal. |
 | Refresh and verify all ten summaries | 471,258,815 bytes (471.3 MB) | All ten summaries were populated again and their answers/indexes checked. This was still a storage experiment, not the final integrated database. |
 | Fresh compact-store base import | 444,085,951 bytes (444.1 MB) | Later compact schema/import proof, measured before the ten consumer summaries were included. |
-| Final integrated local backend database | 480,573,119 bytes (480.6 MB) | Later private PostgreSQL measurement with all ten materialized summary families and the read service. This is the final size quoted in this guide. |
+| Historical integrated local backend database | 480,573,119 bytes (480.6 MB) | Later private PostgreSQL measurement with all ten materialized summary families and the read service. Historical integrated measurement before the new portable rebuild. |
+| New portable rebuild with all existing B-tree indexes packed | 475,559,615 bytes (475.56 MB) | Independently rebuilt from the packaged archive on PostgreSQL 18.3; all ten final summaries and all 53 existing B-tree indexes retained and verified. |
 
 Two choices saved most space without removing current facts: encode each delivery in
 a small versioned block and dictionary-encode repeated categories; store identical
@@ -193,8 +263,26 @@ fail safely if a value outgrows those bounds.
 The early 469.9 MB prototype and 471.3 MB all-ten experiment are useful proof, but
 they are not the final integrated 480.6 MB database. Physical packing, the later
 fresh schema/import path and the integration stage differ. Use the exact final byte
-count above rather than presenting all experiments as one linear result. The final
-recorded size is **480.6 decimal MB (480,573,119 bytes)**, not 480.3 MB.
+count above rather than presenting all experiments as one linear result. The historical
+recorded size is **480.6 decimal MB (480,573,119 bytes)**, not 480.3 MB. The new
+portable build measurement is recorded separately in `database/REBUILD_VERIFICATION.md`.
+
+### Final snapshot index packing
+
+The portable builder additionally rebuilds every existing B-tree index in the
+compact and five read schemas with `fillfactor=100`. This packs the existing
+index entries more tightly; it removes no source rows, columns, indexes,
+constraints or materialized summaries. Index names and query keys stay intact.
+The original schema/codec files remain hash-pinned and unchanged; this explicit
+physical-storage step runs after installation, before independent answer checks.
+
+This is appropriate for the immutable frozen rebuild. Future incremental writes
+may split packed index pages and increase storage; refreshes also need working
+space. Do not infer ingestion headroom from this steady-state snapshot size.
+The builder measures `pg_database_size(current_database())` through a fresh
+connection after temporary verification sessions close and fails at 481 MB or
+above. The user subsequently accepted approximately 483 MB, but the builder keeps
+the stricter 481 MB ceiling and below-480 MB preference to retain more room.
 
 ## Outlier handling and what the quality figures mean
 
@@ -292,28 +380,27 @@ round or silently wrap a value. For the space target, the measured high-volume
 delivery encoding and sharing repeated profile versions mattered more than changing
 small metadata columns.
 
-## Current capacity warning
+## Current capacity and reproducibility scope
 
-The working limit has been 485 MB. At 480.6 MB, the final database has only about
-4.4 MB of steady space below that limit. A prior all-ten refresh test briefly
-measured 484.8 MB on an unchanged snapshot. That means the apparent spare space
-does not establish safe room for 15–20 MB of new matches, correction imports or
-refresh work. The local measurements also do not prove how Supabase counts its
-storage, WAL or temporary files.
+The historical final database was 480,573,119 bytes (480.6 decimal MB). The new
+rebuild has an enforced limit strictly below 481 MB and a preferred target below
+480 MB; see the fresh-build evidence for its actual measurement. A rebuild over
+the hard limit fails instead of claiming success. Every verified match and all ten
+final summaries are required regardless of size.
 
-**Do not turn on automatic ingestion at the current size.** First reduce or raise
-the usable database capacity, then measure a representative import, correction,
-all-ten refresh and rollback on the actual hosting plan. The 485 MB figure is the
-project's chosen operating ceiling, not a guarantee from the provider.
+This snapshot test is not an ingestion-growth or hosted quota guarantee. A prior
+refresh experiment peaked near 484.8 MB; WAL, sort temporary files and hosted
+provider quota accounting require separate measurements. Do not enable automatic
+updates or assume 15–20 MB growth capacity based on the frozen rebuild passing.
+The existing preferred size is not a promise for a larger future dataset.
 
 ## What exists today, and what does not
 
-As of 15 October 2026, all three GitHub Actions workflows in `cricket-extractor`
+As of 16 October 2026, all three GitHub Actions workflows in `cricket-extractor`
 and all three in `cricket-lake-unfiltered` use manual `workflow_dispatch` triggers.
 There is no six-hour scheduled workflow in either repository.
 
-The CricStats service currently serves read requests. Its compact proof importer
-is a guarded fresh-database importer. A production incremental writer, correction
+The frozen builder now runs the guarded fresh importer and final summaries from this repository. The CricStats service currently serves read requests. The importer remains a guarded fresh-database importer. A production incremental writer, correction
 publication, hosted scheduling, safe refresh of one coherent generation across
 all ten summaries, and tested hosted recovery are still required. Adding a cron
 line alone would not safely ingest data.
@@ -377,37 +464,60 @@ scheduled discovery and extraction
   duplicate retry, a failed/held record and a refresh interruption before enabling
   the schedule.
 
-## Handoff map
+## Extract or reparse newer data
 
-`cricket-extractor` owns source discovery, extraction, parsing, curation and the
-immutable delta manifest. The sibling `cricket-stats` repository owns source
-adaptation, the compact PostgreSQL schema/importer, query summaries and the API.
-The extractor must not connect directly to the database. The boundary between the
-repositories is the versioned, hash-checked run package and a private authenticated
-handoff.
+The frozen rebuild above is the reproducible size baseline. New extraction remains
+available in the root repository and produces a new candidate snapshot:
 
-Useful files in `cricket-extractor`:
+```sh
+python -m pip install -r requirements.txt
+python extract.py --match-ids <comma-separated-source-ids> \
+  --raw-dir data/raw --output-dir data/matches
 
-- `CRICKET_EXTRACTOR_CONTEXT.md` — extraction and lake commands.
-- `CURATED_LAUNCH_ADMISSION.md` — scope rules and current frozen-corpus accounting.
-- `prepare_curated_launch.py` — offline source-backed curated builder.
-- `.github/workflows/reparse_and_consolidate.yml` — current manual reparse/build flow.
-- `.github/workflows/parallel_extract.yml` and `batch_extract.yml` — current manual
-  extraction flows.
+# Or reparse archived raw responses entirely offline into a fresh directory.
+python reparse.py --raw-dir <raw-match-directories> \
+  --output-dir <new-candidate-directory> --strict --verify-determinism
 
-Useful code in sibling `cricket-stats`:
+# Use a fresh output directory and scorecard archives as source authority.
+python prepare_curated_launch.py \
+  --input-dir <candidate-directory> \
+  --raw-archives <directory-containing-raw_batch_archives> \
+  --output-dir <new-curated-output-directory>
+```
 
-- `ingestion/source_adapter.py` and `ingestion/source_store.py` — source projection
-  and pinned import payload checks.
-- `ingestion/compact_codec.py`, `ingestion/compact_store.py`,
-  `db/compact_schema.sql` and `db/compact_verify.py` — compact fresh import and
-  proof. Do not reuse the fresh importer as an incremental updater.
-- `db/materialized_views.sql` — consumer summary definitions.
-- `api/backend.py` and `db/runtime_connection.py` — current read-service boundary.
+Angle-bracket paths/IDs above are placeholders to be filled by the agent. Existing
+manual batch/parallel workflows can collect the full checked-in manifest; inspect
+`extract.py --help` and those workflows for batch ranges. Network extraction uses
+the repository's existing secret configuration; never put its values in this guide
+or the data archive. `reparse.py --strict` returns nonzero for held/failed candidates;
+inspect `failed_matches.json` rather than changing rules to make the exit green.
 
-The measured evidence lives in the sibling repository's
-`docs/revamp/D3_COMPACT_STORE_REPORT.md`,
-`docs/revamp/D3_ALL_MATERIALIZED_STORAGE_REPORT.md` and
-`docs/revamp/BACKEND_SERVICE_REPORT.md`. Treat their reported counts and byte sizes
-as snapshot-specific proof, not as a claim that six-hour ingestion or hosted
-refresh has already been implemented.
+New source receipts, per-match hashes, changed code or a larger universe must go
+through a new versioned snapshot admission and payload proof before becoming a new
+rebuild lock. Do not point newer JSONs at the frozen builder, change trusted hashes
+blindly, or silently fill the 18 reviewed-out matches. A future six-hour writer
+must implement the transactional/publication contract above; it is not activated
+by this handoff.
+
+## Handoff files
+
+The agent needs this repository and this guide. The builder downloads the frozen
+input release, or accepts its already downloaded archive. It does not need the
+original workstation, a private `.omx` directory or a sibling repo.
+
+- `database/rebuild.py`: fetch, build, start and stop CLI.
+- `database/snapshot-lock.json`: exact source, archive and implementation hashes,
+  expected 5,215 matches / 2,686,884 deliveries / 18 holds and size limits.
+- `database/snapshots/verified-subset-manifest.json`: original immutable import authority.
+- `database/engine/`: byte-preserved backend modules and five final SQL groups.
+- `requirements-database.txt`: the existing PostgreSQL driver used by the builder.
+- `database/tests/test_rebuild.py`: meaningful archive, target and budget guards.
+- `database/REBUILD_VERIFICATION.md`: fresh full-data reconstruction evidence.
+- `CRICKET_EXTRACTOR_CONTEXT.md`, `CURATED_LAUNCH_ADMISSION.md`, repair reports and
+  root `extract.py`/`reparse.py`/`prepare_curated_launch.py`: source collection and
+  candidate curation.
+
+Historical storage measurements in this guide come from the original CricStats
+compact-store/all-ten/backend service reports. The new reproducibility report must
+identify the exact package and build actually checked, rather than treating those
+historical reports alone as a new end-to-end test.
