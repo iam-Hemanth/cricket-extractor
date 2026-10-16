@@ -174,6 +174,51 @@ fresh schema/import path and the integration stage differ. Use the exact final b
 count above rather than presenting all experiments as one linear result. The final
 recorded size is **480.6 decimal MB (480,573,119 bytes)**, not 480.3 MB.
 
+## Outlier handling and what the quality figures mean
+
+The compact database size proof and the parser's cricket-data quality claims are
+separate results. The database snapshot retains its own source documents and holds;
+it does not prove the entire 16,456-match lake was repaired or rechecked.
+
+| Outlier | Recorded handling | When it must stay unresolved |
+| --- | --- | --- |
+| The Hundred's 100-ball innings and five-ball sets | Keep `playing_format=hundred_ball`, source set/ball markers, actual legal-ball clocks and scorecard quota separately. Apply season-pinned rules; Super Five remains its own innings type. | Missing/conflicting markers, unexpected legal-ball counts, impossible sequence or source-clock mismatch fails construction or remains held. Never pad, trim or turn five-ball sets into six-ball overs. |
+| Unallocated five-run penalty | The parser can detect a +5 difference between source running score and the delivery result. Store the adjustment as a penalty, not as invented batter runs. Later checks require it to reconcile with source innings totals and ball coverage. | If the score jump is not source-supported, would double-count an existing penalty, or breaks the final total, it needs review. |
+| Season-specific Hundred no-ball penalty | Use the matching rule pack (2021–2025 records two penalty runs; 2026 records one) and preserve the source value and rule/version. Four evidenced historical components were normalized without changing team totals. | Unknown season/rule or contradictory source evidence remains unverified; do not apply one season's value to every Hundred match. |
+| Batter timed out | Compare scorecard dismissals with delivery-attached dismissals. Keep any remaining source-only timed-out count as a separate dismissal event; it contributes a team wicket without a synthetic ball or bowler credit. | If event counts conflict or the source does not identify a batter/timing, retain the unknowns rather than invent an actor or delivery. |
+| Byes/legbyes/extras mismatch | Check each component and the total independently. Keep observed source values separate from statistical attribution. Only hash-pinned historical no-ball/bye cases may move byes/legbyes into the statistical no-ball bucket; total runs, total extras and legal-ball status must stay unchanged. | Any unmatched or unexplained component remains a source-review/hold; do not redistribute an aggregate score to make it balance. |
+| Duplicate dismissals, malformed ball labels, substitutions and identities | Deduplicate only evidenced duplicate events; normalize a malformed marker only when independent over/ball/sequence fields agree. Keep original XI, replacements and participation events separate, and preserve explicit aliases. | Conflicting identities, roster facts, unsupported event types or missing timing stays unknown/held. The reviewed concussion example did not contain event metadata, so no concussion event was fabricated. |
+
+The detailed rules and tests are in [DATA_INTEGRITY_REPAIR.md](DATA_INTEGRITY_REPAIR.md),
+[HUNDRED_RULES_REPAIR.md](HUNDRED_RULES_REPAIR.md),
+[CLASSIFICATION_COVERAGE_REPAIR.md](CLASSIFICATION_COVERAGE_REPAIR.md) and
+[CURATED_LAUNCH_ADMISSION.md](CURATED_LAUNCH_ADMISSION.md). These describe candidate
+repairs and frozen-snapshot checks; the classification report says the published
+full-lake release was not rebuilt or re-certified by those local repairs.
+
+### Keep coverage and accuracy separate
+
+The checked notes contain several different historical numbers:
+
+- The extractor's 6 October timeline reports 5,483 valid matches and 99.56%
+  coverage for that consolidation run.
+- The [unfiltered-lake context](https://github.com/iam-Hemanth/cricket-lake-unfiltered/blob/main/CRICKET_LAKE_UNFILTERED_CONTEXT.md)
+  reports 16,456 valid matches and 53 unreconciled edge cases, and labels the
+  snapshot 99.68% "factual perfection." That is a
+  historical self-reported claim, not a fresh independent audit; the same context
+  warns that subsequent local repairs were not applied to the published snapshot.
+- The 8 October curated admission lists 5,527 source IDs: 5,233 selected, 132 held
+  and 162 excluded. The database proof's 5,215 match records plus 18 holds are a
+  separate pinned database snapshot, not a new count of all missing fixtures.
+
+I found **no saved source manifest supporting "only 15 matches missing."** The
+reported 53 edge cases are not interchangeable with missing matches, held records
+or an incomplete ball-level statistic. To publish a missing-match number, first
+name the exact population (dates, formats, competitions and gender), then reconcile
+every expected ID to selected, held, excluded or genuinely absent. Do not label
+99.56% coverage or the 99.68% historical claim as a current certification until the
+full source snapshot is replayed and independently checked.
+
 ## Schema types that mattered
 
 The storage win did **not** come from changing every column to the smallest type.
