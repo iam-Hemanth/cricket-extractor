@@ -41,6 +41,8 @@ Use `python3` instead of `python3.12` if that interpreter is already version 3.1
 If `pg_config` does not point at PostgreSQL 18, provide its actual `bin` directory
 explicitly, for example `/Library/PostgreSQL/18/bin` on the original Mac. Install
 PostgreSQL before running the commands. Run as an ordinary OS user, not root.
+The frozen snapshot download needs no API credentials. The downloader uses Python
+TLS trust or the OS certificate bundle if framework Python has none configured.
 
 The build creates only a new user-private, socket-only PostgreSQL cluster. It
 verifies input and implementation hashes, imports the complete compact base,

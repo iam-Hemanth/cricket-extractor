@@ -12,7 +12,7 @@
   "manifest_sha256": "50a20f4303c8803da3258dbce166842ac2bd9d4f7c4d33c06d931b0adfe72afe",
   "backend_commit": "0239468942e8f179c4f4c67d13322412b748637b",
   "package_sha256": {
-    "database/rebuild.py": "9f7326b266953fb1c568edf7c0df5f93ea448d663f6fe3b2046c327d16d216eb",
+    "database/rebuild.py": "04dd3a5f2e7f0d54ffb54b59c270bf002a558280be43f005d2af53bd1d2db2fd",
     "database/snapshot-lock.json": "8728a54c8929f6d6a13cd3e71bcefe158bb920593ed1c1e63de879339d40a930",
     "requirements-database.txt": "e79aa12d2d74680fa349c82fe4259943bc00d8b222a94322447f892cf0318e34"
   },
@@ -110,5 +110,19 @@
     "Local PostgreSQL database size; excludes source/staging files, WAL and provider-specific quota accounting.",
     "No automatic six-hour incremental writer, hosted migration or future growth/refresh headroom proof.",
     "Partnerships: whole-family counters and six real segmentation controls; not an independent per-row replay of every partnership."
-  ]
+  ],
+  "full_build_commit": "97712eec61f79501ee8cb7d58de5ed744d4ac141",
+  "full_build_builder_sha256": "9f7326b266953fb1c568edf7c0df5f93ea448d663f6fe3b2046c327d16d216eb",
+  "post_build_download_fix": {
+    "change": "Use trusted OS CA bundles when framework Python has no configured trust store; TLS peer and hostname verification stay enabled.",
+    "database_build_functions_unchanged": true,
+    "checked_by": "AST comparison of every existing function against full-build commit; only fetch_payload changed."
+  },
+  "public_download_verification": {
+    "url": "https://github.com/iam-Hemanth/cricket-extractor/releases/download/database-snapshot-20261008-v1/verified-curated-20261008-v1.tar.gz",
+    "anonymous": true,
+    "all_archive_and_payload_hashes_verified": true,
+    "tls_peer_and_hostname_verification_enabled": true
+  },
+  "guard_tests_passed": 11
 }

@@ -2,7 +2,9 @@ import hashlib
 import importlib.util
 import io
 from pathlib import Path
+import ssl
 import tarfile
+from types import SimpleNamespace
 import tempfile
 import unittest
 from unittest import mock
@@ -83,6 +85,25 @@ class ArchiveGuards(unittest.TestCase):
                 with self.assertRaises(FileExistsError):
                     rebuild.fetch_payload(root / 'out')
             self.assertEqual(temporary.read_text(), 'keep')
+
+    def test_empty_python_ca_store_uses_system_bundle(self):
+        context = mock.Mock()
+        context.get_ca_certs.return_value = []
+        with mock.patch.object(rebuild.ssl, 'create_default_context', return_value=context), mock.patch.object(rebuild.ssl, 'get_default_verify_paths', return_value=SimpleNamespace(capath=None)), mock.patch.object(Path, 'is_file', return_value=True):
+            self.assertIs(rebuild.download_context(), context)
+        context.load_verify_locations.assert_called_once_with(cafile='/etc/ssl/cert.pem')
+
+    def test_existing_python_trust_store_is_retained(self):
+        context = mock.Mock()
+        context.get_ca_certs.return_value = ['existing-certificate']
+        with mock.patch.object(rebuild.ssl, 'create_default_context', return_value=context):
+            self.assertIs(rebuild.download_context(), context)
+        context.load_verify_locations.assert_not_called()
+
+    def test_download_context_requires_peer_verification(self):
+        context = rebuild.download_context()
+        self.assertEqual(context.verify_mode, ssl.CERT_REQUIRED)
+        self.assertTrue(context.check_hostname)
 
     def test_user_size_ceiling_is_strict_and_preference_separate(self):
         lock = {'maximum_database_bytes': 481000000, 'preferred_database_bytes': 480000000}

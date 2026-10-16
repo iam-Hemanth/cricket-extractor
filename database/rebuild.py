@@ -8,6 +8,7 @@ from pathlib import Path
 import pwd
 import shlex
 import shutil
+import ssl
 import subprocess
 import sys
 import tarfile
@@ -92,6 +93,18 @@ def unpack_archive(archive, output, expected_hashes, expected_sizes):
         raise
 
 
+def download_context():
+    """Retain Python trust; use OS roots when a framework Python has none."""
+    context = ssl.create_default_context()
+    if not context.get_ca_certs() and ssl.get_default_verify_paths().capath is None:
+        for name in ('/etc/ssl/cert.pem', '/etc/ssl/certs/ca-certificates.crt',
+                     '/etc/pki/tls/certs/ca-bundle.crt'):
+            if Path(name).is_file():
+                context.load_verify_locations(cafile=name)
+                break
+    return context
+
+
 def fetch_payload(output, archive=None):
     lock = load_lock()
     verify_engine(lock)
@@ -107,7 +120,7 @@ def fetch_payload(output, archive=None):
                 raise ValueError('No approved snapshot download URL in lock')
             with temporary.open('xb') as target:
                 owns_temporary = True
-                with urllib.request.urlopen(url, timeout=60) as response:
+                with urllib.request.urlopen(url, timeout=60, context=download_context()) as response:
                     copied = 0
                     while chunk := response.read(1024 * 1024):
                         copied += len(chunk)

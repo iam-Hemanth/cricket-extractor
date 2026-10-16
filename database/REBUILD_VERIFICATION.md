@@ -16,8 +16,8 @@ The user later accepted approximately 483 MB; the builder retains the stricter g
 - Full build finished successfully in approximately 425 seconds before dump export;
   the new server was stopped after completion. The exported custom-format dump was
   195,785,613 bytes; compressed dump size is not the database-size measurement.
-- Eight archive, existing-path, implementation-integrity and strict-size-boundary
-  unit tests passed. The actual connection transaction failure was reproduced, then
+- Eleven archive, existing-path, implementation-integrity, TLS trust and
+  strict-size-boundary unit tests passed. The actual connection transaction failure was reproduced, then
   corrected by rolling back the guard's validation transaction before configuring
   read-only verification. The full fresh run exercised the corrected sequence.
 
@@ -81,3 +81,18 @@ completed database and rejects a result at or above 481,000,000 bytes instead of
 silently dropping data or declaring an oversized build successful. Hosted restoration,
 provider accounting, automatic six-hour updates, future data growth and full lake
 certification require their own verification.
+
+## Public download verification
+
+The published release download was fetched anonymously with certificate and
+hostname verification enabled, then its compressed archive and all three expanded
+input hashes were verified. A clean GitHub checkout exposed a framework-Python
+certificate-store issue on the original Mac; the downloader now retains Python's
+configured trust store or loads the OS CA bundle when Python has none. It never
+disables TLS verification and adds no dependency.
+
+The fresh full database run used commit `97712eec61f79501ee8cb7d58de5ed744d4ac141`.
+Only download handling changed afterward: AST comparison confirmed all database
+import, packing, oracle, size-check and lifecycle functions stayed identical.
+The final downloader passed the real anonymous download plus three new trust-store
+tests; the exact downloaded input hashes match those used by the full build.
